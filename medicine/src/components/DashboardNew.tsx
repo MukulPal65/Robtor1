@@ -1,21 +1,19 @@
 import React from 'react';
-import { 
-  Activity, 
-  Heart, 
-  TrendingUp, 
+import {
+  Activity,
+  Heart,
+  TrendingUp,
   Bell,
   Droplets,
   Moon,
   Flame,
   Target,
-  Award,
   AlertTriangle,
   Shield,
   Apple,
   Dumbbell,
   Brain,
   Sparkles,
-  TrendingDown,
   ArrowRight,
   Zap
 } from 'lucide-react';
@@ -249,7 +247,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               <p className="text-xs text-green-600 font-semibold">Based on your health data</p>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-4 mb-3 border border-green-200">
             <h4 className="font-bold text-sm text-gray-800 mb-2">Today's Meal Plan</h4>
             <div className="space-y-2">
@@ -290,7 +288,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               <p className="text-xs text-blue-600 font-semibold">Personalized workout routine</p>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl p-4 mb-3 border border-blue-200">
             <h4 className="font-bold text-sm text-gray-800 mb-2">Today's Workout</h4>
             <div className="space-y-2">
@@ -448,14 +446,14 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="day" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
               <Bar dataKey="steps" fill="url(#colorSteps)" radius={[8, 8, 0, 0]} />
               <defs>
                 <linearGradient id="colorSteps" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
-                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.3}/>
+                  <stop offset="0%" stopColor="#10b981" stopOpacity={0.8} />
+                  <stop offset="100%" stopColor="#10b981" stopOpacity={0.3} />
                 </linearGradient>
               </defs>
             </BarChart>
@@ -473,20 +471,20 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="time" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
-              <Area 
-                type="monotone" 
-                dataKey="bpm" 
-                stroke="#ef4444" 
-                fill="url(#colorHeart)" 
+              <Area
+                type="monotone"
+                dataKey="bpm"
+                stroke="#ef4444"
+                fill="url(#colorHeart)"
                 strokeWidth={2}
               />
               <defs>
                 <linearGradient id="colorHeart" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.6}/>
-                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.1}/>
+                  <stop offset="0%" stopColor="#ef4444" stopOpacity={0.6} />
+                  <stop offset="100%" stopColor="#ef4444" stopOpacity={0.1} />
                 </linearGradient>
               </defs>
             </AreaChart>
@@ -514,7 +512,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
             </PieChart>
@@ -537,7 +535,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
               <XAxis dataKey="day" stroke="#6b7280" />
               <YAxis stroke="#6b7280" />
-              <Tooltip 
+              <Tooltip
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
               />
               <Legend />

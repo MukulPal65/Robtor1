@@ -14,14 +14,7 @@ interface ChatAssistantProps {
 
 const ChatAssistant: React.FC<ChatAssistantProps> = ({ patientName = 'User' }) => {
   const [messages, setMessages] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  React.useEffect(() => {
-    loadHistory();
-  }, []);
-
   const loadHistory = async () => {
-    setLoading(true);
     try {
       const history = await ChatService.getHistory();
       if (history.length > 0) {
@@ -39,10 +32,12 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ patientName = 'User' }) =
       }
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
+
+  React.useEffect(() => {
+    loadHistory();
+  }, []);
 
   const [inputMessage, setInputMessage] = useState('');
 

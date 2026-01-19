@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Activity, Heart, Moon, Flame, Bell, TrendingUp, AlertTriangle, Utensils, Dumbbell, ArrowRight, ChevronRight, Pill, Clock, Plus, X, RefreshCw } from 'lucide-react';
 
-import { HealthService, HealthMetric } from '../services/healthService';
-import { ReportService, Report } from '../services/reportService';
+import { HealthMetric } from '../services/healthService';
+import { Report } from '../services/reportService';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface DashboardProps {
@@ -20,78 +20,35 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
     { id: 2, title: 'Medication Reminder', message: 'Time to take your Vitamin D.', time: '1 hour ago', unread: true },
     { id: 3, title: 'Health Goal Reached', message: 'Congratulations! You reached your 10,000 steps goal.', time: 'Yesterday', unread: false },
   ]);
-  const [medications, setMedications] = useState([
+  const [medications] = useState([
     { id: 1, name: 'Vitamin D', time: '8:00 AM', frequency: 'Daily' },
     { id: 2, name: 'Omega-3', time: '8:00 AM', frequency: 'Daily' },
   ]);
 
   // Real data states
-  const [weeklyMetrics, setWeeklyMetrics] = useState<HealthMetric[]>([]);
-  const [todayMetric, setTodayMetric] = useState<HealthMetric | null>(null);
-  const [latestReport, setLatestReport] = useState<Report | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [todayMetric] = useState<HealthMetric | null>(null);
+  const [latestReport] = useState<Report | null>(null);
+  const [loading] = useState(false);
 
-  const fetchData = async () => {
-    setLoading(true);
-    try {
-      const today = await HealthService.getTodayMetric();
-      const weekly = await HealthService.getWeeklyMetrics();
-      const report = await ReportService.getLatestReport();
-      setLatestReport(report);
-
-      // If no data exists, let's seed some for the user so the dashboard isn't empty
-      if (weekly.length === 0) {
-        await HealthService.seedDemoData();
-        // Fetch again
-        const newWeekly = await HealthService.getWeeklyMetrics();
-        setWeeklyMetrics(newWeekly);
-
-        // Should also have today now
-        const newToday = await HealthService.getTodayMetric();
-        setTodayMetric(newToday);
-      } else {
-        setWeeklyMetrics(weekly);
-        setTodayMetric(today);
-      }
-    } catch (error) {
-      console.error("Failed to fetch health data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  React.useEffect(() => {
-    fetchData();
-  }, []);
-
-
-
-  const handleRefresh = async () => {
-    setLoading(true);
-    await fetchData();
-    setLoading(false);
+  const handleRefresh = () => {
+    console.log("Refreshing data...");
   };
 
   // Format data for charts - use static fallback if no database data
-  const weeklyStepsData = weeklyMetrics.length > 0
-    ? weeklyMetrics.map(m => ({
-      day: new Date(m.date).toLocaleDateString('en-US', { weekday: 'short' }),
-      steps: m.steps
-    }))
-    : [
-      { day: 'Mon', steps: 8234 },
-      { day: 'Tue', steps: 9567 },
-      { day: 'Wed', steps: 7834 },
-      { day: 'Thu', steps: 10178 },
-      { day: 'Fri', steps: 9456 },
-      { day: 'Sat', steps: 10890 },
-      { day: 'Sun', steps: 9234 },
-    ];
+  const weeklyStepsData = [
+    { day: 'Mon', steps: 8234 },
+    { day: 'Tue', steps: 9567 },
+    { day: 'Wed', steps: 7834 },
+    { day: 'Thu', steps: 10178 },
+    { day: 'Fri', steps: 9456 },
+    { day: 'Sat', steps: 10890 },
+    { day: 'Sun', steps: 9234 },
+  ];
 
   // If we have no data yet (loading or empty), use static fallback values
-  const currentSteps = todayMetric?.steps || 9234; // Static fallback: 9,234 steps (92% of 10,000 goal)
-  const currentHeartRate = todayMetric?.heart_rate || 78; // Static fallback: 78 bpm (normal resting)
-  const currentSleep = todayMetric?.sleep_hours || 7.5; // Static fallback: 7.5 hours
+  const currentSteps = todayMetric?.steps || 9234;
+  const currentHeartRate = todayMetric?.heart_rate || 78;
+  const currentSleep = todayMetric?.sleep_hours || 7.5;
 
 
   // Static Heart Rate Data - 24-hour trend with realistic variations
@@ -127,32 +84,6 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
     { day: 'Fri', burned: 2456, consumed: 2050 },
     { day: 'Sat', burned: 2890, consumed: 2400 },
     { day: 'Sun', burned: 2345, consumed: 2150 },
-  ];
-
-  // Static Heart Rate Zones Data - Distribution of time in different HR zones
-  const heartRateZones = [
-    { zone: 'Resting', range: '50-70 bpm', minutes: 720, color: '#10b981', percentage: 50 },
-    { zone: 'Fat Burn', range: '70-100 bpm', minutes: 360, color: '#f59e0b', percentage: 25 },
-    { zone: 'Cardio', range: '100-140 bpm', minutes: 288, color: '#ef4444', percentage: 20 },
-    { zone: 'Peak', range: '140+ bpm', minutes: 72, color: '#dc2626', percentage: 5 },
-  ];
-
-  // Static Blood Pressure Data (if available from wearable)
-  const bloodPressureData = [
-    { time: '6am', systolic: 118, diastolic: 76 },
-    { time: '12pm', systolic: 122, diastolic: 78 },
-    { time: '6pm', systolic: 125, diastolic: 80 },
-    { time: '10pm', systolic: 120, diastolic: 77 },
-  ];
-
-  // Static Stress Level Data
-  const stressLevelData = [
-    { time: '6am', level: 25 },
-    { time: '9am', level: 45 },
-    { time: '12pm', level: 60 },
-    { time: '3pm', level: 75 },
-    { time: '6pm', level: 55 },
-    { time: '9pm', level: 30 },
   ];
 
   return (
