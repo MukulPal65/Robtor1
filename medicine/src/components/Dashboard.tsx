@@ -1,0 +1,1206 @@
+import React, { useState } from 'react';
+import { Activity, Heart, Moon, Flame, Bell, TrendingUp, AlertTriangle, Utensils, Dumbbell, ArrowRight, ChevronRight, Pill, Clock, Plus, X, RefreshCw } from 'lucide-react';
+
+import { HealthService, HealthMetric } from '../services/healthService';
+import { ReportService, Report } from '../services/reportService';
+import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+interface DashboardProps {
+  patientName?: string;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
+  const [showAddMedication, setShowAddMedication] = useState(false);
+  const [showDietPlan, setShowDietPlan] = useState(false);
+  const [showFitnessPlan, setShowFitnessPlan] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Medical Report Ready', message: 'Your latest blood test results have been analyzed.', time: '2 hours ago', unread: true },
+    { id: 2, title: 'Medication Reminder', message: 'Time to take your Vitamin D.', time: '1 hour ago', unread: true },
+    { id: 3, title: 'Health Goal Reached', message: 'Congratulations! You reached your 10,000 steps goal.', time: 'Yesterday', unread: false },
+  ]);
+  const [medications, setMedications] = useState([
+    { id: 1, name: 'Vitamin D', time: '8:00 AM', frequency: 'Daily' },
+    { id: 2, name: 'Omega-3', time: '8:00 AM', frequency: 'Daily' },
+  ]);
+
+  // Real data states
+  const [weeklyMetrics, setWeeklyMetrics] = useState<HealthMetric[]>([]);
+  const [todayMetric, setTodayMetric] = useState<HealthMetric | null>(null);
+  const [latestReport, setLatestReport] = useState<Report | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const today = await HealthService.getTodayMetric();
+      const weekly = await HealthService.getWeeklyMetrics();
+      const report = await ReportService.getLatestReport();
+      setLatestReport(report);
+
+      // If no data exists, let's seed some for the user so the dashboard isn't empty
+      if (weekly.length === 0) {
+        await HealthService.seedDemoData();
+        // Fetch again
+        const newWeekly = await HealthService.getWeeklyMetrics();
+        setWeeklyMetrics(newWeekly);
+
+        // Should also have today now
+        const newToday = await HealthService.getTodayMetric();
+        setTodayMetric(newToday);
+      } else {
+        setWeeklyMetrics(weekly);
+        setTodayMetric(today);
+      }
+    } catch (error) {
+      console.error("Failed to fetch health data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await fetchData();
+    setLoading(false);
+  };
+
+  // Format data for charts - use static fallback if no database data
+  const weeklyStepsData = weeklyMetrics.length > 0
+    ? weeklyMetrics.map(m => ({
+      day: new Date(m.date).toLocaleDateString('en-US', { weekday: 'short' }),
+      steps: m.steps
+    }))
+    : [
+      { day: 'Mon', steps: 8234 },
+      { day: 'Tue', steps: 9567 },
+      { day: 'Wed', steps: 7834 },
+      { day: 'Thu', steps: 10178 },
+      { day: 'Fri', steps: 9456 },
+      { day: 'Sat', steps: 10890 },
+      { day: 'Sun', steps: 9234 },
+    ];
+
+  // If we have no data yet (loading or empty), use static fallback values
+  const currentSteps = todayMetric?.steps || 9234; // Static fallback: 9,234 steps (92% of 10,000 goal)
+  const currentHeartRate = todayMetric?.heart_rate || 78; // Static fallback: 78 bpm (normal resting)
+  const currentSleep = todayMetric?.sleep_hours || 7.5; // Static fallback: 7.5 hours
+
+
+  // Static Heart Rate Data - 24-hour trend with realistic variations
+  const heartRateData = [
+    { time: '12am', bpm: 58 },
+    { time: '2am', bpm: 55 },
+    { time: '4am', bpm: 54 },
+    { time: '6am', bpm: 65 },
+    { time: '8am', bpm: 72 },
+    { time: '10am', bpm: 78 },
+    { time: '12pm', bpm: 82 },
+    { time: '2pm', bpm: 85 },
+    { time: '4pm', bpm: 88 },
+    { time: '6pm', bpm: 90 },
+    { time: '8pm', bpm: 75 },
+    { time: '10pm', bpm: 68 },
+  ];
+
+  // Static Sleep Analysis Data - Detailed breakdown of sleep stages
+  const sleepData = [
+    { name: 'Deep Sleep', value: 35, color: '#6366f1', percentage: '35%' },
+    { name: 'Light Sleep', value: 45, color: '#a78bfa', percentage: '45%' },
+    { name: 'REM Sleep', value: 15, color: '#c4b5fd', percentage: '15%' },
+    { name: 'Awake', value: 5, color: '#e9d5ff', percentage: '5%' },
+  ];
+
+  // Static Calories Data - Weekly burned vs consumed comparison
+  const caloriesData = [
+    { day: 'Mon', burned: 2340, consumed: 1980 },
+    { day: 'Tue', burned: 2567, consumed: 2100 },
+    { day: 'Wed', burned: 2234, consumed: 1850 },
+    { day: 'Thu', burned: 2678, consumed: 2200 },
+    { day: 'Fri', burned: 2456, consumed: 2050 },
+    { day: 'Sat', burned: 2890, consumed: 2400 },
+    { day: 'Sun', burned: 2345, consumed: 2150 },
+  ];
+
+  // Static Heart Rate Zones Data - Distribution of time in different HR zones
+  const heartRateZones = [
+    { zone: 'Resting', range: '50-70 bpm', minutes: 720, color: '#10b981', percentage: 50 },
+    { zone: 'Fat Burn', range: '70-100 bpm', minutes: 360, color: '#f59e0b', percentage: 25 },
+    { zone: 'Cardio', range: '100-140 bpm', minutes: 288, color: '#ef4444', percentage: 20 },
+    { zone: 'Peak', range: '140+ bpm', minutes: 72, color: '#dc2626', percentage: 5 },
+  ];
+
+  // Static Blood Pressure Data (if available from wearable)
+  const bloodPressureData = [
+    { time: '6am', systolic: 118, diastolic: 76 },
+    { time: '12pm', systolic: 122, diastolic: 78 },
+    { time: '6pm', systolic: 125, diastolic: 80 },
+    { time: '10pm', systolic: 120, diastolic: 77 },
+  ];
+
+  // Static Stress Level Data
+  const stressLevelData = [
+    { time: '6am', level: 25 },
+    { time: '9am', level: 45 },
+    { time: '12pm', level: 60 },
+    { time: '3pm', level: 75 },
+    { time: '6pm', level: 55 },
+    { time: '9pm', level: 30 },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 pb-24 relative overflow-hidden">
+      <div className="container mx-auto px-4 mt-4">
+
+      </div>
+      {/* Decorative Background Elements */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+
+      {/* Header */}
+      <div className="bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-6 py-8 rounded-b-[2rem] shadow-2xl relative overflow-hidden">
+        {/* Header Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-40 h-40 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+          <div className="absolute bottom-0 right-0 w-60 h-60 border-2 border-white rounded-full translate-x-1/3 translate-y-1/3"></div>
+        </div>
+
+        <div className="flex items-center justify-between mb-4 relative z-10">
+          <div>
+            <h1 className="text-2xl font-bold drop-shadow-lg">Welcome back, {patientName}! 👋</h1>
+            <p className="text-green-100 text-sm mt-1">Your health is looking great today</p>
+          </div>
+          <div className="flex items-center space-x-3 relative z-10">
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-all shadow-lg relative"
+            >
+              <Bell className="w-6 h-6" />
+              {notifications.filter(n => n.unread).length > 0 && (
+                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+              )}
+            </button>
+            <button
+              onClick={handleRefresh}
+              className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-all shadow-lg flex items-center justify-center"
+            >
+              <RefreshCw className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Notification Drawer Overlay */}
+      {showNotifications && (
+        <div className="fixed inset-0 z-[110] flex justify-end">
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setShowNotifications(false)}></div>
+          <div className="relative w-full max-w-sm bg-white h-full shadow-2xl animate-fade-in-right overflow-y-auto">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
+              <h2 className="text-xl font-bold text-gray-800 flex items-center">
+                <Bell className="w-5 h-5 mr-2 text-green-600" />
+                Notifications
+              </h2>
+              <button onClick={() => setShowNotifications(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              {notifications.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">No new notifications</div>
+              ) : (
+                notifications.map(notification => (
+                  <div
+                    key={notification.id}
+                    className={`p-4 rounded-2xl border transition-all hover:shadow-md ${notification.unread ? 'bg-green-50/50 border-green-100' : 'bg-white border-gray-100'}`}
+                  >
+                    <div className="flex justify-between items-start mb-1">
+                      <h3 className={`font-bold text-sm ${notification.unread ? 'text-green-800' : 'text-gray-700'}`}>{notification.title}</h3>
+                      <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{notification.time}</span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-relaxed">{notification.message}</p>
+                    {notification.unread && (
+                      <button
+                        onClick={() => setNotifications(notifications.map(n => n.id === notification.id ? { ...n, unread: false } : n))}
+                        className="mt-2 text-[10px] font-bold text-green-600 uppercase hover:underline"
+                      >
+                        Mark as read
+                      </button>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )
+      }
+
+      <div className="px-6 -mt-6">
+        {/* Overall Health Score */}
+        <div className="card mb-6 bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-200 rounded-full -translate-y-1/2 translate-x-1/2 opacity-20"></div>
+          <div className="flex items-center justify-between relative z-10">
+            <div className="flex items-center space-x-4">
+              <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-4 rounded-2xl shadow-lg">
+                <Activity className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Overall Health Score</h3>
+                <p className="text-xs text-gray-600">Based on your wearable data & activity</p>
+              </div>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="relative w-24 h-24">
+                <svg className="transform -rotate-90 w-24 h-24">
+                  <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="8" fill="none" />
+                  <circle cx="48" cy="48" r="40" stroke="url(#healthGradient)" strokeWidth="8" fill="none"
+                    strokeDasharray={`${2 * Math.PI * 40}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.87)}`}
+                    strokeLinecap="round" />
+                </svg>
+                <defs>
+                  <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#6366f1" />
+                    <stop offset="100%" stopColor="#a855f7" />
+                  </linearGradient>
+                </defs>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-2xl font-bold text-indigo-600">87%</span>
+                </div>
+              </div>
+              <p className="text-xs font-semibold text-green-600 mt-1">Excellent</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {/* Steps Card */}
+          <div className="card hover:shadow-lg transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="bg-blue-100 p-3 rounded-xl">
+                <Activity className="w-6 h-6 text-blue-600" />
+              </div>
+            </div>
+            <h3 className="text-sm text-gray-600 mb-1">Steps</h3>
+            <p className="text-2xl font-bold text-gray-800">{currentSteps.toLocaleString()}</p>
+            <div className="flex items-center mt-2">
+              <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style={{ width: '92%' }}></div>
+              </div>
+              <span className="text-xs text-gray-500">92%</span>
+            </div>
+          </div>
+
+          {/* Heart Rate Card */}
+          <div className="card hover:shadow-lg transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="bg-red-100 p-3 rounded-xl">
+                <Heart className="w-6 h-6 text-red-600" />
+              </div>
+            </div>
+            <h3 className="text-sm text-gray-600 mb-1">Heart Rate</h3>
+            <p className="text-2xl font-bold text-gray-800">{currentHeartRate} <span className="text-sm text-gray-500">bpm</span></p>
+            <p className="text-xs text-green-600 mt-2">Normal range</p>
+          </div>
+
+          {/* Sleep Card */}
+          <div className="card hover:shadow-lg transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="bg-purple-100 p-3 rounded-xl">
+                <Moon className="w-6 h-6 text-purple-600" />
+              </div>
+            </div>
+            <h3 className="text-sm text-gray-600 mb-1">Sleep</h3>
+            <p className="text-2xl font-bold text-gray-800">{currentSleep}h</p>
+            <p className="text-xs text-blue-600 mt-2">+12 min vs avg</p>
+          </div>
+
+          {/* Calories Card */}
+          <div className="card hover:shadow-lg transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="bg-orange-100 p-3 rounded-xl">
+                <Flame className="w-6 h-6 text-orange-600" />
+              </div>
+            </div>
+            <h3 className="text-sm text-gray-600 mb-1">Calories</h3>
+            <p className="text-2xl font-bold text-gray-800">2,345</p>
+            <p className="text-xs text-orange-600 mt-2">Burned today</p>
+          </div>
+        </div>
+
+        {/* Early Risk Prediction - Main Feature */}
+        <div className="card mb-6 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200">
+          <div className="flex items-start space-x-4">
+            <div className="bg-gradient-to-br from-red-500 to-orange-600 p-3 rounded-xl shadow-lg">
+              <AlertTriangle className="w-7 h-7 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-lg font-bold text-gray-800 mb-2">Early Risk Prediction</h3>
+              <p className="text-sm text-gray-600 mb-3">
+                AI-powered analysis of your health trends to predict and prevent future risks
+              </p>
+
+              {/* Risk Cards */}
+              <div className="space-y-3">
+                {/* Low Risk */}
+                <div className="bg-white rounded-xl p-4 border-2 border-green-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-800">Cardiovascular Health</span>
+                    <span className="text-xs font-bold text-green-600 bg-green-100 px-3 py-1 rounded-full">Low Risk</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-2">Your heart rate and activity levels are excellent. Keep up the good work!</p>
+                  <div className="flex items-center text-xs text-green-700">
+                    <TrendingUp className="w-4 h-4 mr-1" />
+                    <span className="font-semibold">Prevention: Continue regular exercise and balanced diet</span>
+                  </div>
+                </div>
+
+                {/* Medium Risk */}
+                <div className="bg-white rounded-xl p-4 border-2 border-yellow-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-gray-800">Sleep Quality</span>
+                    <span className="text-xs font-bold text-yellow-600 bg-yellow-100 px-3 py-1 rounded-full">Medium Risk</span>
+                  </div>
+                  <p className="text-xs text-gray-600 mb-2">Slight irregularities detected in sleep patterns over the past week.</p>
+                  <div className="flex items-center text-xs text-yellow-700">
+                    <Moon className="w-4 h-4 mr-1" />
+                    <span className="font-semibold">Treatment: Aim for consistent 8-hour sleep schedule</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setShowAnalytics(true)}
+                className="w-full mt-4 bg-gradient-to-r from-red-500 to-orange-600 text-white py-3 rounded-xl text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2">
+                <span>View Detailed Analysis</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Custom Diet & Fitness Plans */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          {/* Custom Diet Plan */}
+          <div className="card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 hover:shadow-lg transition-all">
+            <div className="flex items-start space-x-3 mb-4">
+              <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-xl shadow-lg">
+                <Utensils className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800">Custom Diet Plan</h3>
+                <p className="text-xs text-gray-600 mt-1">AI-generated based on your health data</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="bg-white rounded-lg p-3 border border-green-200">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-semibold text-gray-800">Today's Goal</span>
+                  <span className="text-xs text-green-600 font-bold">2,150 cal</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full" style={{ width: '68%' }}></div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">1,462 consumed • 688 remaining</p>
+              </div>
+
+              <div className="bg-white rounded-lg p-3 border border-green-200">
+                <p className="text-xs font-semibold text-gray-700 mb-2">Recommended Meals:</p>
+                <ul className="space-y-1 text-xs text-gray-600">
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    {latestReport?.analysis_result?.diet_plan?.breakfast || 'High-protein breakfast with oats'}
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    {latestReport?.analysis_result?.diet_plan?.lunch || 'Grilled chicken with vegetables'}
+                  </li>
+                  <li className="flex items-center">
+                    <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                    {latestReport?.analysis_result?.diet_plan?.dinner || 'Light dinner with salmon'}
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowDietPlan(true)}
+              className="w-full mt-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2">
+              <span>View Full Plan</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Custom Fitness Plan */}
+          <div className="card bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 hover:shadow-lg transition-all">
+            <div className="flex items-start space-x-3 mb-4">
+              <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-3 rounded-xl shadow-lg">
+                <Dumbbell className="w-6 h-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-gray-800">Custom Fitness Plan</h3>
+                <p className="text-xs text-gray-600 mt-1">Personalized workout schedule</p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="bg-white rounded-lg p-3 border border-blue-200">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-semibold text-gray-800">Weekly Progress</span>
+                  <span className="text-xs text-blue-600 font-bold">4/5 days</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-gradient-to-r from-blue-500 to-cyan-600 h-2 rounded-full" style={{ width: '80%' }}></div>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">1 workout remaining this week</p>
+              </div>
+
+              <div className="bg-white rounded-lg p-3 border border-blue-200">
+                <p className="text-xs font-semibold text-gray-700 mb-2">Today's Workout:</p>
+                <ul className="space-y-1 text-xs text-gray-600">
+                  {latestReport?.analysis_result?.fitness_plan?.exercises ? (
+                    latestReport.analysis_result.fitness_plan.exercises.map((ex: any, i: number) => (
+                      <li key={i} className="flex items-center">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        {ex.name} ({ex.duration})
+                      </li>
+                    ))
+                  ) : (
+                    <>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        30 min cardio (based on heart rate)
+                      </li>
+                      <li className="flex items-center">
+                        <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                        Upper body strength training
+                      </li>
+                    </>
+                  )}
+                </ul>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowFitnessPlan(true)}
+              className="w-full mt-4 bg-gradient-to-r from-blue-500 to-cyan-600 text-white py-2.5 rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2">
+              <span>Start Workout</span>
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Medication Reminders */}
+        <div className="card mb-6 bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 relative overflow-hidden">
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200 rounded-full -translate-y-1/2 translate-x-1/2 opacity-20"></div>
+
+          <div className="flex items-center justify-between mb-4 relative z-10">
+            <div className="flex items-center space-x-3">
+              <div className="bg-gradient-to-br from-purple-500 to-pink-600 p-3 rounded-xl shadow-lg">
+                <Pill className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-gray-800">Medication Reminders</h3>
+                <p className="text-xs text-gray-600">Never miss your medications</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setShowAddMedication(true)}
+              className="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-2 rounded-lg hover:shadow-lg transition-all"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          </div>
+
+          <div className="space-y-3 relative z-10">
+            {medications.map((med) => (
+              <div key={med.id} className="bg-white/80 backdrop-blur-sm rounded-xl p-4 border-2 border-purple-100 hover:shadow-md transition-all">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-purple-100 p-2 rounded-lg">
+                      <Pill className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-800">{med.name}</p>
+                      <div className="flex items-center space-x-2 text-xs text-gray-600 mt-1">
+                        <Clock className="w-3 h-3" />
+                        <span>{med.time}</span>
+                        <span className="text-purple-600">• {med.frequency}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <button className="text-green-600 hover:text-green-700 bg-green-100 px-4 py-2 rounded-lg font-semibold text-sm transition-all hover:shadow-md">
+                    Take
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {medications.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <Pill className="w-12 h-12 mx-auto mb-2 opacity-30" />
+              <p className="text-sm">No medications added yet</p>
+              <p className="text-xs mt-1">Click + to add your first medication</p>
+            </div>
+          )}
+        </div>
+
+        {/* Add Medication Modal */}
+        {showAddMedication && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl animate-slide-up">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-xl font-bold text-gray-800">Add Medication</h3>
+                <button
+                  onClick={() => setShowAddMedication(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-all"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Medication Name</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Aspirin, Vitamin C"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Time</label>
+                  <input
+                    type="time"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Frequency</label>
+                  <select className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    <option>Daily</option>
+                    <option>Twice Daily</option>
+                    <option>Three Times Daily</option>
+                    <option>Weekly</option>
+                    <option>As Needed</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Notes (Optional)</label>
+                  <textarea
+                    placeholder="e.g., Take with food"
+                    rows={3}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex space-x-3 mt-6">
+                <button
+                  onClick={() => setShowAddMedication(false)}
+                  className="flex-1 py-3 border-2 border-gray-200 text-gray-700 font-semibold rounded-xl hover:bg-gray-50 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // Add medication logic here
+                    setShowAddMedication(false);
+                  }}
+                  className="flex-1 py-3 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+                >
+                  Add Reminder
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Analytics Section */}
+        <div className="mb-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">Your Health Analytics</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Weekly Steps */}
+            <div className="card">
+              <h4 className="font-semibold text-gray-800 mb-4">Weekly Steps</h4>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={weeklyStepsData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="day" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                  />
+                  <Bar dataKey="steps" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Heart Rate Trend */}
+            <div className="card">
+              <h4 className="font-semibold text-gray-800 mb-4">Heart Rate Trend</h4>
+              <ResponsiveContainer width="100%" height={180}>
+                <AreaChart data={heartRateData}>
+                  <defs>
+                    <linearGradient id="colorBpm" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#ef4444" stopOpacity={0.8} />
+                      <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="time" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                  />
+                  <Area type="monotone" dataKey="bpm" stroke="#ef4444" fillOpacity={1} fill="url(#colorBpm)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Sleep Analysis */}
+            <div className="card">
+              <h4 className="font-semibold text-gray-800 mb-4">Sleep Analysis</h4>
+              <ResponsiveContainer width="100%" height={180}>
+                <PieChart>
+                  <Pie
+                    data={sleepData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={70}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {sleepData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="flex justify-center space-x-4 mt-2">
+                {sleepData.map((item) => (
+                  <div key={item.name} className="flex items-center space-x-1">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }}></div>
+                    <span className="text-xs text-gray-600">{item.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Calories Burned vs Consumed */}
+            <div className="card">
+              <h4 className="font-semibold text-gray-800 mb-4">Calories: Burned vs Consumed</h4>
+              <ResponsiveContainer width="100%" height={180}>
+                <BarChart data={caloriesData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="day" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: '8px' }}
+                  />
+                  <Legend />
+                  <Bar dataKey="burned" fill="#f97316" radius={[8, 8, 0, 0]} name="Burned" />
+                  <Bar dataKey="consumed" fill="#3b82f6" radius={[8, 8, 0, 0]} name="Consumed" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        </div>
+
+        {/* Daily Goals Progress */}
+        <div className="card mb-6">
+          <h3 className="text-lg font-bold text-gray-800 mb-4">Today's Progress</h3>
+          <div className="grid grid-cols-3 gap-6">
+            {/* Steps Circle */}
+            <div className="flex flex-col items-center">
+              <div className="relative w-24 h-24">
+                <svg className="transform -rotate-90 w-24 h-24">
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="#e5e7eb"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="#3b82f6"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 40}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.92)}`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-lg font-bold text-gray-800">92%</span>
+                </div>
+              </div>
+              <p className="text-sm font-semibold text-gray-700 mt-2">Steps</p>
+              <p className="text-xs text-gray-500">9,234/10,000</p>
+            </div>
+
+            {/* Water Circle */}
+            <div className="flex flex-col items-center">
+              <div className="relative w-24 h-24">
+                <svg className="transform -rotate-90 w-24 h-24">
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="#e5e7eb"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="#06b6d4"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 40}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.75)}`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-lg font-bold text-gray-800">75%</span>
+                </div>
+              </div>
+              <p className="text-sm font-semibold text-gray-700 mt-2">Water</p>
+              <p className="text-xs text-gray-500">6/8 glasses</p>
+            </div>
+
+            {/* Calories Circle */}
+            <div className="flex flex-col items-center">
+              <div className="relative w-24 h-24">
+                <svg className="transform -rotate-90 w-24 h-24">
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="#e5e7eb"
+                    strokeWidth="8"
+                    fill="none"
+                  />
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="40"
+                    stroke="#f97316"
+                    strokeWidth="8"
+                    fill="none"
+                    strokeDasharray={`${2 * Math.PI * 40}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.88)}`}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-lg font-bold text-gray-800">88%</span>
+                </div>
+              </div>
+              <p className="text-sm font-semibold text-gray-700 mt-2">Calories</p>
+              <p className="text-xs text-gray-500">2,345/2,650</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Diet Plan Modal */}
+      {
+        showDietPlan && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-xl">
+                    <Utensils className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800">Your Custom Diet Plan</h3>
+                </div>
+                <button onClick={() => setShowDietPlan(false)} className="text-gray-400 hover:text-gray-600">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Daily Nutrition Goals */}
+                <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
+                  <h4 className="font-bold text-gray-800 mb-3">Daily Nutrition Goals</h4>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-xs text-gray-600">Calories</p>
+                      <p className="text-lg font-bold text-gray-800">2,150</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-xs text-gray-600">Protein</p>
+                      <p className="text-lg font-bold text-gray-800">120g</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-xs text-gray-600">Carbs</p>
+                      <p className="text-lg font-bold text-gray-800">200g</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <p className="text-xs text-gray-600">Fats</p>
+                      <p className="text-lg font-bold text-gray-800">65g</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Meal Plan */}
+                <div>
+                  <h4 className="font-bold text-gray-800 mb-3">Today's Meal Plan</h4>
+                  <div className="space-y-3">
+                    <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-4 border-2 border-yellow-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-gray-800">Breakfast</h5>
+                      </div>
+                      <p className="text-sm text-gray-700">{latestReport?.analysis_result?.diet_plan?.breakfast || 'Oatmeal with berries and almonds'}</p>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-gray-800">Lunch</h5>
+                      </div>
+                      <p className="text-sm text-gray-700">{latestReport?.analysis_result?.diet_plan?.lunch || 'Grilled chicken breast (150g)'}</p>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-200">
+                      <div className="flex items-center justify-between mb-2">
+                        <h5 className="font-bold text-gray-800">Dinner</h5>
+                      </div>
+                      <p className="text-sm text-gray-700">{latestReport?.analysis_result?.diet_plan?.dinner || 'Baked salmon (180g)'}</p>
+                    </div>
+
+                    {latestReport?.analysis_result?.diet_plan?.snacks && (
+                      <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-bold text-gray-800">Snacks</h5>
+                        </div>
+                        <ul className="space-y-1 text-sm text-gray-700">
+                          {latestReport.analysis_result.diet_plan.snacks.map((snack: string, i: number) => (
+                            <li key={i}>• {snack}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {latestReport?.analysis_result?.diet_plan?.avoid && (
+                      <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
+                        <div className="flex items-center justify-between mb-2">
+                          <h5 className="font-bold text-red-800">Foods to Avoid</h5>
+                        </div>
+                        <ul className="space-y-1 text-sm text-red-700">
+                          {latestReport.analysis_result.diet_plan.avoid.map((food: string, i: number) => (
+                            <li key={i}>• {food}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tips */}
+                <div className="bg-indigo-50 rounded-xl p-4 border-2 border-indigo-200">
+                  <h4 className="font-bold text-gray-800 mb-2">💡 Nutrition Tips</h4>
+                  <ul className="space-y-1 text-sm text-gray-700">
+                    <li>• Drink 8-10 glasses of water throughout the day</li>
+                    <li>• Eat slowly and mindfully</li>
+                    <li>• Avoid processed foods and added sugars</li>
+                    <li>• Include protein in every meal for sustained energy</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      {/* Fitness Plan Modal */}
+      {
+        showFitnessPlan && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gradient-to-br from-blue-500 to-cyan-600 p-3 rounded-xl">
+                    <Dumbbell className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800">Your Custom Fitness Plan</h3>
+                </div>
+                <button onClick={() => setShowFitnessPlan(false)} className="text-gray-400 hover:text-gray-600">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Weekly Progress */}
+                <div className="bg-blue-50 rounded-xl p-4 border-2 border-blue-200">
+                  <h4 className="font-bold text-gray-800 mb-3">This Week's Progress</h4>
+                  <div className="grid grid-cols-3 gap-3">
+                    <div className="bg-white rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-blue-600">4/5</p>
+                      <p className="text-xs text-gray-600">Workouts</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-green-600">245</p>
+                      <p className="text-xs text-gray-600">Minutes</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-orange-600">1,850</p>
+                      <p className="text-xs text-gray-600">Calories</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Today's Workout */}
+                <div>
+                  <h4 className="font-bold text-gray-800 mb-3">Today's Workout Plan</h4>
+                  <div className="space-y-3">
+                    <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h5 className="font-bold text-gray-800">Warm-up</h5>
+                        <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">10 min</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
+                          Light jogging - 5 minutes
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
+                          Dynamic stretching - 5 minutes
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h5 className="font-bold text-gray-800">Cardio (Based on Heart Rate)</h5>
+                        <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">30 min</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
+                          Running - Target HR: 140-150 bpm - 20 min
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
+                          High-intensity intervals - 10 min
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h5 className="font-bold text-gray-800">Strength Training</h5>
+                        <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">25 min</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
+                          Push-ups - 3 sets of 15 reps
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
+                          Dumbbell rows - 3 sets of 12 reps
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">3</span>
+                          Plank hold - 3 sets of 45 seconds
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">4</span>
+                          Bicep curls - 3 sets of 12 reps
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <h5 className="font-bold text-gray-800">Cool Down & Stretching</h5>
+                        <span className="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded-full">15 min</span>
+                      </div>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
+                          Light walking - 5 minutes
+                        </li>
+                        <li className="flex items-center">
+                          <span className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
+                          Full body stretching - 10 minutes
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Tips */}
+                <div className="bg-indigo-50 rounded-xl p-4 border-2 border-indigo-200">
+                  <h4 className="font-bold text-gray-800 mb-2">💪 Fitness Tips</h4>
+                  <ul className="space-y-1 text-sm text-gray-700">
+                    <li>• Stay hydrated - drink water before, during, and after exercise</li>
+                    <li>• Listen to your body - rest if you feel pain</li>
+                    <li>• Maintain proper form to prevent injuries</li>
+                    <li>• Your heart rate data helps optimize cardio intensity</li>
+                  </ul>
+                </div>
+
+                <button className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 text-white py-3 rounded-xl font-bold hover:shadow-lg transition-all">
+                  Start Workout Session
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      }
+
+      {/* Analytics Modal */}
+      {
+        showAnalytics && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-[9999] p-4">
+            <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slide-up">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="bg-gradient-to-br from-red-500 to-orange-600 p-3 rounded-xl">
+                    <AlertTriangle className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-800">Detailed Risk Analysis</h3>
+                </div>
+                <button onClick={() => setShowAnalytics(false)} className="text-gray-400 hover:text-gray-600">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Risk Overview */}
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-5 border-2 border-red-200">
+                  <h4 className="font-bold text-gray-800 mb-4 text-lg">Health Risk Overview</h4>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="bg-white rounded-lg p-4 text-center border-2 border-green-200">
+                      <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
+                        <Heart className="w-8 h-8 text-green-600" />
+                      </div>
+                      <p className="text-2xl font-bold text-green-600">Low</p>
+                      <p className="text-xs text-gray-600 mt-1">Cardiovascular</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 text-center border-2 border-yellow-200">
+                      <div className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-2">
+                        <Moon className="w-8 h-8 text-yellow-600" />
+                      </div>
+                      <p className="text-2xl font-bold text-yellow-600">Medium</p>
+                      <p className="text-xs text-gray-600 mt-1">Sleep Quality</p>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 text-center border-2 border-green-200">
+                      <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
+                        <Activity className="w-8 h-8 text-green-600" />
+                      </div>
+                      <p className="text-2xl font-bold text-green-600">Low</p>
+                      <p className="text-xs text-gray-600 mt-1">Activity Level</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detailed Analysis */}
+                <div>
+                  <h4 className="font-bold text-gray-800 mb-4 text-lg">Detailed Analysis</h4>
+                  <div className="space-y-4">
+                    {/* Cardiovascular */}
+                    <div className="bg-green-50 rounded-xl p-5 border-2 border-green-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <Heart className="w-6 h-6 text-green-600" />
+                          <h5 className="font-bold text-gray-800">Cardiovascular Health</h5>
+                        </div>
+                        <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold">Low Risk</span>
+                      </div>
+                      <div className="space-y-2 text-sm text-gray-700">
+                        <p><strong>Current Status:</strong> Your heart rate averages 72 bpm (resting), which is in the excellent range for your age group.</p>
+                        <p><strong>Activity Level:</strong> You're consistently hitting 9,000+ steps daily with good cardio sessions.</p>
+                        <p><strong>Prediction:</strong> Based on current trends, you have a 95% likelihood of maintaining healthy cardiovascular function.</p>
+                        <p className="text-green-700 font-semibold mt-3">✓ Recommendations: Continue current exercise routine, maintain balanced diet, monitor weekly.</p>
+                      </div>
+                    </div>
+
+                    {/* Sleep Quality */}
+                    <div className="bg-yellow-50 rounded-xl p-5 border-2 border-yellow-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <Moon className="w-6 h-6 text-yellow-600" />
+                          <h5 className="font-bold text-gray-800">Sleep Quality</h5>
+                        </div>
+                        <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-sm font-bold">Medium Risk</span>
+                      </div>
+                      <div className="space-y-2 text-sm text-gray-700">
+                        <p><strong>Current Status:</strong> Average 7h 32m per night, with irregular sleep patterns detected over the past week.</p>
+                        <p><strong>Deep Sleep:</strong> 35% of total sleep (target: 20-25%) - Good</p>
+                        <p><strong>REM Sleep:</strong> 15% of total sleep (target: 20-25%) - Slightly low</p>
+                        <p><strong>Prediction:</strong> If patterns continue, 60% risk of sleep-related fatigue issues within 30 days.</p>
+                        <p className="text-yellow-700 font-semibold mt-3">⚠ Recommendations: Establish consistent 10 PM bedtime, limit screen time 1 hour before sleep, consider relaxation techniques.</p>
+                      </div>
+                    </div>
+
+                    {/* Activity Level */}
+                    <div className="bg-blue-50 rounded-xl p-5 border-2 border-blue-200">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center space-x-3">
+                          <Activity className="w-6 h-6 text-blue-600" />
+                          <h5 className="font-bold text-gray-800">Physical Activity</h5>
+                        </div>
+                        <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-bold">Excellent</span>
+                      </div>
+                      <div className="space-y-2 text-sm text-gray-700">
+                        <p><strong>Weekly Average:</strong> 9,500 steps/day with 4 structured workouts</p>
+                        <p><strong>Calorie Burn:</strong> Consistently burning 2,300-2,500 calories daily</p>
+                        <p><strong>Trend:</strong> 12% improvement in activity levels over the past month</p>
+                        <p className="text-blue-700 font-semibold mt-3">✓ Excellent work! Maintain current activity levels for optimal health.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Action Plan */}
+                <div className="bg-indigo-50 rounded-xl p-5 border-2 border-indigo-200">
+                  <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                    <TrendingUp className="w-5 h-5 mr-2 text-indigo-600" />
+                    30-Day Action Plan
+                  </h4>
+                  <div className="space-y-2 text-sm text-gray-700">
+                    <p>• <strong>Week 1-2:</strong> Focus on establishing consistent sleep schedule (10 PM - 6 AM)</p>
+                    <p>• <strong>Week 2-3:</strong> Maintain current exercise routine, add 10-minute evening meditation</p>
+                    <p>• <strong>Week 3-4:</strong> Monitor improvements in REM sleep percentage</p>
+                    <p>• <strong>Ongoing:</strong> Continue tracking all metrics through your wearable device</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </div >
+  );
+};
+
+export default Dashboard;
