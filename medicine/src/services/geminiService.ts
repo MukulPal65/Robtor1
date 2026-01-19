@@ -1,4 +1,159 @@
-const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
+// --- Adapter Interfaces ---
+
+interface RequestOptions {
+    url: string;
+    method: string;
+    headers: Record<string, string>;
+    body: string;
+}
+
+interface AIProvider {
+    name: string;
+    apiKey: string;
+    model: string;
+    // Adapter function converts standard inputs to provider-specific request
+    createChatRequest: (apiKey: string, model: string, userMessage: string) => RequestOptions;
+    createImageRequest: (apiKey: string, model: string, prompt: string, base64Image: string, mimeType: string) => RequestOptions;
+    // Adapter function to extract text from provider-specific response
+    extractContent: (response: any) => string;
+}
+
+// --- Adapters ---
+
+// 1. OpenAI Compatible Adapter (Works for OpenAI, Groq, OpenRouter, HuggingFace)
+const OpenAIAdapter = {
+    createChatRequest: (apiKey: string, model: string, userMessage: string, baseUrl: string, headers: Record<string, string> = {}): RequestOptions => ({
+        url: baseUrl,
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            ...headers
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: [{ role: "user", content: userMessage }]
+        })
+    }),
+    createImageRequest: (apiKey: string, model: string, prompt: string, base64Image: string, mimeType: string, baseUrl: string, headers: Record<string, string> = {}): RequestOptions => ({
+        url: baseUrl,
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+            ...headers
+        },
+        body: JSON.stringify({
+            model: model,
+            messages: [
+                {
+                    role: "user",
+                    content: [
+                        { type: "text", text: prompt },
+                        { type: "image_url", image_url: { url: `data:${mimeType};base64,${base64Image}` } }
+                    ]
+                }
+            ]
+        })
+    }),
+    extractContent: (data: any) => {
+        if (data.error) throw new Error(data.error.message || "API Error");
+        return data.choices?.[0]?.message?.content || "";
+    }
+};
+
+// 2. Google Gemini Direct Adapter
+const GoogleAdapter = {
+    createChatRequest: (apiKey: string, model: string, userMessage: string): RequestOptions => ({
+        url: `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            contents: [{ parts: [{ text: userMessage }] }]
+        })
+    }),
+    createImageRequest: (apiKey: string, model: string, prompt: string, base64Image: string, mimeType: string): RequestOptions => ({
+        url: `https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`,
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            contents: [{
+                parts: [
+                    { text: prompt },
+                    { inline_data: { mime_type: mimeType, data: base64Image } }
+                ]
+            }]
+        })
+    }),
+    extractContent: (data: any) => {
+        if (data.error) throw new Error(data.error.message || "Google API Error");
+        return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    }
+};
+
+// --- Provider Configuration ---
+
+const PROVIDERS: AIProvider[] = [
+    // 1. Groq (Fastest)
+    {
+        name: "Groq",
+        apiKey: import.meta.env.VITE_GROQ_API_KEY,
+        model: import.meta.env.VITE_GROQ_MODEL || "llama-3.3-70b-versatile",
+        createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(k, m, u, "https://api.groq.com/openai/v1/chat/completions"),
+        createImageRequest: (k, m, p, i, t) => OpenAIAdapter.createImageRequest(k, m, p, i, t, "https://api.groq.com/openai/v1/chat/completions"),
+        extractContent: OpenAIAdapter.extractContent
+    },
+    // 2. Google Gemini Direct
+    {
+        name: "Google Gemini",
+        apiKey: import.meta.env.VITE_GOOGLE_GEMINI_API_KEY,
+        model: "models/gemini-1.5-flash", // Use 1.5 Flash for best speed/cost balance
+        createChatRequest: GoogleAdapter.createChatRequest,
+        createImageRequest: GoogleAdapter.createImageRequest,
+        extractContent: GoogleAdapter.extractContent
+    },
+    // 3. OpenAI (Reliable)
+    {
+        name: "OpenAI",
+        apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+        model: import.meta.env.VITE_OPENAI_MODEL || "gpt-4o-mini",
+        createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(k, m, u, "https://api.openai.com/v1/chat/completions"),
+        createImageRequest: (k, m, p, i, t) => OpenAIAdapter.createImageRequest(k, m, p, i, t, "https://api.openai.com/v1/chat/completions"),
+        extractContent: OpenAIAdapter.extractContent
+    },
+    // 4. Hugging Face
+    {
+        name: "Hugging Face",
+        apiKey: import.meta.env.VITE_HUGGINGFACE_API_KEY,
+        model: import.meta.env.VITE_HUGGINGFACE_MODEL || "mistralai/Mixtral-8x7B-Instruct-v0.1",
+        createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(
+            k, m, u,
+            `https://api-inference.huggingface.co/models/${import.meta.env.VITE_HUGGINGFACE_MODEL || "mistralai/Mixtral-8x7B-Instruct-v0.1"}/v1/chat/completions`
+        ),
+        createImageRequest: (k, m, p, i, t) => OpenAIAdapter.createImageRequest(
+            k, m, p, i, t,
+            `https://api-inference.huggingface.co/models/${import.meta.env.VITE_HUGGINGFACE_MODEL || "mistralai/Mixtral-8x7B-Instruct-v0.1"}/v1/chat/completions`
+        ),
+        extractContent: OpenAIAdapter.extractContent
+    },
+    // 5. OpenRouter (Fallback)
+    {
+        name: "OpenRouter",
+        apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
+        model: import.meta.env.VITE_OPENROUTER_MODEL || "google/gemini-2.0-flash-exp:free",
+        createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(k, m, u, "https://openrouter.ai/api/v1/chat/completions", {
+            "HTTP-Referer": window.location.origin,
+            "X-Title": "Robtor Health"
+        }),
+        createImageRequest: (k, m, p, i, t) => OpenAIAdapter.createImageRequest(k, m, p, i, t, "https://openrouter.ai/api/v1/chat/completions", {
+            "HTTP-Referer": window.location.origin,
+            "X-Title": "Robtor Health"
+        }),
+        extractContent: OpenAIAdapter.extractContent
+    }
+];
+
+// --- Helpers & Logic ---
 
 async function fileToBase64(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
@@ -12,56 +167,75 @@ async function fileToBase64(file: File): Promise<string> {
     });
 }
 
+// Generic execution wrapper with fallback
+async function executeWithFallback(
+    operationName: string,
+    executeOperation: (provider: AIProvider) => Promise<any>
+): Promise<any> {
+    let lastError: any = null;
+    let attempts = 0;
+
+    for (const provider of PROVIDERS) {
+        // Skip if API key is missing or placeholder
+        if (!provider.apiKey || provider.apiKey.includes('your_') || provider.apiKey.length < 5) {
+            console.warn(`[AIService] Skipping ${provider.name} - No valid API key found.`);
+            continue;
+        }
+
+        attempts++;
+        try {
+            console.log(`[AIService] Attempting ${operationName} with ${provider.name}...`);
+            const result = await executeOperation(provider);
+            console.log(`[AIService] Success with ${provider.name}`);
+            return result;
+        } catch (error: any) {
+            console.warn(`[AIService] Failed with ${provider.name}:`, error.message || error);
+            lastError = error;
+            // Continue to next provider
+        }
+    }
+
+    if (attempts === 0) throw new Error("No AI providers configured. Check .env file.");
+    throw lastError || new Error("All AI providers failed.");
+}
+
 export const GeminiService = {
     async generateResponse(userMessage: string): Promise<string> {
-        if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'your_openrouter_key_here') {
-            return "Error: OpenRouter API Key not configured. Please add VITE_OPENROUTER_API_KEY to your .env file.";
-        }
-
-        try {
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                    "HTTP-Referer": window.location.origin,
-                    "X-Title": "Robtor Health Assistant",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "model": "google/gemini-2.0-flash-001",
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "You are Robtor, a helpful and empathetic personal AI health assistant. Provide helpful, concise, and safe responses. If the user asks for medical advice, kindly remind them that you are an AI and they should consult a doctor for serious concerns. Keep the tone professional yet warm. Do not make up facts."
-                        },
-                        {
-                            "role": "user",
-                            "content": userMessage
-                        }
-                    ]
-                })
+        return executeWithFallback("Chat Generation", async (provider) => {
+            const req = provider.createChatRequest(provider.apiKey, provider.model, userMessage);
+            const response = await fetch(req.url, {
+                method: req.method,
+                headers: req.headers,
+                body: req.body
             });
-
             const data = await response.json();
-            if (data.error) throw new Error(data.error.message || "OpenRouter API Error");
-            return data.choices[0].message.content;
-        } catch (error: any) {
-            console.error("OpenRouter/Gemini API Error:", error);
-            return "I'm having trouble connecting to my AI brain right now. Please try again later.";
-        }
+            return provider.extractContent(data);
+        });
     },
 
     async analyzeImage(file: File): Promise<any> {
-        if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'your_openrouter_key_here') {
-            throw new Error("OpenRouter API Key missing");
-        }
+        const base64Image = await fileToBase64(file);
+        // Note: Google requires proper MIME type, we'll extract it or default to jpeg
+        const mimeType = file.type || 'image/jpeg';
 
-        try {
-            const base64Image = await fileToBase64(file);
-            const prompt = `
+        const prompt = `
             You are an expert medical AI assistant. Analyze this medical report image.
             
-            Extract the following information and return it in valid JSON format ONLY (no markdown formatting, just the raw JSON object):
+            PART 1 - ANALYSIS:
+            1. Identify the key health parameters and their values.
+            2. Determine if each value is Normal, Low, or High.
+            3. Provide a brief interpretation of the findings.
+
+            PART 2 - RECOMMENDATIONS:
+            Based on the analysis, provide personalized recommendations for:
+            1. Diet (Meals + Tips)
+            2. Lifestyle changes
+            3. Exercise & Fitness
+            4. Yoga & Mindfulness
+            5. Things to avoid
+            6. Key Benefits of following this advice
+
+            You MUST return the result in the following JSON format ONLY (no markdown, just raw JSON):
             {
                 "health_score": <number between 0-100 based on overall results>,
                 "summary": "<brief 1-sentence summary of the user's health status>",
@@ -77,7 +251,16 @@ export const GeminiService = {
                 "recommendations": [
                     "<specific actionable recommendation 1>",
                     "<specific actionable recommendation 2>",
-                    "<specific actionable recommendation 3>"
+                    "<specific actionable recommendation 3>",
+                    "<specific actionable recommendation 4>",
+                    "<specific actionable recommendation 5>"
+                ],
+                "lifestyle_tips": [
+                    "<lifestyle tip 1>",
+                    "<lifestyle tip 2>",
+                    "<lifestyle tip 3>",
+                    "<lifestyle tip 4>",
+                    "<lifestyle tip 5>"
                 ],
                 "diet_plan": {
                     "breakfast": "<personalized breakfast recommendation>",
@@ -97,58 +280,42 @@ export const GeminiService = {
                         }
                     ],
                     "weekly_goal": "<summary goal for the week>"
-                }
+                },
+                "yoga_tips": [
+                    "<yoga/mindfulness practice 1>",
+                    "<yoga/mindfulness practice 2>",
+                    "<yoga/mindfulness practice 3>",
+                    "<yoga/mindfulness practice 4>",
+                    "<yoga/mindfulness practice 5>"
+                ],
+                "benefits": [
+                    "<benefit of following advice 1>",
+                    "<benefit of following advice 2>",
+                    "<benefit of following advice 3>",
+                    "<benefit of following advice 4>",
+                    "<benefit of following advice 5>"
+                ]
             }
 
-            If the image is not a medical report, return a JSON with health_score: 0 and summary: "This does not appear to be a valid medical report."
+            If the image is not a medical report, return a JSON with health_score: 0 and summary: "This does not appear to be a valid medical report." and empty arrays/objects for other fields.
             `;
 
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                    "HTTP-Referer": window.location.origin,
-                    "X-Title": "Robtor Health Assistant",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "model": "google/gemini-2.0-flash-001",
-                    "messages": [
-                        {
-                            "role": "user",
-                            "content": [
-                                { "type": "text", "text": prompt },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {
-                                        "url": `data:${file.type};base64,${base64Image}`
-                                    }
-                                }
-                            ]
-                        }
-                    ]
-                })
+        return executeWithFallback("Image Analysis", async (provider) => {
+            const req = provider.createImageRequest(provider.apiKey, provider.model, prompt, base64Image, mimeType);
+            const response = await fetch(req.url, {
+                method: req.method,
+                headers: req.headers,
+                body: req.body
             });
-
             const data = await response.json();
-            if (data.error) throw new Error(data.error.message || "OpenRouter API Error");
-
-            const text = data.choices[0].message.content;
+            const text = provider.extractContent(data);
             const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(cleanText);
-        } catch (error) {
-            console.error("Error analyzing image with OpenRouter:", error);
-            throw error;
-        }
+        });
     },
 
     async analyzeSymptoms(symptoms: string[]): Promise<any> {
-        if (!OPENROUTER_API_KEY || OPENROUTER_API_KEY === 'your_openrouter_key_here') {
-            throw new Error("OpenRouter API Key missing");
-        }
-
-        try {
-            const prompt = `
+        const prompt = `
             You are an expert medical AI. Analyze the following symptoms: ${symptoms.join(', ')}.
             
             Provide a health assessment in valid JSON format ONLY:
@@ -168,29 +335,17 @@ export const GeminiService = {
             }
             `;
 
-            const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-                method: "POST",
-                headers: {
-                    "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
-                    "HTTP-Referer": window.location.origin,
-                    "X-Title": "Robtor Health Assistant",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    "model": "google/gemini-2.0-flash-001",
-                    "messages": [{ "role": "user", "content": prompt }]
-                })
+        return executeWithFallback("Symptom Analysis", async (provider) => {
+            const req = provider.createChatRequest(provider.apiKey, provider.model, prompt);
+            const response = await fetch(req.url, {
+                method: req.method,
+                headers: req.headers,
+                body: req.body
             });
-
             const data = await response.json();
-            if (data.error) throw new Error(data.error.message || "OpenRouter API Error");
-
-            const text = data.choices[0].message.content;
+            const text = provider.extractContent(data);
             const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
             return JSON.parse(cleanText);
-        } catch (error) {
-            console.error("Error analyzing symptoms with OpenRouter:", error);
-            throw error;
-        }
+        });
     }
 };

@@ -100,7 +100,6 @@ export const HealthService = {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
         const today = new Date();
 
         const metrics = [];

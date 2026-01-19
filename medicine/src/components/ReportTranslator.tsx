@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { GeminiService } from '../services/geminiService';
-import { FileText, Upload, CheckCircle, Activity, Loader, Utensils, Dumbbell, AlertTriangle, PlayCircle } from 'lucide-react';
+import { FileText, Upload, CheckCircle, Activity, Loader, Utensils, Dumbbell, AlertTriangle, PlayCircle, Heart, Sun } from 'lucide-react';
 
 const ReportTranslator: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -306,6 +306,60 @@ const ReportTranslator: React.FC = () => {
                     ))}
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Lifestyle Tips */}
+            {analysis.lifestyle_tips && (
+              <div className="card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <Sun className="w-6 h-6 text-blue-600 mr-2" />
+                  Lifestyle Recommendations
+                </h3>
+                <ul className="space-y-3">
+                  {analysis.lifestyle_tips.map((tip: string, i: number) => (
+                    <li key={i} className="flex items-start space-x-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+                      <span className="text-gray-700">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Yoga & Mindfulness */}
+            {analysis.yoga_tips && (
+              <div className="card bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <Activity className="w-6 h-6 text-indigo-600 mr-2" />
+                  Yoga & Mindfulness
+                </h3>
+                <ul className="space-y-3">
+                  {analysis.yoga_tips.map((tip: string, i: number) => (
+                    <li key={i} className="flex items-start space-x-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
+                      <span className="text-gray-700">{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Benefits */}
+            {analysis.benefits && (
+              <div className="card bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200">
+                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                  <Heart className="w-6 h-6 text-amber-600 mr-2" />
+                  Health Benefits
+                </h3>
+                <ul className="space-y-3">
+                  {analysis.benefits.map((benefit: string, i: number) => (
+                    <li key={i} className="flex items-start space-x-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
+                      <span className="text-gray-700">{benefit}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             )}
 

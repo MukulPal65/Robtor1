@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Activity, Moon, Droplet, TrendingUp, Clock, Apple, Pill, Brain, Heart, Smartphone, Zap, Plus, ArrowRight, Calendar, X, Utensils, Dumbbell, ChevronRight, PlayCircle, AlertTriangle } from 'lucide-react';
 import { ReportService, Report } from '../services/reportService';
-import { AreaChart, Area, BarChart, Bar, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
+import { BarChart, Bar, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Cell } from 'recharts';
 
 interface DashboardSimpleProps {
   patientName?: string;
@@ -12,35 +12,32 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
   const [showAddMedication, setShowAddMedication] = useState(false);
   const [showDietPlan, setShowDietPlan] = useState(false);
   const [showFitnessPlan, setShowFitnessPlan] = useState(false);
-  const [medications, setMedications] = useState([
+  const [medications] = useState([
     { id: 1, name: 'Morning Vitamins', time: '8:00 AM', frequency: 'Daily' },
   ]);
   const [latestReport, setLatestReport] = useState<Report | null>(null);
-  const [loading, setLoading] = useState(true);
 
   React.useEffect(() => {
     fetchLatestData();
   }, []);
 
   const fetchLatestData = async () => {
-    setLoading(true);
     try {
       const report = await ReportService.getLatestReport();
       setLatestReport(report);
     } catch (e) {
       console.error(e);
-    } finally {
-      setLoading(false);
     }
   };
 
   // Static Health Data for users without wearables
   // Heart Rate Data - Manual entries or estimated based on activity
-  const heartRateData = [
-    { time: 'Morning', bpm: 68, status: 'Resting' },
-    { time: 'Afternoon', bpm: 82, status: 'Active' },
-    { time: 'Evening', bpm: 75, status: 'Normal' },
-  ];
+  /* Unused variables - commenting out to satisfy compiler */
+  // const heartRateData = [
+  //   { time: 'Morning', bpm: 68, status: 'Resting' },
+  //   { time: 'Afternoon', bpm: 82, status: 'Active' },
+  //   { time: 'Evening', bpm: 75, status: 'Normal' },
+  // ];
 
   // Activity Summary - Manual tracking
   const activitySummary = {
@@ -60,15 +57,15 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
   };
 
   // Weekly Activity Pattern
-  const weeklyActivity = [
-    { day: 'Mon', minutes: 30, type: 'Walking' },
-    { day: 'Tue', minutes: 45, type: 'Yoga' },
-    { day: 'Wed', minutes: 0, type: 'Rest' },
-    { day: 'Thu', minutes: 60, type: 'Gym' },
-    { day: 'Fri', minutes: 30, type: 'Walking' },
-    { day: 'Sat', minutes: 90, type: 'Hiking' },
-    { day: 'Sun', minutes: 45, type: 'Cycling' },
-  ];
+  // const weeklyActivity = [
+  //   { day: 'Mon', minutes: 30, type: 'Walking' },
+  //   { day: 'Tue', minutes: 45, type: 'Yoga' },
+  //   { day: 'Wed', minutes: 0, type: 'Rest' },
+  //   { day: 'Thu', minutes: 60, type: 'Gym' },
+  //   { day: 'Fri', minutes: 30, type: 'Walking' },
+  //   { day: 'Sat', minutes: 90, type: 'Hiking' },
+  //   { day: 'Sun', minutes: 45, type: 'Cycling' },
+  // ];
 
   // Weekly Steps Data for Graph
   const weeklyStepsData = [
@@ -82,13 +79,13 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
   ];
 
   // Nutrition Tracking
-  const nutritionData = {
-    caloriesConsumed: 1850,
-    caloriesGoal: 2100,
-    protein: 85, // grams
-    carbs: 220,
-    fats: 65,
-  };
+  // const nutritionData = {
+  //   caloriesConsumed: 1850,
+  //   caloriesGoal: 2100,
+  //   protein: 85, // grams
+  //   carbs: 220,
+  //   fats: 65,
+  // };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 pb-24 relative overflow-hidden">
@@ -292,7 +289,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                   labelStyle={{ color: '#6b7280', marginBottom: '4px' }}
                 />
                 <Bar dataKey="steps" radius={[6, 6, 0, 0]} barSize={32}>
-                  {weeklyStepsData.map((entry, index) => (
+                  {weeklyStepsData.map((_, index) => (
                     <Cell key={`cell-${index}`} fill={index === weeklyStepsData.length - 1 ? '#4f46e5' : '#93c5fd'} />
                   ))}
                 </Bar>

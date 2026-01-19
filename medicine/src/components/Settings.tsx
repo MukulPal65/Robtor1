@@ -88,6 +88,7 @@ const Settings: React.FC<SettingsProps> = ({
     shareHealthData: false,
     analyticsTracking: true,
     locationServices: false,
+    twoStepEnabled: false,
   });
 
   useEffect(() => {
@@ -423,7 +424,7 @@ const Settings: React.FC<SettingsProps> = ({
 
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        const { error: updateError } = await supabase.from('profiles').update({
+        await supabase.from('profiles').update({
           avatar_url: publicUrl,
           updated_at: new Date().toISOString(),
         }).eq('id', user.id);

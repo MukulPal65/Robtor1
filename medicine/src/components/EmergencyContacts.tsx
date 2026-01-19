@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Phone, UserPlus, AlertCircle, Shield, Heart, Edit2, Trash2, Save, X, Loader } from 'lucide-react';
-import { ProfileService, Profile } from '../services/profileService';
+import { ProfileService } from '../services/profileService';
 
 interface EmergencyContact {
   id: string;
