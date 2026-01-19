@@ -113,5 +113,24 @@ export const ProfileService = {
         }
 
         return data || [];
+    },
+
+    async logLoginActivity(): Promise<void> {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { error } = await supabase
+            .from('login_activity')
+            .insert({
+                user_id: user.id,
+                device: navigator.userAgent,
+                ip_address: '127.0.0.1', // Client side IP is harder to get without a service
+                location: 'Web App',
+                created_at: new Date().toISOString()
+            });
+
+        if (error) {
+            console.error('Error logging login activity:', error);
+        }
     }
 };

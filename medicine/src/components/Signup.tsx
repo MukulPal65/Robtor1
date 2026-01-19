@@ -52,6 +52,13 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
       if (data.user) {
         if (data.session) {
           alert("Signup successful!");
+          // Log the activity if session is established automatically
+          try {
+            const { ProfileService } = await import('../services/profileService');
+            await ProfileService.logLoginActivity();
+          } catch (logError) {
+            console.error('Failed to log login activity:', logError);
+          }
           onSignup();
         } else {
           alert("Signup successful! Please check your email for verification.");

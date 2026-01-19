@@ -37,6 +37,13 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
 
       if (data.user) {
         alert("Login Successful!");
+        // Log the activity
+        try {
+          const { ProfileService } = await import('../services/profileService');
+          await ProfileService.logLoginActivity();
+        } catch (logError) {
+          console.error('Failed to log login activity:', logError);
+        }
         onLogin();
       }
     } catch (error: any) {
