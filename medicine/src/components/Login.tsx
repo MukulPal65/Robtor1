@@ -27,6 +27,9 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
       return;
     }
 
+    console.log('Attempting login for:', email, '(length:', password?.length, ')');
+    console.log('Supabase Project:', import.meta.env.VITE_SUPABASE_URL);
+
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
