@@ -108,7 +108,7 @@ export const ProfileService = {
             .limit(5);
 
         if (error) {
-            console.error('Error fetching login activity:', error);
+            console.error('❌ Supabase error fetching login activity:', error.message, error.details, error.hint);
             return [];
         }
 
@@ -130,7 +130,9 @@ export const ProfileService = {
             });
 
         if (error) {
-            console.error('Error logging login activity:', error);
+            console.error('❌ Supabase error logging login activity:', error.message, error.details, error.hint);
+        } else {
+            console.log('✅ Login activity logged successfully');
         }
     }
 };
