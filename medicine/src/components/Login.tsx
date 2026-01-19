@@ -49,7 +49,12 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
         onLogin();
       }
     } catch (error: any) {
-      console.error(error);
+      console.group('🔐 Login Debug Information');
+      console.error('Error Object:', error);
+      console.error('Error Message:', error.message);
+      console.error('Error Status:', error.status);
+      console.groupEnd();
+
       if (error.message.includes("Email not confirmed")) {
         alert("Please verify your email address before logging in. Check your inbox (and spam folder) for the confirmation link.");
       } else {
