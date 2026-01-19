@@ -73,15 +73,16 @@ function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setIsAuthenticated(!!session);
-      if (session) {
+
+      if (event === 'PASSWORD_RECOVERY') {
+        setCurrentView('settings');
+        alert("Password recovery link verified. Please set a new password in your account settings.");
+      } else if (session) {
         if (currentView === 'login' || currentView === 'signup' || currentView === 'splash') {
           setCurrentView('dashboard');
         }
-      } else {
-        // Optionally redirect to login if logged out
-        // setCurrentView('login');
       }
     });
 

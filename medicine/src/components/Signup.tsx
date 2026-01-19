@@ -254,6 +254,12 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
                 Sign In
               </button>
             </p>
+            <button
+              onClick={onLogin} // In this simple implementation, we just go to Login where Forgot Password is available
+              className="text-sm text-gray-500 hover:text-green-600 mt-2 block mx-auto underline"
+            >
+              Forgot Password?
+            </button>
           </div>
         </div>
       </div>
