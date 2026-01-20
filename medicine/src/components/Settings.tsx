@@ -22,6 +22,7 @@ import {
 interface SettingsProps {
   patientName?: string;
   patientEmail?: string;
+  initialShowPasswordForm?: boolean;
 }
 
 interface ProfileData {
@@ -40,13 +41,14 @@ interface ProfileData {
 
 const Settings: React.FC<SettingsProps> = ({
   patientName = '',
-  patientEmail = ''
+  patientEmail = '',
+  initialShowPasswordForm = false
 }) => {
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState(initialShowPasswordForm ? 'privacy' : 'profile');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [sessionEmail, setSessionEmail] = useState(patientEmail);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [showPasswordForm, setShowPasswordForm] = useState(initialShowPasswordForm);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showTwoFactorForm, setShowTwoFactorForm] = useState(false);

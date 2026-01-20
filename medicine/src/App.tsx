@@ -19,6 +19,7 @@ function App() {
   const [currentView, setCurrentView] = useState<View>('splash');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [patientData, setPatientData] = useState<any>(null);
+  const [recoveryMode, setRecoveryMode] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -77,6 +78,7 @@ function App() {
       setIsAuthenticated(!!session);
 
       if (event === 'PASSWORD_RECOVERY') {
+        setRecoveryMode(true);
         setCurrentView('settings');
         alert("Password recovery link verified. Please set a new password in your account settings.");
       } else if (session) {
@@ -136,7 +138,7 @@ function App() {
       case 'symptom':
         return <SymptomChecker />;
       case 'settings':
-        return <Settings patientName={patientData?.fullName} />;
+        return <Settings patientName={patientData?.fullName} initialShowPasswordForm={recoveryMode} />;
       case 'emergency':
         return <EmergencyContacts />;
       default:
