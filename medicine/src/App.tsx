@@ -19,7 +19,6 @@ function App() {
   const [currentView, setCurrentView] = useState<View>('splash');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [patientData, setPatientData] = useState<any>(null);
-  const [recoveryMode, setRecoveryMode] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -74,14 +73,10 @@ function App() {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuthenticated(!!session);
 
-      if (event === 'PASSWORD_RECOVERY') {
-        setRecoveryMode(true);
-        setCurrentView('settings');
-        alert("Password recovery link verified. Please set a new password in your account settings.");
-      } else if (session) {
+      if (session) {
         if (currentView === 'login' || currentView === 'signup' || currentView === 'splash') {
           setCurrentView('dashboard');
         }
@@ -138,7 +133,7 @@ function App() {
       case 'symptom':
         return <SymptomChecker />;
       case 'settings':
-        return <Settings patientName={patientData?.fullName} initialShowPasswordForm={recoveryMode} />;
+        return <Settings patientName={patientData?.fullName} />;
       case 'emergency':
         return <EmergencyContacts />;
       default:
