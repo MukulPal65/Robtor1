@@ -216,7 +216,6 @@ async function executeWithFallback(
                 errors.push(`${provider.name}: ${errorMsg}`);
             }
 
-            lastError = error;
             // Continue to next provider
         }
     }
