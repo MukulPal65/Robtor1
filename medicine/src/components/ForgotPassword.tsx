@@ -36,7 +36,7 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack }) => {
 
             if (error) throw error;
             if (!data || !data.question) {
-                throw new Error('No security question found for this email. Please contact support.');
+                throw new Error('This account does not have a security question set yet. Please contact support at support@robtor.health to recover your account.');
             }
 
             setQuestion(data.question);
