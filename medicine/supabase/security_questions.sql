@@ -3,7 +3,34 @@ ALTER TABLE public.profiles
 ADD COLUMN IF NOT EXISTS security_question text,
 ADD COLUMN IF NOT EXISTS security_answer text;
 
--- 2. Create the Password Reset Function (RPC)
+-- 2. Fix Login Activity Table
+ALTER TABLE public.login_activity 
+ADD COLUMN IF NOT EXISTS device text,
+ADD COLUMN IF NOT EXISTS ip_address text,
+ADD COLUMN IF NOT EXISTS location text;
+
+-- 3. Ensure RLS for login_activity
+ALTER TABLE public.login_activity ENABLE ROW LEVEL SECURITY;
+
+-- Policy for Users to see their own activity
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can view own activity' AND tablename = 'login_activity') THEN
+        CREATE POLICY "Users can view own activity" ON public.login_activity
+        FOR SELECT USING (auth.uid() = user_id);
+    END IF;
+END $$;
+
+-- Policy for Users to insert their own activity
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Users can insert own activity' AND tablename = 'login_activity') THEN
+        CREATE POLICY "Users can insert own activity" ON public.login_activity
+        FOR INSERT WITH CHECK (auth.uid() = user_id);
+    END IF;
+END $$;
+
+-- 4. Create the Password Reset Function (RPC)
 -- This function runs with "SECURITY DEFINER" to allow it to update the auth.users table
 CREATE OR REPLACE FUNCTION public.reset_password_with_security_answer(
     target_email text,
