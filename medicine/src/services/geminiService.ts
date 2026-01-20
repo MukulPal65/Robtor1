@@ -11,6 +11,7 @@ interface AIProvider {
     name: string;
     apiKey: string;
     model: string;
+    supportsVision: boolean;
     // Adapter function converts standard inputs to provider-specific request
     createChatRequest: (apiKey: string, model: string, userMessage: string) => RequestOptions;
     createImageRequest: (apiKey: string, model: string, prompt: string, base64Image: string, mimeType: string) => RequestOptions;
@@ -99,6 +100,7 @@ const PROVIDERS: AIProvider[] = [
         name: "Groq",
         apiKey: import.meta.env.VITE_GROQ_API_KEY,
         model: import.meta.env.VITE_GROQ_MODEL || "llama-3.3-70b-versatile",
+        supportsVision: false,
         createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(k, m, u, "https://api.groq.com/openai/v1/chat/completions"),
         createImageRequest: (k, m, p, i, t) => OpenAIAdapter.createImageRequest(k, m, p, i, t, "https://api.groq.com/openai/v1/chat/completions"),
         extractContent: OpenAIAdapter.extractContent
@@ -107,7 +109,8 @@ const PROVIDERS: AIProvider[] = [
     {
         name: "Google Gemini",
         apiKey: import.meta.env.VITE_GOOGLE_GEMINI_API_KEY,
-        model: "models/gemini-1.5-flash", // Use 1.5 Flash for best speed/cost balance
+        model: import.meta.env.VITE_GOOGLE_GEMINI_MODEL || "models/gemini-1.5-flash",
+        supportsVision: true,
         createChatRequest: GoogleAdapter.createChatRequest,
         createImageRequest: GoogleAdapter.createImageRequest,
         extractContent: GoogleAdapter.extractContent
@@ -117,6 +120,7 @@ const PROVIDERS: AIProvider[] = [
         name: "OpenAI",
         apiKey: import.meta.env.VITE_OPENAI_API_KEY,
         model: import.meta.env.VITE_OPENAI_MODEL || "gpt-4o-mini",
+        supportsVision: true,
         createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(k, m, u, "https://api.openai.com/v1/chat/completions"),
         createImageRequest: (k, m, p, i, t) => OpenAIAdapter.createImageRequest(k, m, p, i, t, "https://api.openai.com/v1/chat/completions"),
         extractContent: OpenAIAdapter.extractContent
@@ -126,6 +130,7 @@ const PROVIDERS: AIProvider[] = [
         name: "Hugging Face",
         apiKey: import.meta.env.VITE_HUGGINGFACE_API_KEY,
         model: import.meta.env.VITE_HUGGINGFACE_MODEL || "mistralai/Mixtral-8x7B-Instruct-v0.1",
+        supportsVision: false,
         createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(
             k, m, u,
             `https://api-inference.huggingface.co/models/${import.meta.env.VITE_HUGGINGFACE_MODEL || "mistralai/Mixtral-8x7B-Instruct-v0.1"}/v1/chat/completions`
@@ -141,6 +146,7 @@ const PROVIDERS: AIProvider[] = [
         name: "OpenRouter",
         apiKey: import.meta.env.VITE_OPENROUTER_API_KEY,
         model: import.meta.env.VITE_OPENROUTER_MODEL || "google/gemini-2.0-flash-exp:free",
+        supportsVision: true,
         createChatRequest: (k, m, u) => OpenAIAdapter.createChatRequest(k, m, u, "https://openrouter.ai/api/v1/chat/completions", {
             "HTTP-Referer": window.location.origin,
             "X-Title": "Robtor Health"
@@ -170,12 +176,19 @@ async function fileToBase64(file: File): Promise<string> {
 // Generic execution wrapper with fallback
 async function executeWithFallback(
     operationName: string,
-    executeOperation: (provider: AIProvider) => Promise<any>
+    executeOperation: (provider: AIProvider) => Promise<any>,
+    requiresVision: boolean = false
 ): Promise<any> {
-    let lastError: any = null;
     let attempts = 0;
+    const errors: string[] = [];
 
     for (const provider of PROVIDERS) {
+        // Skip if vision is required but provider doesn't support it
+        if (requiresVision && !provider.supportsVision) {
+            console.log(`[AIService] Skipping ${provider.name} - Vision not supported.`);
+            continue;
+        }
+
         // Skip if API key is missing or placeholder
         if (!provider.apiKey || provider.apiKey.includes('your_') || provider.apiKey.length < 5) {
             console.warn(`[AIService] Skipping ${provider.name} - No valid API key found.`);
@@ -184,19 +197,38 @@ async function executeWithFallback(
 
         attempts++;
         try {
-            console.log(`[AIService] Attempting ${operationName} with ${provider.name}...`);
+            console.log(`[AIService] Attempting ${operationName} with ${provider.name} (${provider.model})...`);
             const result = await executeOperation(provider);
             console.log(`[AIService] Success with ${provider.name}`);
             return result;
         } catch (error: any) {
-            console.warn(`[AIService] Failed with ${provider.name}:`, error.message || error);
+            const errorMsg = error.message || error.toString();
+            console.error(`[AIService] Error with ${provider.name}:`, errorMsg);
+
+            // Special handling for common errors
+            if (errorMsg.includes("403")) {
+                errors.push(`${provider.name}: Permission denied (403)`);
+            } else if (errorMsg.includes("401")) {
+                errors.push(`${provider.name}: Invalid API Key (401)`);
+            } else if (errorMsg.includes("429")) {
+                errors.push(`${provider.name}: Rate limit exceeded (429)`);
+            } else {
+                errors.push(`${provider.name}: ${errorMsg}`);
+            }
+
             lastError = error;
             // Continue to next provider
         }
     }
 
-    if (attempts === 0) throw new Error("No AI providers configured. Check .env file.");
-    throw lastError || new Error("All AI providers failed.");
+    if (attempts === 0) {
+        throw new Error(`No ${requiresVision ? 'Vision-capable ' : ''}AI providers configured. Check your API keys in .env`);
+    }
+
+    const finalErrorMessage = errors.length > 0 ? errors.join(" | ") : "All AI providers failed.";
+    const compositeError = new Error(finalErrorMessage);
+    compositeError.name = "AIServiceError";
+    throw compositeError;
 }
 
 export const GeminiService = {
@@ -208,9 +240,15 @@ export const GeminiService = {
                 headers: req.headers,
                 body: req.body
             });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
             return provider.extractContent(data);
-        });
+        }, false);
     },
 
     async analyzeImage(file: File): Promise<any> {
@@ -307,11 +345,22 @@ export const GeminiService = {
                 headers: req.headers,
                 body: req.body
             });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
             const text = provider.extractContent(data);
             const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(cleanText);
-        });
+            try {
+                return JSON.parse(cleanText);
+            } catch (parseError) {
+                console.error("[AIService] JSON Parse Error. Raw text:", text);
+                throw new Error("Failed to parse AI response as JSON");
+            }
+        }, true);
     },
 
     async analyzeSymptoms(symptoms: string[]): Promise<any> {
@@ -342,10 +391,21 @@ export const GeminiService = {
                 headers: req.headers,
                 body: req.body
             });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.error?.message || `HTTP error! status: ${response.status}`);
+            }
+
             const data = await response.json();
             const text = provider.extractContent(data);
             const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-            return JSON.parse(cleanText);
-        });
+            try {
+                return JSON.parse(cleanText);
+            } catch (parseError) {
+                console.error("[AIService] JSON Parse Error. Raw text:", text);
+                throw new Error("Failed to parse AI response as JSON");
+            }
+        }, false);
     }
 };
