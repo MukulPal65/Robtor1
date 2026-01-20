@@ -20,9 +20,17 @@
 
 ✅ **Main Application**
 - `src/main.tsx` - Application entry point
-- `src/App.tsx` - Main app with routing and navigation
+- `src/App.tsx` - Main app with view management and auth state
 - `src/index.css` - Global styles and Tailwind directives
 - `index.html` - HTML template
+
+✅ **Authentication & Security**
+- `src/components/Login.tsx` - Professional login with "Forgot Password" flow
+- `src/components/Signup.tsx` - Registration with security question setup
+- `src/components/ForgotPassword.tsx` - Email-free recovery via security questions
+- `src/components/Settings.tsx` - User profile, security, and activity management
+- `src/components/EmergencyContacts.tsx` - Emergency contact management
+- `supabase/security_questions.sql` - Secure RPC functions for password recovery
 
 ### 🎨 UI Components (5 Major Components)
 
@@ -148,6 +156,8 @@
 5. **24/7 Health Assistant** - Interactive chatbot
 6. **Early Risk Prediction** - Health trend analysis display
 7. **Real-Time Health Alerts** - Notification system
+8. **Email-Free Security Recovery** - Password reset via security questions
+9. **Login Activity Tracking** - Monitor account access for security
 
 ### ✅ User Experience
 - Splash screen with brand message
