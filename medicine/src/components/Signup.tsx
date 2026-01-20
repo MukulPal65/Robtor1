@@ -13,7 +13,17 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
     email: '',
     password: '',
     confirmPassword: '',
+    securityQuestion: 'What was the name of your first pet?',
+    securityAnswer: '',
   });
+
+  const securityQuestions = [
+    "What was the name of your first pet?",
+    "In what city were you born?",
+    "What is your mother's maiden name?",
+    "What was the name of your favorite teacher?",
+    "What was the make of your first car?"
+  ];
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -41,6 +51,8 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
         options: {
           data: {
             full_name: formData.fullName,
+            security_question: formData.securityQuestion,
+            security_answer: formData.securityAnswer,
           },
         },
       });
@@ -206,6 +218,28 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
               {formData.confirmPassword && formData.password !== formData.confirmPassword && (
                 <p className="text-xs text-red-500 mt-1">Passwords do not match</p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">Security Question (for recovery)</label>
+              <select
+                value={formData.securityQuestion}
+                onChange={(e) => setFormData({ ...formData, securityQuestion: e.target.value })}
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 mb-4"
+              >
+                {securityQuestions.map(q => <option key={q} value={q}>{q}</option>)}
+              </select>
+              <div className="relative">
+                <Lock className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+                <input
+                  type="text"
+                  value={formData.securityAnswer}
+                  onChange={(e) => setFormData({ ...formData, securityAnswer: e.target.value })}
+                  placeholder="Your security answer"
+                  className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  required
+                />
+              </div>
             </div>
 
             <div className="flex items-start space-x-3">
