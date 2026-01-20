@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { ProfileService } from '../services/profileService';
 import { Mail, ArrowLeft, Send, CheckCircle, Lock, Eye, EyeOff } from 'lucide-react';
 
 interface ForgotPasswordProps {
@@ -30,16 +30,13 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack }) => {
             // Find user profile by email
             // We need to fetch from profiles table where id matches auth.users email
             // This usually requires an RPC or a specific view if we want to search profiles by auth email safely
-            const { data, error } = await supabase.rpc('get_user_question_by_email', {
-                target_email: email.trim()
-            });
+            const foundQuestion = await ProfileService.getUserSecurityQuestion(email.trim());
 
-            if (error) throw error;
-            if (!data || !data.question) {
+            if (!foundQuestion) {
                 throw new Error('This account does not have a security question set yet. Please contact support at support@robtor.health to recover your account.');
             }
 
-            setQuestion(data.question);
+            setQuestion(foundQuestion);
             setStep('question');
         } catch (err: any) {
             console.error(err);
@@ -57,15 +54,14 @@ const ForgotPassword: React.FC<ForgotPasswordProps> = ({ onBack }) => {
         setError(null);
 
         try {
-            const { data, error } = await supabase.rpc('reset_password_with_security_answer', {
-                target_email: email.trim(),
-                provided_answer: answer.trim(),
-                new_password: newPassword.trim()
-            });
+            const result = await ProfileService.resetPasswordWithSecurityAnswer(
+                email.trim(),
+                answer.trim(),
+                newPassword.trim()
+            );
 
-            if (error) throw error;
-            if (data && !data.success) {
-                throw new Error(data.message || 'Failed to reset password');
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to reset password');
             }
 
             setSubmitted(true);

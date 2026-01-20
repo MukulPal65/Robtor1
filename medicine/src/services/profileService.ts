@@ -18,6 +18,8 @@ export interface Profile {
     privacy?: any;
     subscription_tier?: 'free' | 'pro' | 'elite';
     subscription_status?: 'active' | 'expired' | 'trialing';
+    security_question?: string;
+    security_answer?: string;
 }
 
 export const ProfileService = {
@@ -134,5 +136,33 @@ export const ProfileService = {
         } else {
             console.log('✅ Login activity logged successfully');
         }
+    },
+
+    async getUserSecurityQuestion(email: string): Promise<string | null> {
+        const { data, error } = await supabase.rpc('get_user_question_by_email', {
+            target_email: email
+        });
+
+        if (error) {
+            console.error('Error fetching security question:', error);
+            return null;
+        }
+
+        return data?.question || null;
+    },
+
+    async resetPasswordWithSecurityAnswer(email: string, answer: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+        const { data, error } = await supabase.rpc('reset_password_with_security_answer', {
+            target_email: email,
+            provided_answer: answer,
+            new_password: newPassword
+        });
+
+        if (error) {
+            console.error('Error resetting password:', error);
+            return { success: false, message: error.message };
+        }
+
+        return data || { success: false, message: 'Unknown error occurred' };
     }
 };

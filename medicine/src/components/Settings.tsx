@@ -351,19 +351,12 @@ const Settings: React.FC<SettingsProps> = ({
   const handleSaveSecurityQuestion = async () => {
     try {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('No user logged in');
+      const { ProfileService } = await import('../services/profileService');
 
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          security_question: securityQuestion,
-          security_answer: securityAnswer,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
+      await ProfileService.updateProfile({
+        security_question: securityQuestion,
+        security_answer: securityAnswer
+      });
 
       alert('Security recovery question updated successfully!');
     } catch (error: any) {
