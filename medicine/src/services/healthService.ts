@@ -26,27 +26,39 @@ export const HealthService = {
 
     // Get metrics for the last 7 days
     async getWeeklyMetrics() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
+
         const { data, error } = await supabase
             .from('health_metrics')
             .select('*')
+            .eq('user_id', user.id)
             .order('date', { ascending: true }) // Ascending for charts
             .limit(7);
 
-        if (error) throw error;
+        if (error) {
+            console.error('Error fetching weekly metrics:', error);
+            return [];
+        }
         return data as HealthMetric[];
     },
 
     // Get today's metric
     async getTodayMetric() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return null;
+
         const today = new Date().toISOString().split('T')[0];
         const { data, error } = await supabase
             .from('health_metrics')
             .select('*')
+            .eq('user_id', user.id)
             .eq('date', today)
-            .single();
+            .maybeSingle();
 
-        if (error && error.code !== 'PGRST116') { // PGRST116 is "Row not found"
-            throw error;
+        if (error) {
+            console.error('Error fetching today metric:', error);
+            return null;
         }
 
         return data as HealthMetric | null;

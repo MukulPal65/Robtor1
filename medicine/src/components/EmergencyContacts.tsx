@@ -288,22 +288,17 @@ const EmergencyContacts: React.FC = () => {
             <h3 className="text-lg font-bold text-gray-800">Safety Tips</h3>
           </div>
           <ul className="space-y-2 text-sm text-gray-700">
-            <li className="flex items-start space-x-2">
-              <span className="text-blue-600 font-bold mt-0.5">•</span>
-              <span>Keep your emergency contacts up to date</span>
-            </li>
-            <li className="flex items-start space-x-2">
-              <span className="text-blue-600 font-bold mt-0.5">•</span>
-              <span>Share your medical information with emergency contacts</span>
-            </li>
-            <li className="flex items-start space-x-2">
-              <span className="text-blue-600 font-bold mt-0.5">•</span>
-              <span>Know the local emergency numbers when traveling</span>
-            </li>
-            <li className="flex items-start space-x-2">
-              <span className="text-blue-600 font-bold mt-0.5">•</span>
-              <span>In case of emergency, stay calm and call for help immediately</span>
-            </li>
+            {[
+              'Keep your emergency contacts up to date',
+              'Share your medical information with emergency contacts',
+              'Know the local emergency numbers when traveling',
+              'In case of emergency, stay calm and call for help immediately'
+            ].map((tip, index) => (
+              <li key={index} className="flex items-start space-x-2">
+                <span className="text-blue-600 font-bold mt-0.5">•</span>
+                <span>{tip}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>

@@ -10,7 +10,8 @@ type View =
   | 'report'
   | 'symptom'
   | 'settings'
-  | 'emergency';
+  | 'emergency'
+  | 'apitest';
 
 interface Props {
   isAuthenticated: boolean;

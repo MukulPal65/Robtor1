@@ -11,9 +11,10 @@ import ReportTranslator from './components/ReportTranslator';
 import SymptomChecker from './components/SymptomChecker';
 import Settings from './components/Settings';
 import EmergencyContacts from './components/EmergencyContacts';
+import APITestPanel from './components/APITestPanel';
 import Navbar from './components/Navbar';
 
-type View = 'splash' | 'login' | 'signup' | 'onboarding' | 'dashboard' | 'chat' | 'report' | 'symptom' | 'settings' | 'emergency';
+type View = 'splash' | 'login' | 'signup' | 'onboarding' | 'dashboard' | 'chat' | 'report' | 'symptom' | 'settings' | 'emergency' | 'apitest';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('splash');
@@ -99,6 +100,12 @@ function App() {
     setCurrentView('dashboard'); // Always go to onboarding to check wearable status
   };
 
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPatientData(null);
+    setCurrentView('login');
+  };
+
   const handleSignup = () => {
     setCurrentView('onboarding');
   };
@@ -106,6 +113,13 @@ function App() {
   const handleOnboardingComplete = (data: PatientData) => {
     setPatientData(data);
     setIsAuthenticated(true);
+    setCurrentView('dashboard');
+  };
+
+  const handleDashboardRefresh = () => {
+    // Reload profile data to refresh dashboard
+    loadProfileData();
+    // Switch to dashboard view
     setCurrentView('dashboard');
   };
 
@@ -129,13 +143,15 @@ function App() {
       case 'chat':
         return <ChatAssistant patientName={patientData?.fullName} />;
       case 'report':
-        return <ReportTranslator />;
+        return <ReportTranslator onDashboardUpdate={handleDashboardRefresh} />;
       case 'symptom':
         return <SymptomChecker />;
       case 'settings':
-        return <Settings patientName={patientData?.fullName} />;
+        return <Settings patientName={patientData?.fullName} onLogout={handleLogout} />;
       case 'emergency':
         return <EmergencyContacts />;
+      case 'apitest':
+        return <APITestPanel />;
       default:
         return <Dashboard />;
     }

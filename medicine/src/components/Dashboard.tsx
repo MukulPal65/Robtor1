@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Activity, Heart, Moon, Flame, Bell, TrendingUp, AlertTriangle, Utensils, Dumbbell, ArrowRight, ChevronRight, Pill, Clock, Plus, X, RefreshCw } from 'lucide-react';
+import { Activity, Heart, Moon, Flame, Bell, TrendingUp, AlertTriangle, Utensils, Dumbbell, ArrowRight, ChevronRight, Pill, Clock, Plus, X, RefreshCw, Droplet, Shield } from 'lucide-react';
 
-import { HealthMetric } from '../services/healthService';
-import { Report } from '../services/reportService';
+import { HealthService, HealthMetric } from '../services/healthService';
+import { ReportService, Report } from '../services/reportService';
+import { RecommendationService, PersonalizedRecommendation } from '../services/recommendationService';
+import { RiskAnalysisService } from '../services/riskAnalysisService';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 interface DashboardProps {
@@ -26,29 +28,93 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
   ]);
 
   // Real data states
-  const [todayMetric] = useState<HealthMetric | null>(null);
-  const [latestReport] = useState<Report | null>(null);
-  const [loading] = useState(false);
+  const [weeklyMetrics, setWeeklyMetrics] = useState<HealthMetric[]>([]);
+  const [todayMetric, setTodayMetric] = useState<HealthMetric | null>(null);
+  const [latestReport, setLatestReport] = useState<Report | null>(null);
+  const [recommendations, setRecommendations] = useState<PersonalizedRecommendation | null>(null);
+  const [riskAnalysis, setRiskAnalysis] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  const handleRefresh = () => {
-    console.log("Refreshing data...");
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const today = await HealthService.getTodayMetric();
+      const weekly = await HealthService.getWeeklyMetrics();
+      const report = await ReportService.getLatestReport();
+      const recs = await RecommendationService.getPersonalizedRecommendations();
+      
+      setLatestReport(report);
+      setRecommendations(recs);
+
+      // If no data exists, let's seed some for the user so the dashboard isn't empty
+      if (weekly.length === 0) {
+        await HealthService.seedDemoData();
+        // Fetch again
+        const newWeekly = await HealthService.getWeeklyMetrics();
+        setWeeklyMetrics(newWeekly);
+
+        // Should also have today now
+        const newToday = await HealthService.getTodayMetric();
+        setTodayMetric(newToday);
+      } else {
+        setWeeklyMetrics(weekly);
+        setTodayMetric(today);
+      }
+    } catch (error) {
+      console.error("Failed to fetch health data:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+
+
+  const handleRefresh = async () => {
+    setLoading(true);
+    await fetchData();
+    setLoading(false);
+  };
+
+  const handleShowAnalytics = async () => {
+    setShowAnalytics(true);
+    if (!riskAnalysis) {
+      // Fast local calculation - no API calls!
+      const risk = await RiskAnalysisService.calculateLocalRisk();
+      setRiskAnalysis(risk);
+    }
+  };
+
+
   // Format data for charts - use static fallback if no database data
-  const weeklyStepsData = [
-    { day: 'Mon', steps: 8234 },
-    { day: 'Tue', steps: 9567 },
-    { day: 'Wed', steps: 7834 },
-    { day: 'Thu', steps: 10178 },
-    { day: 'Fri', steps: 9456 },
-    { day: 'Sat', steps: 10890 },
-    { day: 'Sun', steps: 9234 },
-  ];
+  const weeklyStepsData = weeklyMetrics.length > 0
+    ? weeklyMetrics.map(m => ({
+      day: new Date(m.date).toLocaleDateString('en-US', { weekday: 'short' }),
+      steps: m.steps
+    }))
+    : [
+      { day: 'Mon', steps: 8234 },
+      { day: 'Tue', steps: 9567 },
+      { day: 'Wed', steps: 7834 },
+      { day: 'Thu', steps: 10178 },
+      { day: 'Fri', steps: 9456 },
+      { day: 'Sat', steps: 10890 },
+      { day: 'Sun', steps: 9234 },
+    ];
 
   // If we have no data yet (loading or empty), use static fallback values
-  const currentSteps = todayMetric?.steps || 9234;
-  const currentHeartRate = todayMetric?.heart_rate || 78;
-  const currentSleep = todayMetric?.sleep_hours || 7.5;
+  const currentSteps = todayMetric?.steps || 9234; // Static fallback: 9,234 steps (92% of 10,000 goal)
+  const currentHeartRate = todayMetric?.heart_rate || 78; // Static fallback: 78 bpm (normal resting)
+  const currentSleep = todayMetric?.sleep_hours || 7.5; // Static fallback: 7.5 hours
+  
+  // Calculate overall health score from latest report or use default
+  const overallHealthScore = latestReport?.analysis_result?.health_score || 87;
+  const healthScoreLabel = overallHealthScore >= 80 ? 'Excellent' : overallHealthScore >= 60 ? 'Good' : overallHealthScore >= 40 ? 'Fair' : 'Needs Attention';
+  const healthScoreColor = overallHealthScore >= 80 ? 'green' : overallHealthScore >= 60 ? 'blue' : overallHealthScore >= 40 ? 'yellow' : 'red';
+
 
 
   // Static Heart Rate Data - 24-hour trend with realistic variations
@@ -85,6 +151,32 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
     { day: 'Sat', burned: 2890, consumed: 2400 },
     { day: 'Sun', burned: 2345, consumed: 2150 },
   ];
+
+  // Static Heart Rate Zones Data - Distribution of time in different HR zones
+  // const heartRateZones = [
+  //   { zone: 'Resting', range: '50-70 bpm', minutes: 720, color: '#10b981', percentage: 50 },
+  //   { zone: 'Fat Burn', range: '70-100 bpm', minutes: 360, color: '#f59e0b', percentage: 25 },
+  //   { zone: 'Cardio', range: '100-140 bpm', minutes: 288, color: '#ef4444', percentage: 20 },
+  //   { zone: 'Peak', range: '140+ bpm', minutes: 72, color: '#dc2626', percentage: 5 },
+  // ];
+
+  // Static Blood Pressure Data (if available from wearable)
+  // const bloodPressureData = [
+  //   { time: '6am', systolic: 118, diastolic: 76 },
+  //   { time: '12pm', systolic: 122, diastolic: 78 },
+  //   { time: '6pm', systolic: 125, diastolic: 80 },
+  //   { time: '10pm', systolic: 120, diastolic: 77 },
+  // ];
+
+  // Static Stress Level Data
+  // const stressLevelData = [
+  //   { time: '6am', level: 25 },
+  //   { time: '9am', level: 45 },
+  //   { time: '12pm', level: 60 },
+  //   { time: '3pm', level: 75 },
+  //   { time: '6pm', level: 55 },
+  //   { time: '9pm', level: 30 },
+  // ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 pb-24 relative overflow-hidden">
@@ -191,23 +283,23 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
             <div className="flex flex-col items-center">
               <div className="relative w-24 h-24">
                 <svg className="transform -rotate-90 w-24 h-24">
+                  <defs>
+                    <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#6366f1" />
+                      <stop offset="100%" stopColor="#a855f7" />
+                    </linearGradient>
+                  </defs>
                   <circle cx="48" cy="48" r="40" stroke="#e5e7eb" strokeWidth="8" fill="none" />
                   <circle cx="48" cy="48" r="40" stroke="url(#healthGradient)" strokeWidth="8" fill="none"
                     strokeDasharray={`${2 * Math.PI * 40}`}
-                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - 0.87)}`}
+                    strokeDashoffset={`${2 * Math.PI * 40 * (1 - (overallHealthScore / 100))}`}
                     strokeLinecap="round" />
                 </svg>
-                <defs>
-                  <linearGradient id="healthGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stopColor="#6366f1" />
-                    <stop offset="100%" stopColor="#a855f7" />
-                  </linearGradient>
-                </defs>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-indigo-600">87%</span>
+                  <span className="text-2xl font-bold text-indigo-600">{overallHealthScore}%</span>
                 </div>
               </div>
-              <p className="text-xs font-semibold text-green-600 mt-1">Excellent</p>
+              <p className={`text-xs font-semibold text-${healthScoreColor}-600 mt-1`}>{healthScoreLabel}</p>
             </div>
           </div>
         </div>
@@ -310,7 +402,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               </div>
 
               <button
-                onClick={() => setShowAnalytics(true)}
+                onClick={handleShowAnalytics}
                 className="w-full mt-4 bg-gradient-to-r from-red-500 to-orange-600 text-white py-3 rounded-xl text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2">
                 <span>View Detailed Analysis</span>
                 <ArrowRight className="w-4 h-4" />
@@ -808,43 +900,55 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                       <div className="flex items-center justify-between mb-2">
                         <h5 className="font-bold text-gray-800">Breakfast</h5>
                       </div>
-                      <p className="text-sm text-gray-700">{latestReport?.analysis_result?.diet_plan?.breakfast || 'Oatmeal with berries and almonds'}</p>
+                      <ul className="text-sm text-gray-700 space-y-1">
+                        {recommendations?.diet.breakfast.map((item, i) => (
+                          <li key={i}>• {item}</li>
+                        )) || <li>• Oatmeal with berries and almonds</li>}
+                      </ul>
                     </div>
 
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
                       <div className="flex items-center justify-between mb-2">
                         <h5 className="font-bold text-gray-800">Lunch</h5>
                       </div>
-                      <p className="text-sm text-gray-700">{latestReport?.analysis_result?.diet_plan?.lunch || 'Grilled chicken breast (150g)'}</p>
+                      <ul className="text-sm text-gray-700 space-y-1">
+                        {recommendations?.diet.lunch.map((item, i) => (
+                          <li key={i}>• {item}</li>
+                        )) || <li>• Grilled chicken breast with vegetables</li>}
+                      </ul>
                     </div>
 
                     <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-200">
                       <div className="flex items-center justify-between mb-2">
                         <h5 className="font-bold text-gray-800">Dinner</h5>
                       </div>
-                      <p className="text-sm text-gray-700">{latestReport?.analysis_result?.diet_plan?.dinner || 'Baked salmon (180g)'}</p>
+                      <ul className="text-sm text-gray-700 space-y-1">
+                        {recommendations?.diet.dinner.map((item, i) => (
+                          <li key={i}>• {item}</li>
+                        )) || <li>• Baked salmon with steamed broccoli</li>}
+                      </ul>
                     </div>
 
-                    {latestReport?.analysis_result?.diet_plan?.snacks && (
+                    {recommendations?.diet.snacks && recommendations.diet.snacks.length > 0 && (
                       <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
                         <div className="flex items-center justify-between mb-2">
                           <h5 className="font-bold text-gray-800">Snacks</h5>
                         </div>
                         <ul className="space-y-1 text-sm text-gray-700">
-                          {latestReport.analysis_result.diet_plan.snacks.map((snack: string, i: number) => (
+                          {recommendations.diet.snacks.map((snack: string, i: number) => (
                             <li key={i}>• {snack}</li>
                           ))}
                         </ul>
                       </div>
                     )}
 
-                    {latestReport?.analysis_result?.diet_plan?.avoid && (
+                    {recommendations?.diet.avoid && recommendations.diet.avoid.length > 0 && (
                       <div className="bg-red-50 rounded-xl p-4 border-2 border-red-200">
                         <div className="flex items-center justify-between mb-2">
                           <h5 className="font-bold text-red-800">Foods to Avoid</h5>
                         </div>
                         <ul className="space-y-1 text-sm text-red-700">
-                          {latestReport.analysis_result.diet_plan.avoid.map((food: string, i: number) => (
+                          {recommendations.diet.avoid.map((food: string, i: number) => (
                             <li key={i}>• {food}</li>
                           ))}
                         </ul>
@@ -857,10 +961,13 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <div className="bg-indigo-50 rounded-xl p-4 border-2 border-indigo-200">
                   <h4 className="font-bold text-gray-800 mb-2">💡 Nutrition Tips</h4>
                   <ul className="space-y-1 text-sm text-gray-700">
-                    <li>• Drink 8-10 glasses of water throughout the day</li>
+                    <li>• {recommendations?.diet.hydration || 'Drink 8-10 glasses of water throughout the day'}</li>
                     <li>• Eat slowly and mindfully</li>
                     <li>• Avoid processed foods and added sugars</li>
                     <li>• Include protein in every meal for sustained energy</li>
+                    {recommendations?.lifestyle.habits.slice(0, 2).map((habit, i) => (
+                      <li key={i}>• {habit}</li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -908,81 +1015,53 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
 
                 {/* Today's Workout */}
                 <div>
-                  <h4 className="font-bold text-gray-800 mb-3">Today's Workout Plan</h4>
+                  <h4 className="font-bold text-gray-800 mb-3">Personalized Workout Plan</h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    {recommendations?.exercise.duration} • {recommendations?.exercise.frequency}
+                  </p>
                   <div className="space-y-3">
                     <div className="bg-gradient-to-r from-red-50 to-orange-50 rounded-xl p-4 border-2 border-red-200">
                       <div className="flex items-center justify-between mb-3">
-                        <h5 className="font-bold text-gray-800">Warm-up</h5>
-                        <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">10 min</span>
+                        <h5 className="font-bold text-gray-800">Cardio Exercises</h5>
+                        <span className="text-xs font-bold text-red-600 bg-red-100 px-2 py-1 rounded-full">Primary</span>
                       </div>
                       <ul className="space-y-2 text-sm text-gray-700">
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
-                          Light jogging - 5 minutes
-                        </li>
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
-                          Dynamic stretching - 5 minutes
-                        </li>
+                        {recommendations?.exercise.cardio.map((exercise, i) => (
+                          <li key={i} className="flex items-center">
+                            <span className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">{i + 1}</span>
+                            {exercise}
+                          </li>
+                        )) || <li>• Brisk walking 30 minutes</li>}
                       </ul>
                     </div>
 
                     <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-4 border-2 border-blue-200">
                       <div className="flex items-center justify-between mb-3">
-                        <h5 className="font-bold text-gray-800">Cardio (Based on Heart Rate)</h5>
-                        <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">30 min</span>
+                        <h5 className="font-bold text-gray-800">Strength Training</h5>
+                        <span className="text-xs font-bold text-blue-600 bg-blue-100 px-2 py-1 rounded-full">Build</span>
                       </div>
                       <ul className="space-y-2 text-sm text-gray-700">
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
-                          Running - Target HR: 140-150 bpm - 20 min
-                        </li>
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
-                          High-intensity intervals - 10 min
-                        </li>
+                        {recommendations?.exercise.strength.map((exercise, i) => (
+                          <li key={i} className="flex items-center">
+                            <span className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">{i + 1}</span>
+                            {exercise}
+                          </li>
+                        )) || <li>• Bodyweight exercises</li>}
                       </ul>
                     </div>
 
                     <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-4 border-2 border-green-200">
                       <div className="flex items-center justify-between mb-3">
-                        <h5 className="font-bold text-gray-800">Strength Training</h5>
-                        <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">25 min</span>
+                        <h5 className="font-bold text-gray-800">Flexibility & Recovery</h5>
+                        <span className="text-xs font-bold text-green-600 bg-green-100 px-2 py-1 rounded-full">Essential</span>
                       </div>
                       <ul className="space-y-2 text-sm text-gray-700">
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
-                          Push-ups - 3 sets of 15 reps
-                        </li>
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
-                          Dumbbell rows - 3 sets of 12 reps
-                        </li>
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">3</span>
-                          Plank hold - 3 sets of 45 seconds
-                        </li>
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">4</span>
-                          Bicep curls - 3 sets of 12 reps
-                        </li>
-                      </ul>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border-2 border-purple-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <h5 className="font-bold text-gray-800">Cool Down & Stretching</h5>
-                        <span className="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded-full">15 min</span>
-                      </div>
-                      <ul className="space-y-2 text-sm text-gray-700">
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">1</span>
-                          Light walking - 5 minutes
-                        </li>
-                        <li className="flex items-center">
-                          <span className="w-6 h-6 bg-purple-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">2</span>
-                          Full body stretching - 10 minutes
-                        </li>
+                        {recommendations?.exercise.flexibility.map((exercise, i) => (
+                          <li key={i} className="flex items-center">
+                            <span className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center mr-2 text-xs font-bold">{i + 1}</span>
+                            {exercise}
+                          </li>
+                        )) || <li>• Stretching routine</li>}
                       </ul>
                     </div>
                   </div>
@@ -1025,107 +1104,146 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 </button>
               </div>
 
-              <div className="space-y-6">
-                {/* Risk Overview */}
-                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-5 border-2 border-red-200">
-                  <h4 className="font-bold text-gray-800 mb-4 text-lg">Health Risk Overview</h4>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="bg-white rounded-lg p-4 text-center border-2 border-green-200">
-                      <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
-                        <Heart className="w-8 h-8 text-green-600" />
-                      </div>
-                      <p className="text-2xl font-bold text-green-600">Low</p>
-                      <p className="text-xs text-gray-600 mt-1">Cardiovascular</p>
+              {riskAnalysis ? (
+                <div className="space-y-6">
+                  {/* Risk Overview */}
+                  <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-5 border-2 border-red-200">
+                    <div className="flex items-center justify-between mb-4">
+                      <h4 className="font-bold text-gray-800 mb-0 text-lg">Health Risk Overview</h4>
+                      <span className={`px-4 py-2 rounded-full font-bold text-sm ${
+                        riskAnalysis.overall_risk === 'Low' ? 'bg-green-100 text-green-700' :
+                        riskAnalysis.overall_risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {riskAnalysis.overall_risk} Risk Overall
+                      </span>
                     </div>
-                    <div className="bg-white rounded-lg p-4 text-center border-2 border-yellow-200">
-                      <div className="w-16 h-16 mx-auto bg-yellow-100 rounded-full flex items-center justify-center mb-2">
-                        <Moon className="w-8 h-8 text-yellow-600" />
-                      </div>
-                      <p className="text-2xl font-bold text-yellow-600">Medium</p>
-                      <p className="text-xs text-gray-600 mt-1">Sleep Quality</p>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 text-center border-2 border-green-200">
-                      <div className="w-16 h-16 mx-auto bg-green-100 rounded-full flex items-center justify-center mb-2">
-                        <Activity className="w-8 h-8 text-green-600" />
-                      </div>
-                      <p className="text-2xl font-bold text-green-600">Low</p>
-                      <p className="text-xs text-gray-600 mt-1">Activity Level</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Detailed Analysis */}
-                <div>
-                  <h4 className="font-bold text-gray-800 mb-4 text-lg">Detailed Analysis</h4>
-                  <div className="space-y-4">
-                    {/* Cardiovascular */}
-                    <div className="bg-green-50 rounded-xl p-5 border-2 border-green-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <Heart className="w-6 h-6 text-green-600" />
-                          <h5 className="font-bold text-gray-800">Cardiovascular Health</h5>
-                        </div>
-                        <span className="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold">Low Risk</span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-700">
-                        <p><strong>Current Status:</strong> Your heart rate averages 72 bpm (resting), which is in the excellent range for your age group.</p>
-                        <p><strong>Activity Level:</strong> You're consistently hitting 9,000+ steps daily with good cardio sessions.</p>
-                        <p><strong>Prediction:</strong> Based on current trends, you have a 95% likelihood of maintaining healthy cardiovascular function.</p>
-                        <p className="text-green-700 font-semibold mt-3">✓ Recommendations: Continue current exercise routine, maintain balanced diet, monitor weekly.</p>
-                      </div>
-                    </div>
-
-                    {/* Sleep Quality */}
-                    <div className="bg-yellow-50 rounded-xl p-5 border-2 border-yellow-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <Moon className="w-6 h-6 text-yellow-600" />
-                          <h5 className="font-bold text-gray-800">Sleep Quality</h5>
-                        </div>
-                        <span className="bg-yellow-100 text-yellow-600 px-3 py-1 rounded-full text-sm font-bold">Medium Risk</span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-700">
-                        <p><strong>Current Status:</strong> Average 7h 32m per night, with irregular sleep patterns detected over the past week.</p>
-                        <p><strong>Deep Sleep:</strong> 35% of total sleep (target: 20-25%) - Good</p>
-                        <p><strong>REM Sleep:</strong> 15% of total sleep (target: 20-25%) - Slightly low</p>
-                        <p><strong>Prediction:</strong> If patterns continue, 60% risk of sleep-related fatigue issues within 30 days.</p>
-                        <p className="text-yellow-700 font-semibold mt-3">⚠ Recommendations: Establish consistent 10 PM bedtime, limit screen time 1 hour before sleep, consider relaxation techniques.</p>
-                      </div>
-                    </div>
-
-                    {/* Activity Level */}
-                    <div className="bg-blue-50 rounded-xl p-5 border-2 border-blue-200">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <Activity className="w-6 h-6 text-blue-600" />
-                          <h5 className="font-bold text-gray-800">Physical Activity</h5>
-                        </div>
-                        <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-bold">Excellent</span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-700">
-                        <p><strong>Weekly Average:</strong> 9,500 steps/day with 4 structured workouts</p>
-                        <p><strong>Calorie Burn:</strong> Consistently burning 2,300-2,500 calories daily</p>
-                        <p><strong>Trend:</strong> 12% improvement in activity levels over the past month</p>
-                        <p className="text-blue-700 font-semibold mt-3">✓ Excellent work! Maintain current activity levels for optimal health.</p>
-                      </div>
+                    <p className="text-sm text-gray-600 mb-3">
+                      Analysis Confidence: {riskAnalysis.confidence}% • Based on your latest health reports and activity metrics
+                    </p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {riskAnalysis.risk_areas.slice(0, 3).map((area: any, idx: number) => {
+                        const IconComponent = area.icon_suggestion === 'Heart' ? Heart : 
+                                             area.icon_suggestion === 'Moon' ? Moon :
+                                             area.icon_suggestion === 'Droplet' ? Droplet :
+                                             area.icon_suggestion === 'Shield' ? Shield : Activity;
+                        const riskColor = area.risk_level === 'Low' ? 'green' : 
+                                         area.risk_level === 'Medium' ? 'yellow' : 'red';
+                        
+                        return (
+                          <div key={idx} className={`bg-white rounded-lg p-4 text-center border-2 border-${riskColor}-200`}>
+                            <div className={`w-16 h-16 mx-auto bg-${riskColor}-100 rounded-full flex items-center justify-center mb-2`}>
+                              <IconComponent className={`w-8 h-8 text-${riskColor}-600`} />
+                            </div>
+                            <p className={`text-2xl font-bold text-${riskColor}-600`}>{area.risk_level}</p>
+                            <p className="text-xs text-gray-600 mt-1">{area.category}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
-                </div>
 
-                {/* Action Plan */}
-                <div className="bg-indigo-50 rounded-xl p-5 border-2 border-indigo-200">
-                  <h4 className="font-bold text-gray-800 mb-3 flex items-center">
-                    <TrendingUp className="w-5 h-5 mr-2 text-indigo-600" />
-                    30-Day Action Plan
-                  </h4>
-                  <div className="space-y-2 text-sm text-gray-700">
-                    <p>• <strong>Week 1-2:</strong> Focus on establishing consistent sleep schedule (10 PM - 6 AM)</p>
-                    <p>• <strong>Week 2-3:</strong> Maintain current exercise routine, add 10-minute evening meditation</p>
-                    <p>• <strong>Week 3-4:</strong> Monitor improvements in REM sleep percentage</p>
-                    <p>• <strong>Ongoing:</strong> Continue tracking all metrics through your wearable device</p>
+                  {/* Detailed Analysis */}
+                  <div>
+                    <h4 className="font-bold text-gray-800 mb-4 text-lg">Detailed Analysis</h4>
+                    <div className="space-y-4">
+                      {riskAnalysis.risk_areas.map((area: any, idx: number) => {
+                        const riskColor = area.risk_level === 'Low' ? 'green' : 
+                                         area.risk_level === 'Medium' ? 'yellow' : 'red';
+                        const IconComponent = area.icon_suggestion === 'Heart' ? Heart : 
+                                             area.icon_suggestion === 'Moon' ? Moon :
+                                             area.icon_suggestion === 'Droplet' ? Droplet :
+                                             area.icon_suggestion === 'Shield' ? Shield : Activity;
+                        
+                        return (
+                          <div key={idx} className={`bg-${riskColor}-50 rounded-xl p-5 border-2 border-${riskColor}-200`}>
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center space-x-3">
+                                <IconComponent className={`w-6 h-6 text-${riskColor}-600`} />
+                                <h5 className="font-bold text-gray-800">{area.category}</h5>
+                              </div>
+                              <span className={`bg-${riskColor}-100 text-${riskColor}-600 px-3 py-1 rounded-full text-sm font-bold`}>
+                                {area.risk_level} Risk
+                              </span>
+                            </div>
+                            <div className="space-y-2 text-sm text-gray-700">
+                              <p><strong>Current Status:</strong> {area.current_status}</p>
+                              <p><strong>Prediction:</strong> {area.prediction}</p>
+                              <p className={`text-${riskColor}-700 font-semibold mt-3`}>
+                                {area.risk_level === 'Low' ? '✓' : '⚠'} Recommendations: {area.recommendations}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {/* Positive Trends & Improvements */}
+                  {(riskAnalysis.positive_trends?.length > 0 || riskAnalysis.areas_for_improvement?.length > 0) && (
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {riskAnalysis.positive_trends?.length > 0 && (
+                        <div className="bg-green-50 rounded-xl p-4 border-2 border-green-200">
+                          <h4 className="font-bold text-gray-800 mb-2 flex items-center">
+                            <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
+                            Positive Trends
+                          </h4>
+                          <ul className="space-y-1 text-sm text-gray-700">
+                            {riskAnalysis.positive_trends.map((trend: string, i: number) => (
+                              <li key={i}>✓ {trend}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {riskAnalysis.areas_for_improvement?.length > 0 && (
+                        <div className="bg-yellow-50 rounded-xl p-4 border-2 border-yellow-200">
+                          <h4 className="font-bold text-gray-800 mb-2 flex items-center">
+                            <AlertTriangle className="w-5 h-5 mr-2 text-yellow-600" />
+                            Areas for Improvement
+                          </h4>
+                          <ul className="space-y-1 text-sm text-gray-700">
+                            {riskAnalysis.areas_for_improvement.map((area: string, i: number) => (
+                              <li key={i}>• {area}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Action Plan */}
+                  {riskAnalysis.action_plan && (
+                    <div className="bg-indigo-50 rounded-xl p-5 border-2 border-indigo-200">
+                      <h4 className="font-bold text-gray-800 mb-3 flex items-center">
+                        <TrendingUp className="w-5 h-5 mr-2 text-indigo-600" />
+                        30-Day Action Plan
+                      </h4>
+                      <div className="space-y-2 text-sm text-gray-700">
+                        <p>• <strong>Week 1-2:</strong> {riskAnalysis.action_plan.week_1_2}</p>
+                        <p>• <strong>Week 2-3:</strong> {riskAnalysis.action_plan.week_2_3}</p>
+                        <p>• <strong>Week 3-4:</strong> {riskAnalysis.action_plan.week_3_4}</p>
+                        <p>• <strong>Ongoing:</strong> {riskAnalysis.action_plan.ongoing}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                  <p>Unable to load risk analysis</p>
+                  <button 
+                    onClick={async () => {
+                      const risk = await RiskAnalysisService.calculateLocalRisk();
+                      setRiskAnalysis(risk);
+                    }}
+                    className="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                  >
+                    Try Again
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )

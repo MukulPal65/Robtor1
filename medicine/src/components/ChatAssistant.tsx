@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { MessageCircle, Send, Bot, User } from 'lucide-react';
 import { ChatService, ChatMessage } from '../services/chatService';
 import { GeminiService } from '../services/geminiService';
+import { ReportService } from '../services/reportService';
+import { HealthService } from '../services/healthService';
 
 // Use the interface from the service or map it locally. 
 // Since the service exports ChatMessage which matches our needs, we can assume it's compatible or just use it.
@@ -12,8 +14,80 @@ interface ChatAssistantProps {
   patientName?: string;
 }
 
+// Helper component to format bot messages
+const FormattedMessage: React.FC<{ text: string; isBot: boolean }> = ({ text, isBot }) => {
+  if (!isBot) {
+    return <p className="text-sm whitespace-pre-wrap">{text}</p>;
+  }
+
+  // Format bot messages with structure
+  const formatText = (content: string) => {
+    // Split by double line breaks for paragraphs
+    const paragraphs = content.split('\n\n');
+    
+    return paragraphs.map((para, index) => {
+      // Check if it's a bullet list
+      if (para.includes('•') || para.match(/^[•\-\*]\s/m)) {
+        const items = para.split('\n').filter(line => line.trim());
+        return (
+          <ul key={index} className="space-y-1 my-2 ml-4">
+            {items.map((item, i) => (
+              <li key={i} className="text-sm">
+                {item.replace(/^[•\-\*]\s/, '')}
+              </li>
+            ))}
+          </ul>
+        );
+      }
+      
+      // Check if it's a numbered list
+      if (para.match(/^\d+\.\s/m)) {
+        const items = para.split('\n').filter(line => line.trim());
+        return (
+          <ol key={index} className="space-y-1 my-2 ml-4 list-decimal">
+            {items.map((item, i) => (
+              <li key={i} className="text-sm">
+                {item.replace(/^\d+\.\s/, '')}
+              </li>
+            ))}
+          </ol>
+        );
+      }
+      
+      // Regular paragraph - render bold text
+      const parts = para.split(/(\*\*.*?\*\*)/g);
+      return (
+        <p key={index} className="text-sm my-2">
+          {parts.map((part, i) => {
+            if (part.startsWith('**') && part.endsWith('**')) {
+              return <strong key={i}>{part.slice(2, -2)}</strong>;
+            }
+            return part;
+          })}
+        </p>
+      );
+    });
+  };
+
+  return <div className="space-y-1">{formatText(text)}</div>;
+};
+
 const ChatAssistant: React.FC<ChatAssistantProps> = ({ patientName = 'User' }) => {
   const [messages, setMessages] = useState<Message[]>([]);
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  React.useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  React.useEffect(() => {
+    loadHistory();
+  }, []);
+
   const loadHistory = async () => {
     try {
       const history = await ChatService.getHistory();
@@ -65,9 +139,46 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ patientName = 'User' }) =
         setMessages((prev) => prev.map(m => m.id === tempId ? savedUserMsg : m));
       }
 
-      // Generate AI response using Gemini
+      // Build conversation history for context (last 10 messages)
+      const recentMessages = messages.slice(-10);
+      const conversationHistory = recentMessages.map(msg => ({
+        role: msg.sender === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
+      // Get user's latest health data to provide context
+      let contextInfo = '';
       try {
-        const botResponseText = await GeminiService.generateResponse(textToSend);
+        const [latestReport, todayMetric] = await Promise.all([
+          ReportService.getLatestReport(),
+          HealthService.getTodayMetric()
+        ]);
+
+        if (latestReport?.analysis_result) {
+          const report = latestReport.analysis_result;
+          contextInfo += `\n\n[User's Recent Health Report Context - Use this to personalize your response]:
+- Health Score: ${report.health_score}/100
+- Summary: ${report.summary}`;
+          
+          if (report.results && report.results.length > 0) {
+            contextInfo += '\n- Recent Test Results: ';
+            report.results.slice(0, 3).forEach((r: any) => {
+              contextInfo += `${r.test_name}: ${r.value} (${r.status}), `;
+            });
+          }
+        }
+
+        if (todayMetric) {
+          contextInfo += `\n- Today's Metrics: Steps: ${todayMetric.steps || 0}, Heart Rate: ${todayMetric.heart_rate || 'N/A'}, Sleep: ${todayMetric.sleep_hours || 'N/A'}h`;
+        }
+      } catch (err) {
+        console.log('Could not fetch health context:', err);
+      }
+
+      // Generate AI response using Gemini with conversation history and health context
+      try {
+        const enhancedMessage = textToSend + contextInfo;
+        const botResponseText = await GeminiService.generateResponse(enhancedMessage, conversationHistory);
 
         // Save bot response to DB
         const savedBotMsg = await ChatService.sendMessage(botResponseText, true);
@@ -126,7 +237,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ patientName = 'User' }) =
                     : 'bg-white text-gray-800 shadow-md'
                     }`}
                 >
-                  <p className="text-sm">{message.text}</p>
+                  <FormattedMessage text={message.text} isBot={message.sender === 'bot'} />
                 </div>
                 <p className="text-xs text-gray-500 mt-1 px-2">
                   {message.timestamp.toLocaleTimeString()}
@@ -135,6 +246,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({ patientName = 'User' }) =
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input */}

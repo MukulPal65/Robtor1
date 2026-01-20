@@ -22,7 +22,7 @@ import {
 interface SettingsProps {
   patientName?: string;
   patientEmail?: string;
-  initialShowPasswordForm?: boolean;
+  onLogout?: () => void;
 }
 
 interface ProfileData {
@@ -37,20 +37,18 @@ interface ProfileData {
   avatar_url?: string;
   subscription_tier?: 'free' | 'pro' | 'elite';
   subscription_status?: 'active' | 'expired' | 'trialing';
-  security_question?: string;
-  security_answer?: string;
 }
 
 const Settings: React.FC<SettingsProps> = ({
   patientName = '',
   patientEmail = '',
-  initialShowPasswordForm = false
+  onLogout
 }) => {
-  const [activeTab, setActiveTab] = useState(initialShowPasswordForm ? 'privacy' : 'profile');
+  const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [sessionEmail, setSessionEmail] = useState(patientEmail);
-  const [showPasswordForm, setShowPasswordForm] = useState(initialShowPasswordForm);
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showTwoFactorForm, setShowTwoFactorForm] = useState(false);
@@ -64,16 +62,6 @@ const Settings: React.FC<SettingsProps> = ({
     { id: 2, message: "Can I sync data from my Mi Band?", date: "2026-01-09", status: "Pending" }
   ]);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
-  const [securityQuestion, setSecurityQuestion] = useState('What was the name of your first pet?');
-  const [securityAnswer, setSecurityAnswer] = useState('');
-
-  const securityQuestionsList = [
-    "What was the name of your first pet?",
-    "In what city were you born?",
-    "What is your mother's maiden name?",
-    "What was the name of your favorite teacher?",
-    "What was the make of your first car?"
-  ];
 
   // Profile State
   const [profile, setProfile] = useState<ProfileData>({
@@ -151,13 +139,8 @@ const Settings: React.FC<SettingsProps> = ({
             dob: data.dob || '',
             avatar_url: data.avatar_url || '',
             subscription_tier: data.subscription_tier || 'free',
-            subscription_status: data.subscription_status || 'active',
-            security_question: data.security_question || 'What was the name of your first pet?',
-            security_answer: data.security_answer || ''
+            subscription_status: data.subscription_status || 'active'
           });
-
-          setSecurityQuestion(data.security_question || 'What was the name of your first pet?');
-          setSecurityAnswer(data.security_answer || '');
 
           if (data.notifications) {
             setNotifications(data.notifications);
@@ -348,25 +331,6 @@ const Settings: React.FC<SettingsProps> = ({
     }
   };
 
-  const handleSaveSecurityQuestion = async () => {
-    try {
-      setLoading(true);
-      const { ProfileService } = await import('../services/profileService');
-
-      await ProfileService.updateProfile({
-        security_question: securityQuestion,
-        security_answer: securityAnswer
-      });
-
-      alert('Security recovery question updated successfully!');
-    } catch (error: any) {
-      console.error('Error saving security question:', error);
-      alert('Failed to update security question: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handlePasswordChange = async () => {
     if (!newPassword || newPassword.length < 6) {
       alert('Password must be at least 6 characters long');
@@ -434,8 +398,19 @@ const Settings: React.FC<SettingsProps> = ({
   ];
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.reload();
+    if (window.confirm('Are you sure you want to logout?')) {
+      try {
+        await supabase.auth.signOut();
+        if (onLogout) {
+          onLogout();
+        } else {
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error('Error logging out:', error);
+        alert('Failed to logout. Please try again.');
+      }
+    }
   };
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -462,11 +437,12 @@ const Settings: React.FC<SettingsProps> = ({
 
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from('profiles').update({
+        const { error: updateError } = await supabase.from('profiles').update({
           avatar_url: publicUrl,
           updated_at: new Date().toISOString(),
         }).eq('id', user.id);
 
+        if (updateError) throw updateError;
         alert('Profile picture updated!');
       }
 
@@ -815,48 +791,6 @@ const Settings: React.FC<SettingsProps> = ({
                     >
                       {loading ? 'Saving...' : 'Save Privacy Settings'}
                     </button>
-                  </div>
-
-                  {/* Security Question Section */}
-                  <div className="pt-6 border-t border-gray-200 mt-8">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Account Recovery</h3>
-                    <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-100 mb-4">
-                      <p className="text-sm text-yellow-800">
-                        <strong>Important:</strong> Set a security question to recover your account if you forget your password. We do not use email for recovery.
-                      </p>
-                    </div>
-
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Security Question</label>
-                        <select
-                          value={securityQuestion}
-                          onChange={(e) => setSecurityQuestion(e.target.value)}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                        >
-                          {securityQuestionsList.map(q => <option key={q} value={q}>{q}</option>)}
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Your Answer</label>
-                        <input
-                          type="text"
-                          value={securityAnswer}
-                          onChange={(e) => setSecurityAnswer(e.target.value)}
-                          placeholder="Enter your secret answer"
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-                      <div className="flex justify-end">
-                        <button
-                          onClick={handleSaveSecurityQuestion}
-                          disabled={loading || !securityAnswer.trim()}
-                          className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
-                        >
-                          {loading ? 'Saving...' : 'Update Recovery Question'}
-                        </button>
-                      </div>
-                    </div>
                   </div>
 
                   {/* Security Actions */}

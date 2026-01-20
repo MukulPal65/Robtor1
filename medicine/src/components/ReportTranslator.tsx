@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { GeminiService } from '../services/geminiService';
-import { FileText, Upload, CheckCircle, Activity, Loader, Utensils, Dumbbell, AlertTriangle, PlayCircle, Heart, Sun } from 'lucide-react';
+import { HealthService } from '../services/healthService';
+import { FileText, Upload, CheckCircle, Activity, Loader, Utensils, Dumbbell, AlertTriangle, PlayCircle, RefreshCw } from 'lucide-react';
 
-const ReportTranslator: React.FC = () => {
+interface ReportTranslatorProps {
+  onDashboardUpdate?: () => void;
+}
+
+const ReportTranslator: React.FC<ReportTranslatorProps> = ({ onDashboardUpdate }) => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [analysis, setAnalysis] = useState<any>(null);
+  const [updatingDashboard, setUpdatingDashboard] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -66,10 +72,36 @@ const ReportTranslator: React.FC = () => {
       }
 
       // 2. Analyze with Gemini
-      // 2. Analyze with Gemini
       console.log("Starting Gemini analysis service call...");
       const aiResults = await GeminiService.analyzeImage(selectedFile);
       console.log("Gemini Results:", aiResults);
+      
+      // Validate the results have the expected structure
+      if (!aiResults || typeof aiResults !== 'object') {
+        throw new Error('Invalid response from AI service. Please try again.');
+      }
+      
+      // Ensure minimum required fields (AI should calculate score, but have fallback)
+      if (!aiResults.health_score || aiResults.health_score === 0) {
+        // Calculate basic score from results if AI didn't provide one or returned 0
+        if (aiResults.results && Array.isArray(aiResults.results) && aiResults.results.length > 0) {
+          const normalCount = aiResults.results.filter((r: any) => r.status?.toLowerCase() === 'normal').length;
+          const totalCount = aiResults.results.length;
+          aiResults.health_score = Math.round((normalCount / totalCount) * 100);
+        } else {
+          aiResults.health_score = 75; // Default moderate score if no results
+        }
+      }
+      if (!aiResults.summary) {
+        aiResults.summary = 'Medical report analyzed. Please review the results below.';
+      }
+      if (!Array.isArray(aiResults.results)) {
+        aiResults.results = [];
+      }
+      if (!Array.isArray(aiResults.recommendations)) {
+        aiResults.recommendations = ['Consult with your healthcare provider to discuss these results.'];
+      }
+      
       setAnalysis(aiResults);
 
       // 3. Create record in reports table only if authenticated
@@ -96,8 +128,74 @@ const ReportTranslator: React.FC = () => {
 
     } catch (error: any) {
       console.error("Error processing report (Detailed):", error);
-      alert("Failed to analyze report (" + (error.name || "Error") + "): " + error.message);
+      
+      // Provide user-friendly error messages
+      let errorMessage = "Failed to analyze report. ";
+      if (error.message?.includes('JSON')) {
+        errorMessage += "The AI had trouble reading the report format. Please try:\n• A clearer image\n• Better lighting\n• A different report format";
+      } else if (error.message?.includes('API')) {
+        errorMessage += "Connection issue with AI service. Please check your internet and try again.";
+      } else {
+        errorMessage += error.message || "Unknown error occurred.";
+      }
+      
+      alert(errorMessage);
       setAnalyzing(false);
+    }
+  };
+
+  const handleUpdateDashboard = async () => {
+    if (!analysis) return;
+
+    setUpdatingDashboard(true);
+    try {
+      // Extract health metrics from the report analysis
+      const metrics: any = {};
+
+      // Try to extract heart rate from results
+      const heartRateResult = analysis.results?.find((r: any) => 
+        r.test_name.toLowerCase().includes('heart rate') || 
+        r.test_name.toLowerCase().includes('pulse')
+      );
+      if (heartRateResult) {
+        const hrValue = parseInt(heartRateResult.value);
+        if (!isNaN(hrValue)) metrics.heart_rate = hrValue;
+      }
+
+      // Try to extract blood oxygen
+      const o2Result = analysis.results?.find((r: any) => 
+        r.test_name.toLowerCase().includes('oxygen') || 
+        r.test_name.toLowerCase().includes('spo2')
+      );
+      if (o2Result) {
+        const o2Value = parseInt(o2Result.value);
+        if (!isNaN(o2Value)) metrics.blood_oxygen = o2Value;
+      }
+
+      // Set default steps if not found
+      if (!metrics.steps) {
+        metrics.steps = 0; // Will be updated by wearable or manual entry
+      }
+
+      // Set default sleep if not found
+      if (!metrics.sleep_hours) {
+        metrics.sleep_hours = 7; // Default healthy sleep
+      }
+
+      // Update or create today's health metric
+      await HealthService.upsertMetric(metrics);
+
+      // Call the callback to refresh dashboard
+      if (onDashboardUpdate) {
+        onDashboardUpdate();
+      }
+
+      alert('✅ Dashboard updated successfully with your report data!');
+    } catch (error) {
+      console.error('Error updating dashboard:', error);
+      alert('Failed to update dashboard. Please try again.');
+    } finally {
+      setUpdatingDashboard(false);
     }
   };
 
@@ -151,6 +249,27 @@ const ReportTranslator: React.FC = () => {
         {/* Results Section */}
         {showResults && analysis && (
           <div className="space-y-6 animate-slide-up">
+            {/* Update Dashboard Button */}
+            <div className="flex justify-center">
+              <button
+                onClick={handleUpdateDashboard}
+                disabled={updatingDashboard}
+                className="btn-primary flex items-center space-x-2 px-8 py-4 text-lg"
+              >
+                {updatingDashboard ? (
+                  <>
+                    <Loader className="w-5 h-5 animate-spin" />
+                    <span>Updating Dashboard...</span>
+                  </>
+                ) : (
+                  <>
+                    <RefreshCw className="w-5 h-5" />
+                    <span>Update Dashboard with Report Data</span>
+                  </>
+                )}
+              </button>
+            </div>
+
             {/* Overall Health Score */}
             <div className={`card border-2 ${analysis.health_score > 70 ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-300' : 'bg-gradient-to-br from-yellow-50 to-orange-50 border-yellow-300'} `}>
               <div className="flex items-center justify-between mb-4">
@@ -306,60 +425,6 @@ const ReportTranslator: React.FC = () => {
                     ))}
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Lifestyle Tips */}
-            {analysis.lifestyle_tips && (
-              <div className="card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <Sun className="w-6 h-6 text-blue-600 mr-2" />
-                  Lifestyle Recommendations
-                </h3>
-                <ul className="space-y-3">
-                  {analysis.lifestyle_tips.map((tip: string, i: number) => (
-                    <li key={i} className="flex items-start space-x-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
-                      <span className="text-gray-700">{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Yoga & Mindfulness */}
-            {analysis.yoga_tips && (
-              <div className="card bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-200">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <Activity className="w-6 h-6 text-indigo-600 mr-2" />
-                  Yoga & Mindfulness
-                </h3>
-                <ul className="space-y-3">
-                  {analysis.yoga_tips.map((tip: string, i: number) => (
-                    <li key={i} className="flex items-start space-x-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 mt-2 flex-shrink-0" />
-                      <span className="text-gray-700">{tip}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Benefits */}
-            {analysis.benefits && (
-              <div className="card bg-gradient-to-br from-amber-50 to-yellow-50 border-2 border-amber-200">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-                  <Heart className="w-6 h-6 text-amber-600 mr-2" />
-                  Health Benefits
-                </h3>
-                <ul className="space-y-3">
-                  {analysis.benefits.map((benefit: string, i: number) => (
-                    <li key={i} className="flex items-start space-x-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 mt-2 flex-shrink-0" />
-                      <span className="text-gray-700">{benefit}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
             )}
 
