@@ -11,10 +11,12 @@ import ReportTranslator from './components/ReportTranslator';
 import SymptomChecker from './components/SymptomChecker';
 import Settings from './components/Settings';
 import EmergencyContacts from './components/EmergencyContacts';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 import APITestPanel from './components/APITestPanel';
 import Navbar from './components/Navbar';
 
-type View = 'splash' | 'login' | 'signup' | 'onboarding' | 'dashboard' | 'chat' | 'report' | 'symptom' | 'settings' | 'emergency' | 'apitest';
+type View = 'splash' | 'login' | 'signup' | 'onboarding' | 'dashboard' | 'chat' | 'report' | 'symptom' | 'settings' | 'emergency' | 'privacy' | 'terms' | 'apitest';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('splash');
@@ -128,9 +130,23 @@ function App() {
       case 'splash':
         return <SplashScreen onFinish={handleSplashFinish} />;
       case 'login':
-        return <Login onLogin={handleLogin} onSignup={() => setCurrentView('signup')} />;
+        return (
+          <Login
+            onLogin={handleLogin}
+            onSignup={() => setCurrentView('signup')}
+            onPrivacy={() => setCurrentView('privacy')}
+            onTerms={() => setCurrentView('terms')}
+          />
+        );
       case 'signup':
-        return <Signup onSignup={handleSignup} onLogin={() => setCurrentView('login')} />;
+        return (
+          <Signup
+            onSignup={handleSignup}
+            onLogin={() => setCurrentView('login')}
+            onPrivacy={() => setCurrentView('privacy')}
+            onTerms={() => setCurrentView('terms')}
+          />
+        );
       case 'onboarding':
         return <Onboarding onComplete={handleOnboardingComplete} />;
       case 'dashboard':
@@ -150,6 +166,10 @@ function App() {
         return <Settings patientName={patientData?.fullName} onLogout={handleLogout} />;
       case 'emergency':
         return <EmergencyContacts />;
+      case 'privacy':
+        return <PrivacyPolicy onBack={() => setCurrentView('login')} />;
+      case 'terms':
+        return <TermsOfService onBack={() => setCurrentView('login')} />;
       case 'apitest':
         return <APITestPanel />;
       default:

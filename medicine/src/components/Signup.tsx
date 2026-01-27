@@ -5,9 +5,11 @@ import { Heart, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 interface SignupProps {
   onSignup: () => void;
   onLogin: () => void;
+  onPrivacy: () => void;
+  onTerms: () => void;
 }
 
-const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
+const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }) => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -252,13 +254,13 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
               />
               <label htmlFor="terms" className="text-sm text-gray-600">
                 I agree to the{' '}
-                <a href="#" className="text-green-600 font-semibold hover:underline">
+                <button type="button" onClick={onTerms} className="text-green-600 font-semibold hover:underline">
                   Terms of Service
-                </a>{' '}
+                </button>{' '}
                 and{' '}
-                <a href="#" className="text-green-600 font-semibold hover:underline">
+                <button type="button" onClick={onPrivacy} className="text-green-600 font-semibold hover:underline">
                   Privacy Policy
-                </a>
+                </button>
               </label>
             </div>
 
@@ -295,6 +297,13 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin }) => {
               Forgot Password?
             </button>
           </div>
+        </div>
+
+        {/* Legal Footer */}
+        <div className="mt-8 text-center">
+          <p className="text-[10px] text-gray-400 max-w-sm mx-auto leading-tight italic">
+            <strong>Medical Disclaimer:</strong> Robtor is an AI health assistant and does NOT provide medical diagnosis or professional advice. Always consult a doctor for medical concerns.
+          </p>
         </div>
       </div>
     </div>

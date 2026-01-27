@@ -5,9 +5,11 @@ import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
 interface LoginProps {
   onLogin: () => void;
   onSignup: () => void;
+  onPrivacy: () => void;
+  onTerms: () => void;
 }
 
-const Login: React.FC<LoginProps> = ({ onLogin, onSignup }) => {
+const Login: React.FC<LoginProps> = ({ onLogin, onSignup, onPrivacy, onTerms }) => {
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
@@ -85,9 +87,9 @@ For now, you can contact your administrator to reset your password manually in t
       setResetEmail('');
     } catch (error: any) {
       console.error('Password reset error:', error);
-      
+
       let errorMessage = '❌ Failed to send reset email.\n\n';
-      
+
       if (error.message.includes('User not found')) {
         errorMessage += 'This email is not registered. Please sign up first.';
       } else if (error.message.includes('rate limit')) {
@@ -97,7 +99,7 @@ For now, you can contact your administrator to reset your password manually in t
       } else {
         errorMessage += error.message || 'Unknown error occurred.';
       }
-      
+
       alert(errorMessage);
     } finally {
       setResetLoading(false);
@@ -202,11 +204,11 @@ For now, you can contact your administrator to reset your password manually in t
             <div className="bg-white rounded-2xl p-8 max-w-md w-full shadow-2xl max-h-[90vh] overflow-y-auto">
               <h3 className="text-2xl font-bold mb-2">Reset Password</h3>
               <p className="text-gray-600 mb-4">Enter your email address and we'll send you a link to reset your password.</p>
-              
+
               {/* Info Box */}
               <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 mb-4">
                 <p className="text-sm text-blue-800">
-                  <strong>📧 Email Setup Required:</strong><br/>
+                  <strong>📧 Email Setup Required:</strong><br />
                   If you don't receive an email, Supabase email service needs to be configured:
                 </p>
                 <ol className="text-xs text-blue-700 mt-2 ml-4 space-y-1">
@@ -216,7 +218,7 @@ For now, you can contact your administrator to reset your password manually in t
                   <li>4. Test the email service</li>
                 </ol>
               </div>
-              
+
               <div className="mb-6">
                 <label className="block text-sm font-semibold mb-2">Email Address</label>
                 <div className="relative">
@@ -253,6 +255,18 @@ For now, you can contact your administrator to reset your password manually in t
             </div>
           </div>
         )}
+
+        {/* Legal Footer */}
+        <div className="mt-8 text-center space-y-4">
+          <p className="text-[10px] text-gray-400 max-w-sm mx-auto leading-tight italic">
+            <strong>Medical Disclaimer:</strong> Robtor is an AI health assistant and does NOT provide medical diagnosis or professional advice. Always consult a doctor for medical concerns.
+          </p>
+          <div className="flex justify-center space-x-4 text-xs text-gray-500">
+            <button onClick={onPrivacy} className="hover:text-green-600 transition-colors">Privacy Policy</button>
+            <span>•</span>
+            <button onClick={onTerms} className="hover:text-green-600 transition-colors">Terms of Service</button>
+          </div>
+        </div>
       </div>
     </div>
   );

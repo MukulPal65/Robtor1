@@ -215,6 +215,14 @@ const ReportTranslator: React.FC<ReportTranslatorProps> = ({ onDashboardUpdate }
           </div>
         </div>
 
+        {/* Warning Disclaimer */}
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-8 flex items-start space-x-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-800 leading-tight">
+            <strong>Important:</strong> This AI tool is for informational purposes only. It does not provide medical diagnosis. Always review lab results with a qualified healthcare professional.
+          </p>
+        </div>
+
         {/* Upload Section */}
         {!showResults && (
           <div className="card mb-6">

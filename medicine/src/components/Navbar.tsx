@@ -11,6 +11,8 @@ type View =
   | 'symptom'
   | 'settings'
   | 'emergency'
+  | 'privacy'
+  | 'terms'
   | 'apitest';
 
 interface Props {
@@ -108,9 +110,8 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
                 onClick={() => setCurrentView(item.view)}
                 aria-label={item.label}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex flex-col items-center justify-center space-y-1 px-4 py-2 min-w-[56px] rounded-lg transition-colors transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-300 ${
-                  isActive ? accentClass : 'text-gray-600 hover:text-green-600'
-                }`}
+                className={`flex flex-col items-center justify-center space-y-1 px-4 py-2 min-w-[56px] rounded-lg transition-colors transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-300 ${isActive ? accentClass : 'text-gray-600 hover:text-green-600'
+                  }`}
               >
                 <div className="relative">
                   {item.icon}
