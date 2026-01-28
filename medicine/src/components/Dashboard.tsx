@@ -198,7 +198,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
 
         <div className="flex items-center justify-between mb-2 relative z-10 max-w-5xl mx-auto">
           <div>
-            <h1 className="text-3xl font-black mb-1 drop-shadow-lg tracking-tight">Welcome back, {patientName}! 👋</h1>
+            <h1 className="text-2xl font-bold mb-1 drop-shadow-lg tracking-tight">Welcome back, {patientName}! 👋</h1>
             <p className="text-green-100/90 text-sm font-medium">Your vitals are looking excellent today</p>
           </div>
           <div className="flex items-center space-x-4 relative z-10">
@@ -276,7 +276,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Activity className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Overall Health Score</h3>
+                <h3 className="text-base font-bold text-gray-800">Overall Health Score</h3>
                 <p className="text-xs text-gray-600">Based on your wearable data & activity</p>
               </div>
             </div>
@@ -296,7 +296,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                     strokeLinecap="round" />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-indigo-600">{overallHealthScore}%</span>
+                  <span className="text-xl font-bold text-indigo-600">{overallHealthScore}%</span>
                 </div>
               </div>
               <p className={`text-xs font-semibold text-${healthScoreColor}-600 mt-1`}>{healthScoreLabel}</p>
@@ -314,8 +314,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Activity className="w-6 h-6 text-blue-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Steps</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">{currentSteps.toLocaleString()}</p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Steps</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">{currentSteps.toLocaleString()}</p>
             <div className="flex items-center mt-3 relative z-10">
               <div className="flex-1 bg-gray-100 rounded-full h-2.5 mr-2 overflow-hidden shadow-inner">
                 <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full shadow-lg" style={{ width: '92%' }}></div>
@@ -332,8 +332,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Heart className="w-6 h-6 text-red-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Heart Rate</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">{currentHeartRate} <span className="text-sm font-medium text-gray-400">bpm</span></p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Heart Rate</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">{currentHeartRate} <span className="text-xs font-medium text-gray-400">bpm</span></p>
             <div className="flex items-center mt-3 text-[10px] font-bold text-green-600 uppercase tracking-widest">
               <span className="flex h-2 w-2 mr-2">
                 <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
@@ -351,8 +351,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Moon className="w-6 h-6 text-purple-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Sleep</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">{currentSleep} <span className="text-sm font-medium text-gray-400">hrs</span></p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Sleep</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">{currentSleep} <span className="text-xs font-medium text-gray-400">hrs</span></p>
             <p className="text-[10px] font-bold text-purple-600 mt-3 uppercase tracking-widest">+12 min vs avg</p>
           </div>
 
@@ -364,8 +364,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Flame className="w-6 h-6 text-orange-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Calories</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">2,345</p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Calories</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">2,345</p>
             <p className="text-[10px] font-bold text-orange-600 mt-3 uppercase tracking-widest">Today's burn</p>
           </div>
         </div>
@@ -377,7 +377,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               <AlertTriangle className="w-7 h-7 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-lg font-bold text-gray-800 mb-2">Early Risk Prediction</h3>
+              <h3 className="text-base font-bold text-gray-800 mb-2">Early Risk Prediction</h3>
               <p className="text-sm text-gray-600 mb-3">
                 AI-powered analysis of your health trends to predict and prevent future risks
               </p>
@@ -430,7 +430,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Utensils className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-800">Custom Diet Plan</h3>
+                <h3 className="text-base font-bold text-gray-800">Custom Diet Plan</h3>
                 <p className="text-xs text-gray-600 mt-1">AI-generated based on your health data</p>
               </div>
             </div>
@@ -481,7 +481,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Dumbbell className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-800">Custom Fitness Plan</h3>
+                <h3 className="text-base font-bold text-gray-800">Custom Fitness Plan</h3>
                 <p className="text-xs text-gray-600 mt-1">Personalized workout schedule</p>
               </div>
             </div>
@@ -544,7 +544,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <Pill className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Medication Reminders</h3>
+                <h3 className="text-base font-bold text-gray-800">Medication Reminders</h3>
                 <p className="text-xs text-gray-600">Never miss your medications</p>
               </div>
             </div>
@@ -666,7 +666,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
 
         {/* Analytics Section */}
         <div className="mb-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Your Health Analytics</h3>
+          <h3 className="text-base font-bold text-gray-800 mb-4">Your Health Analytics</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Weekly Steps */}
@@ -760,7 +760,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
 
         {/* Daily Goals Progress */}
         <div className="card mb-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4">Today's Progress</h3>
+          <h3 className="text-base font-bold text-gray-800 mb-4">Today's Progress</h3>
           <div className="grid grid-cols-3 gap-6">
             {/* Steps Circle */}
             <div className="flex flex-col items-center">
@@ -1121,8 +1121,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-bold text-gray-800 mb-0 text-lg">Health Risk Overview</h4>
                       <span className={`px-4 py-2 rounded-full font-bold text-sm ${riskAnalysis.overall_risk === 'Low' ? 'bg-green-100 text-green-700' :
-                          riskAnalysis.overall_risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-red-100 text-red-700'
+                        riskAnalysis.overall_risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                          'bg-red-100 text-red-700'
                         }`}>
                         {riskAnalysis.overall_risk} Risk Overall
                       </span>

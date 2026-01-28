@@ -10,21 +10,21 @@
 
 @layer components {
   .card {
-    @apply bg-white/80 backdrop-blur-md rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-8 hover:shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] transition-all duration-500 border border-white/50;
+    @apply bg-white/80 backdrop-blur-md rounded-[2rem] shadow-[0_8px_30px_rgba(0, 0, 0, 0.04)] p-6 hover:shadow-[0_20px_50px_rgba(8, 112, 184, 0.07)] transition-all duration-500 border border-white/50;
   }
-  
+
   .glass-card {
     @apply bg-white/40 backdrop-blur-xl rounded-[2rem] border border-white/60 shadow-xl;
   }
-  
+
   .btn-primary {
-    @apply bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-8 py-4 rounded-2xl font-bold hover:shadow-[0_10px_20px_rgba(16,_185,_129,_0.3)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
+    @apply bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-6 py-3 rounded-2xl font-bold hover:shadow-[0_10px_20px_rgba(16, 185, 129, 0.3)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
   }
-  
+
   .btn-secondary {
-    @apply bg-white/80 backdrop-blur-sm text-green-700 px-8 py-4 rounded-2xl font-bold border border-green-100 hover:bg-green-50 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
+    @apply bg-white/80 backdrop-blur-sm text-green-700 px-6 py-3 rounded-2xl font-bold border border-green-100 hover:bg-green-50 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
   }
-  
+
   .feature-card {
     @apply bg-white/60 backdrop-blur-md rounded-3xl p-8 shadow-sm hover:shadow-2xl transition-all duration-500 cursor-pointer border border-white hover:border-green-300/50 hover:-translate-y-2;
   }
@@ -38,15 +38,15 @@
   .animate-blob {
     animation: blob 7s infinite;
   }
-  
+
   .animation-delay-2000 {
     animation-delay: 2s;
   }
-  
+
   .animation-delay-4000 {
     animation-delay: 4s;
   }
-  
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
   }
@@ -57,31 +57,41 @@
 }
 
 @keyframes blob {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0px, 0px) scale(1);
   }
+
   33% {
     transform: translate(30px, -50px) scale(1.1);
   }
+
   66% {
     transform: translate(-20px, 20px) scale(0.9);
   }
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-20px);
   }
 }
 
 @keyframes pulseSlow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.8;
     transform: scale(1.05);
@@ -91,6 +101,7 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

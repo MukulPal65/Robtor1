@@ -104,7 +104,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
 
         <div className="flex items-center justify-between mb-2 relative z-10 max-w-5xl mx-auto">
           <div>
-            <h1 className="text-3xl font-black mb-1 drop-shadow-lg tracking-tight">Hello, {patientName}! 👋</h1>
+            <h1 className="text-2xl font-bold mb-1 drop-shadow-lg tracking-tight">Hello, {patientName}! 👋</h1>
             <p className="text-purple-100/90 text-sm font-medium">Let's build healthy habits today</p>
           </div>
           <div className="bg-white/20 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/20 animate-float">
@@ -120,12 +120,12 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
               </div>
               <div>
                 <p className="text-purple-100 text-[10px] font-bold uppercase tracking-widest mb-0.5">Health Score</p>
-                <p className="text-3xl font-black">85%</p>
+                <p className="text-2xl font-bold">85%</p>
               </div>
             </div>
             <div className="text-right">
               <p className="text-purple-100 text-[10px] font-bold uppercase tracking-widest mb-0.5">Streak</p>
-              <p className="text-2xl font-black tracking-tighter">7 days 🔥</p>
+              <p className="text-xl font-bold tracking-tighter">7 days 🔥</p>
             </div>
           </div>
         </div>
@@ -144,7 +144,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                   RECOMMENDED
                 </span>
               </div>
-              <h3 className="text-xl font-bold mb-2">Connect Your Device</h3>
+              <h3 className="text-lg font-bold mb-2">Connect Your Device</h3>
               <p className="text-white/90 text-sm mb-4 leading-relaxed">
                 Sync your smartwatch or fitness tracker for automatic health monitoring, real-time insights, and personalized AI recommendations.
               </p>
@@ -167,8 +167,8 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Activity className="w-6 h-6 text-blue-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Steps</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">{activitySummary.steps.toLocaleString()}</p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Steps</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">{activitySummary.steps.toLocaleString()}</p>
             <p className="text-[10px] font-bold text-blue-600 mt-3 uppercase tracking-widest">{Math.round((activitySummary.steps / activitySummary.stepsGoal) * 100)}% of goal</p>
           </div>
 
@@ -180,8 +180,8 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Apple className="w-6 h-6 text-orange-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Food</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">log</p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Food</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">log</p>
             <p className="text-[10px] font-bold text-orange-600 mt-3 uppercase tracking-widest">Track meals</p>
           </div>
 
@@ -193,8 +193,8 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Droplet className="w-6 h-6 text-cyan-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Water</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">{waterCount}/8</p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Water</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">{waterCount}/8</p>
             <button
               onClick={() => setWaterCount(prev => Math.min(prev + 1, 8))}
               className="mt-3 text-[10px] font-bold text-cyan-600 uppercase tracking-widest hover:underline flex items-center"
@@ -211,8 +211,8 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Moon className="w-6 h-6 text-purple-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-bold text-gray-500 mb-1">Sleep</h3>
-            <p className="text-3xl font-black text-gray-800 tracking-tighter">{sleepTracking.lastNight}h</p>
+            <h3 className="text-xs font-bold text-gray-500 mb-1">Sleep</h3>
+            <p className="text-2xl font-bold text-gray-800 tracking-tighter">{sleepTracking.lastNight}h</p>
             <p className="text-[10px] font-bold text-purple-600 mt-3 uppercase tracking-widest">{sleepTracking.quality} quality</p>
           </div>
         </div>
@@ -223,7 +223,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
             <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-2.5 rounded-xl shadow-lg">
               <Brain className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-lg font-bold text-gray-800">AI Health Insights</h3>
+            <h3 className="text-base font-bold text-gray-800">AI Health Insights</h3>
           </div>
           <div className="space-y-3">
             <div className="bg-white border-2 border-green-300 rounded-xl p-4 shadow-sm hover:shadow-md transition-all">
@@ -259,12 +259,12 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Activity className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Weekly Steps Trends</h3>
+                <h3 className="text-base font-bold text-gray-800">Weekly Steps Trends</h3>
                 <p className="text-xs text-gray-600">Your activity over the last 7 days</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-gray-800">65,403</p>
+              <p className="text-xl font-bold text-gray-800">65,403</p>
               <p className="text-xs text-blue-600 font-bold">Total Steps</p>
             </div>
           </div>
@@ -316,7 +316,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Utensils className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-800">Custom Diet Plan</h3>
+                <h3 className="text-base font-bold text-gray-800">Custom Diet Plan</h3>
                 <p className="text-xs text-gray-600 mt-1">AI-generated based on your goals</p>
               </div>
             </div>
@@ -367,7 +367,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Dumbbell className="w-6 h-6 text-white" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-800">Custom Fitness Plan</h3>
+                <h3 className="text-base font-bold text-gray-800">Custom Fitness Plan</h3>
                 <p className="text-xs text-gray-600 mt-1">Personalized workout schedule</p>
               </div>
             </div>
@@ -430,7 +430,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
                 <Pill className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-gray-800">Medication Reminders</h3>
+                <h3 className="text-base font-bold text-gray-800">Medication Reminders</h3>
                 <p className="text-xs text-gray-600">Stay on track with your meds</p>
               </div>
             </div>
@@ -556,7 +556,7 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
             <div className="bg-gradient-to-br from-purple-500 to-indigo-600 p-2.5 rounded-xl shadow-lg">
               <TrendingUp className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-lg font-bold text-gray-800">Your Health Goals</h3>
+            <h3 className="text-base font-bold text-gray-800">Your Health Goals</h3>
           </div>
           <div className="space-y-5">
             {/* Water Goal */}
@@ -612,19 +612,19 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
             <div className="bg-gradient-to-br from-amber-500 to-yellow-600 p-2.5 rounded-xl shadow-lg">
               <Calendar className="w-6 h-6 text-white" />
             </div>
-            <h3 className="text-lg font-bold text-gray-800">This Week</h3>
+            <h3 className="text-base font-bold text-gray-800">This Week</h3>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white rounded-xl p-3 text-center border-2 border-amber-200">
-              <p className="text-2xl font-bold text-amber-600">52</p>
+              <p className="text-xl font-bold text-amber-600">52</p>
               <p className="text-xs text-gray-600 mt-1">Glasses</p>
             </div>
             <div className="bg-white rounded-xl p-3 text-center border-2 border-green-200">
-              <p className="text-2xl font-bold text-green-600">3</p>
+              <p className="text-xl font-bold text-green-600">3</p>
               <p className="text-xs text-gray-600 mt-1">Workouts</p>
             </div>
             <div className="bg-white rounded-xl p-3 text-center border-2 border-purple-200">
-              <p className="text-2xl font-bold text-purple-600">7.5h</p>
+              <p className="text-xl font-bold text-purple-600">7.5h</p>
               <p className="text-xs text-gray-600 mt-1">Avg Sleep</p>
             </div>
           </div>
