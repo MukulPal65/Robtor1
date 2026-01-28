@@ -93,39 +93,41 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
   ];
 
   return (
-    <nav
-      role="navigation"
-      aria-label="Main"
-      className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-[100]"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-    >
-      <div className="max-w-screen-xl mx-auto px-2">
-        <div className="flex items-center justify-between gap-1 py-2">
+    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-lg z-[100] px-4">
+      <nav
+        role="navigation"
+        aria-label="Main"
+        className="bg-white/80 backdrop-blur-xl border border-white/40 shadow-[0_20px_50px_rgba(0,0,0,0.1)] rounded-[2.5rem] px-2 py-3"
+      >
+        <div className="flex items-center justify-between">
           {navItems.map((item) => {
             const isActive = currentView === item.view;
-            const accentClass = item.accent ? item.accent : isActive ? 'text-green-600 bg-green-50' : '';
             return (
               <button
                 key={item.key}
                 onClick={() => setCurrentView(item.view)}
                 aria-label={item.label}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex flex-col items-center justify-center space-y-1 px-4 py-2 min-w-[56px] rounded-lg transition-colors transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-green-300 ${isActive ? accentClass : 'text-gray-600 hover:text-green-600'
+                className={`nav-item relative px-3 py-2 rounded-2xl transition-all duration-500 group ${isActive ? 'bg-green-500/10 scale-110' : 'hover:bg-gray-100/50'
                   }`}
               >
-                <div className="relative">
+                <div className={`transition-all duration-500 ${isActive ? 'text-green-600' : 'text-gray-400 group-hover:text-gray-600'}`}>
                   {item.icon}
-                  {/* Active dot indicator */}
-                  {isActive && <span className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-2 h-2 rounded-full bg-green-600" aria-hidden />}
                 </div>
-                {/* On very small screens we show icons only; show label starting at md */}
-                <span className="text-[11px] font-semibold md:block hidden">{item.label}</span>
+
+                {/* Active Bar indicator */}
+                <div className={`absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full transition-all duration-500 ${isActive ? 'bg-green-600 w-4' : 'opacity-0'}`} aria-hidden />
+
+                {/* Label Tooltip */}
+                <span className={`absolute -top-12 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-[10px] px-2 py-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap font-bold shadow-xl`}>
+                  {item.label}
+                </span>
               </button>
             );
           })}
         </div>
-      </div>
-    </nav>
+      </nav>
+    </div>
   );
 };
 

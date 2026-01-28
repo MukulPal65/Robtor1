@@ -16,7 +16,11 @@ import {
   MessageSquare,
   ChevronDown,
   ChevronUp,
-  ExternalLink
+  ExternalLink,
+  Plus,
+  Activity,
+  Droplet,
+  RefreshCw
 } from 'lucide-react';
 
 interface SettingsProps {
@@ -1176,41 +1180,82 @@ const Settings: React.FC<SettingsProps> = ({
 
               {/* Connected Devices Tab */}
               {activeTab === 'devices' && (
-                <div className="space-y-8 animate-fade-in text-center">
-                  <div className="flex justify-center items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Connected Devices</h2>
+                <div className="space-y-8 animate-fade-in">
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h2 className="text-2xl font-bold text-gray-800">Connected Devices</h2>
+                      <p className="text-sm text-gray-500">Manage your wearables and health sensors</p>
+                    </div>
+                    <button
+                      onClick={() => alert('Searching for nearby devices...')}
+                      className="flex items-center space-x-2 bg-green-50 text-green-700 px-4 py-2 rounded-xl font-bold border border-green-200 hover:bg-green-100 transition-all"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Pair New</span>
+                    </button>
                   </div>
 
-                  {/* Coming Soon Card */}
-                  <div className="max-w-md mx-auto">
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-12 border-2 border-blue-200 shadow-lg">
-                      <div className="flex justify-center mb-6">
-                        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-6 rounded-full shadow-xl">
-                          <Smartphone className="w-12 h-12 text-white" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {[
+                      { name: 'Apple Watch Series 9', type: 'Smartwatch', status: 'Connected', battery: '85%', color: 'blue', icon: Smartphone },
+                      { name: 'Oura Ring Gen 3', type: 'Health Ring', status: 'Connected', battery: '42%', color: 'purple', icon: Activity },
+                    ].map((device, i) => (
+                      <div key={i} className="card relative group overflow-hidden">
+                        <div className={`absolute top-0 right-0 w-24 h-24 bg-${device.color}-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700`}></div>
+
+                        <div className="flex items-start justify-between relative z-10">
+                          <div className="flex items-start space-x-4">
+                            <div className={`bg-${device.color}-100 p-4 rounded-2xl`}>
+                              <device.icon className={`w-8 h-8 text-${device.color}-600`} />
+                            </div>
+                            <div>
+                              <h3 className="font-bold text-gray-800 text-lg">{device.name}</h3>
+                              <p className="text-sm text-gray-500">{device.type}</p>
+                              <div className="flex items-center space-x-2 mt-2">
+                                <span className="flex h-2 w-2 relative">
+                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                                </span>
+                                <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">{device.status}</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="flex items-center space-x-1 justify-end">
+                              <Droplet className="w-3 h-3 text-green-500 rotate-180" />
+                              <span className="text-xs font-bold text-gray-600">{device.battery}</span>
+                            </div>
+                            <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">Battery</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 mt-8 relative z-10">
+                          <button className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm transition-all">
+                            Settings
+                          </button>
+                          <button className="flex-1 bg-white border border-red-100 text-red-600 hover:bg-red-50 py-3 rounded-xl font-bold text-sm transition-all">
+                            Disconnect
+                          </button>
                         </div>
                       </div>
+                    ))}
+                  </div>
 
-                      <h3 className="text-2xl font-bold text-gray-800 mb-3">Coming Soon!</h3>
-                      <p className="text-gray-600 mb-6 leading-relaxed">
-                        We're working on bringing you seamless integration with your favorite health devices and wearables.
-                      </p>
-
-                      <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-blue-100">
-                        <p className="text-sm font-semibold text-blue-800 mb-2">Planned Features:</p>
-                        <ul className="text-xs text-gray-700 space-y-2 text-left">
-                          <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-blue-500 mr-2 shrink-0" />
-                            <span>Google Fit & Apple Health sync</span>
-                          </li>
-                          <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-blue-500 mr-2 shrink-0" />
-                            <span>Smartwatch integration</span>
-                          </li>
-                          <li className="flex items-center">
-                            <CheckCircle className="w-4 h-4 text-blue-500 mr-2 shrink-0" />
-                            <span>Automatic health data syncing</span>
-                          </li>
-                        </ul>
+                  {/* Sync Status Section */}
+                  <div className="card bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-100">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="bg-indigo-500 p-3 rounded-2xl shadow-lg animate-pulse">
+                          <RefreshCw className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-800">Background Sync</h3>
+                          <p className="text-sm text-gray-600">Your health data is automatically syncing every 15 minutes</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Last Synced</p>
+                        <p className="text-sm font-bold text-indigo-600">2 minutes ago</p>
                       </div>
                     </div>
                   </div>

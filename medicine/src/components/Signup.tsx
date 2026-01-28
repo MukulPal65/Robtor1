@@ -98,13 +98,14 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
   const strength = passwordStrength();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center p-6">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-200 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-emerald-200 rounded-full opacity-20 blur-3xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 flex items-center justify-center p-6 relative overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-40 -right-40 w-96 h-96 bg-green-200 rounded-full opacity-30 blur-3xl animate-blob"></div>
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-emerald-200 rounded-full opacity-30 blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none"></div>
       </div>
 
-      <div className="relative w-full max-w-md">
+      <div className="relative w-full max-w-md z-10">
         <div className="text-center mb-8 animate-fade-in">
           <div className="flex justify-center mb-4">
             <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-4 rounded-3xl shadow-lg">
@@ -115,7 +116,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
           <p className="text-gray-600">Start your journey to better health</p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-8 backdrop-blur-lg animate-slide-up">
+        <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-10 shadow-[0_20px_50px_rgba(0,0,0,0.1)] border border-white/50 animate-slide-up">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Create Account</h2>
           <p className="text-gray-600 mb-6">Sign up to get started</p>
 

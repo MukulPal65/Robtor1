@@ -95,31 +95,37 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
       <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-pink-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
       {/* Header */}
-      <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 text-white px-6 py-10 rounded-b-[2.5rem] shadow-2xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-blue-500 via-purple-600 to-pink-600 text-white px-6 py-10 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
         {/* Header Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-40 h-40 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-60 h-60 border-2 border-white rounded-full translate-x-1/3 translate-y-1/3"></div>
+          <div className="absolute top-0 left-0 w-48 h-48 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
+          <div className="absolute bottom-0 right-1/4 w-72 h-72 border-2 border-white rounded-full translate-y-1/2 opacity-20 animate-float"></div>
         </div>
 
-        <div className="flex items-center justify-between mb-2 relative z-10">
+        <div className="flex items-center justify-between mb-2 relative z-10 max-w-5xl mx-auto">
           <div>
-            <h1 className="text-3xl font-bold mb-1 drop-shadow-lg">Hello, {patientName}! 👋</h1>
-            <p className="text-purple-100 text-base">Let's build healthy habits together</p>
+            <h1 className="text-3xl font-black mb-1 drop-shadow-lg tracking-tight">Hello, {patientName}! 👋</h1>
+            <p className="text-purple-100/90 text-sm font-medium">Let's build healthy habits today</p>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm p-3 rounded-2xl shadow-lg">
-            <Heart className="w-7 h-7 text-white" />
+          <div className="bg-white/20 backdrop-blur-md p-4 rounded-3xl shadow-xl border border-white/20 animate-float">
+            <Heart className="w-8 h-8 text-white" fill="white" />
           </div>
         </div>
-        <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-2xl p-4">
+
+        <div className="mt-8 bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 max-w-5xl mx-auto">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-green-100 text-xs mb-1">Today's Health Score</p>
-              <p className="text-3xl font-bold">85%</p>
+            <div className="flex items-center space-x-4">
+              <div className="bg-white/20 p-3 rounded-2xl">
+                <Zap className="w-6 h-6 text-yellow-300" />
+              </div>
+              <div>
+                <p className="text-purple-100 text-[10px] font-bold uppercase tracking-widest mb-0.5">Health Score</p>
+                <p className="text-3xl font-black">85%</p>
+              </div>
             </div>
             <div className="text-right">
-              <p className="text-green-100 text-xs mb-1">Streak</p>
-              <p className="text-2xl font-bold">7 days 🔥</p>
+              <p className="text-purple-100 text-[10px] font-bold uppercase tracking-widest mb-0.5">Streak</p>
+              <p className="text-2xl font-black tracking-tighter">7 days 🔥</p>
             </div>
           </div>
         </div>
@@ -152,59 +158,62 @@ const DashboardSimple: React.FC<DashboardSimpleProps> = ({ patientName = 'User' 
         </div>
 
         {/* Quick Action Cards */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {/* Activity Card */}
-          <div className="card hover:shadow-xl transition-all cursor-pointer group bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
-                <Activity className="w-6 h-6 text-white" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-500 transition-colors duration-300">
+                <Activity className="w-6 h-6 text-blue-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Daily Steps</h3>
-            <p className="text-2xl font-bold text-gray-800 mb-1">{activitySummary.steps.toLocaleString()}</p>
-            <p className="text-xs text-blue-600 font-semibold">{Math.round((activitySummary.steps / activitySummary.stepsGoal) * 100)}% of goal →</p>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Steps</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">{activitySummary.steps.toLocaleString()}</p>
+            <p className="text-[10px] font-bold text-blue-600 mt-3 uppercase tracking-widest">{Math.round((activitySummary.steps / activitySummary.stepsGoal) * 100)}% of goal</p>
           </div>
 
           {/* Meals Card */}
-          <div className="card hover:shadow-xl transition-all cursor-pointer group bg-gradient-to-br from-orange-50 to-orange-100 border-2 border-orange-200">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
-                <Apple className="w-6 h-6 text-white" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-orange-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-orange-50 p-4 rounded-2xl group-hover:bg-orange-500 transition-colors duration-300">
+                <Apple className="w-6 h-6 text-orange-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Meals</h3>
-            <p className="text-2xl font-bold text-gray-800 mb-1">Track</p>
-            <p className="text-xs text-orange-600 font-semibold">Food diary →</p>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Food</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">log</p>
+            <p className="text-[10px] font-bold text-orange-600 mt-3 uppercase tracking-widest">Track meals</p>
           </div>
 
           {/* Water Card */}
-          <div className="card hover:shadow-xl transition-all cursor-pointer group bg-gradient-to-br from-cyan-50 to-cyan-100 border-2 border-cyan-200">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
-                <Droplet className="w-6 h-6 text-white" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-cyan-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-cyan-50 p-4 rounded-2xl group-hover:bg-cyan-500 transition-colors duration-300">
+                <Droplet className="w-6 h-6 text-cyan-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Water Intake</h3>
-            <p className="text-2xl font-bold text-gray-800 mb-1">{waterCount}/8</p>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Water</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">{waterCount}/8</p>
             <button
               onClick={() => setWaterCount(prev => Math.min(prev + 1, 8))}
-              className="text-xs text-cyan-600 font-semibold flex items-center space-x-1"
+              className="mt-3 text-[10px] font-bold text-cyan-600 uppercase tracking-widest hover:underline flex items-center"
             >
-              <Plus className="w-3 h-3" />
-              <span>Add glass</span>
+              <Plus className="w-3 h-3 mr-1" /> Add glass
             </button>
           </div>
 
           {/* Sleep Card */}
-          <div className="card hover:shadow-xl transition-all cursor-pointer group bg-gradient-to-br from-purple-50 to-purple-100 border-2 border-purple-200">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-gradient-to-br from-purple-500 to-purple-600 p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform">
-                <Moon className="w-6 h-6 text-white" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-purple-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-purple-50 p-4 rounded-2xl group-hover:bg-purple-500 transition-colors duration-300">
+                <Moon className="w-6 h-6 text-purple-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm font-semibold text-gray-700 mb-1">Sleep</h3>
-            <p className="text-2xl font-bold text-gray-800 mb-1">{sleepTracking.lastNight}h</p>
-            <p className="text-xs text-purple-600 font-semibold">{sleepTracking.quality} quality →</p>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Sleep</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">{sleepTracking.lastNight}h</p>
+            <p className="text-[10px] font-bold text-purple-600 mt-3 uppercase tracking-widest">{sleepTracking.quality} quality</p>
           </div>
         </div>
 

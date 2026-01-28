@@ -42,7 +42,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       const weekly = await HealthService.getWeeklyMetrics();
       const report = await ReportService.getLatestReport();
       const recs = await RecommendationService.getPersonalizedRecommendations();
-      
+
       setLatestReport(report);
       setRecommendations(recs);
 
@@ -109,7 +109,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
   const currentSteps = todayMetric?.steps || 9234; // Static fallback: 9,234 steps (92% of 10,000 goal)
   const currentHeartRate = todayMetric?.heart_rate || 78; // Static fallback: 78 bpm (normal resting)
   const currentSleep = todayMetric?.sleep_hours || 7.5; // Static fallback: 7.5 hours
-  
+
   // Calculate overall health score from latest report or use default
   const overallHealthScore = latestReport?.analysis_result?.health_score || 87;
   const healthScoreLabel = overallHealthScore >= 80 ? 'Excellent' : overallHealthScore >= 60 ? 'Good' : overallHealthScore >= 40 ? 'Fair' : 'Needs Attention';
@@ -189,31 +189,31 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
       {/* Header */}
-      <div className="bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-6 py-8 rounded-b-[2rem] shadow-2xl relative overflow-hidden">
+      <div className="bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-6 py-10 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
         {/* Header Background Pattern */}
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-40 h-40 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2"></div>
-          <div className="absolute bottom-0 right-0 w-60 h-60 border-2 border-white rounded-full translate-x-1/3 translate-y-1/3"></div>
+          <div className="absolute top-0 left-0 w-48 h-48 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
+          <div className="absolute bottom-0 right-1/4 w-72 h-72 border-2 border-white rounded-full translate-y-1/2 opacity-20 animate-float"></div>
         </div>
 
-        <div className="flex items-center justify-between mb-4 relative z-10">
+        <div className="flex items-center justify-between mb-2 relative z-10 max-w-5xl mx-auto">
           <div>
-            <h1 className="text-2xl font-bold drop-shadow-lg">Welcome back, {patientName}! 👋</h1>
-            <p className="text-green-100 text-sm mt-1">Your health is looking great today</p>
+            <h1 className="text-3xl font-black mb-1 drop-shadow-lg tracking-tight">Welcome back, {patientName}! 👋</h1>
+            <p className="text-green-100/90 text-sm font-medium">Your vitals are looking excellent today</p>
           </div>
-          <div className="flex items-center space-x-3 relative z-10">
+          <div className="flex items-center space-x-4 relative z-10">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-all shadow-lg relative"
+              className="bg-white/20 backdrop-blur-md p-4 rounded-3xl hover:bg-white/30 transition-all shadow-xl relative border border-white/20 active:scale-95"
             >
               <Bell className="w-6 h-6" />
               {notifications.filter(n => n.unread).length > 0 && (
-                <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+                <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 border-2 border-green-500 rounded-full animate-bounce"></span>
               )}
             </button>
             <button
               onClick={handleRefresh}
-              className="bg-white/20 backdrop-blur-sm p-3 rounded-full hover:bg-white/30 transition-all shadow-lg flex items-center justify-center"
+              className="bg-white/20 backdrop-blur-md p-4 rounded-3xl hover:bg-white/30 transition-all shadow-xl active:scale-95 border border-white/20"
             >
               <RefreshCw className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -305,58 +305,68 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {/* Steps Card */}
-          <div className="card hover:shadow-lg transition-all">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <Activity className="w-6 h-6 text-blue-600" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-blue-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-blue-50 p-4 rounded-2xl group-hover:bg-blue-500 transition-colors duration-300">
+                <Activity className="w-6 h-6 text-blue-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm text-gray-600 mb-1">Steps</h3>
-            <p className="text-2xl font-bold text-gray-800">{currentSteps.toLocaleString()}</p>
-            <div className="flex items-center mt-2">
-              <div className="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                <div className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full" style={{ width: '92%' }}></div>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Steps</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">{currentSteps.toLocaleString()}</p>
+            <div className="flex items-center mt-3 relative z-10">
+              <div className="flex-1 bg-gray-100 rounded-full h-2.5 mr-2 overflow-hidden shadow-inner">
+                <div className="bg-gradient-to-r from-blue-400 to-blue-600 h-full rounded-full shadow-lg" style={{ width: '92%' }}></div>
               </div>
-              <span className="text-xs text-gray-500">92%</span>
+              <span className="text-[10px] font-black text-blue-600">92%</span>
             </div>
           </div>
 
           {/* Heart Rate Card */}
-          <div className="card hover:shadow-lg transition-all">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-red-100 p-3 rounded-xl">
-                <Heart className="w-6 h-6 text-red-600" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-red-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-red-50 p-4 rounded-2xl group-hover:bg-red-500 transition-colors duration-300">
+                <Heart className="w-6 h-6 text-red-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm text-gray-600 mb-1">Heart Rate</h3>
-            <p className="text-2xl font-bold text-gray-800">{currentHeartRate} <span className="text-sm text-gray-500">bpm</span></p>
-            <p className="text-xs text-green-600 mt-2">Normal range</p>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Heart Rate</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">{currentHeartRate} <span className="text-sm font-medium text-gray-400">bpm</span></p>
+            <div className="flex items-center mt-3 text-[10px] font-bold text-green-600 uppercase tracking-widest">
+              <span className="flex h-2 w-2 mr-2">
+                <span className="animate-ping absolute inline-flex h-2 w-2 rounded-full bg-green-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+              </span>
+              Healthy resting
+            </div>
           </div>
 
           {/* Sleep Card */}
-          <div className="card hover:shadow-lg transition-all">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-purple-100 p-3 rounded-xl">
-                <Moon className="w-6 h-6 text-purple-600" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-purple-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-purple-50 p-4 rounded-2xl group-hover:bg-purple-500 transition-colors duration-300">
+                <Moon className="w-6 h-6 text-purple-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm text-gray-600 mb-1">Sleep</h3>
-            <p className="text-2xl font-bold text-gray-800">{currentSleep}h</p>
-            <p className="text-xs text-blue-600 mt-2">+12 min vs avg</p>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Sleep</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">{currentSleep} <span className="text-sm font-medium text-gray-400">hrs</span></p>
+            <p className="text-[10px] font-bold text-purple-600 mt-3 uppercase tracking-widest">+12 min vs avg</p>
           </div>
 
           {/* Calories Card */}
-          <div className="card hover:shadow-lg transition-all">
-            <div className="flex items-start justify-between mb-3">
-              <div className="bg-orange-100 p-3 rounded-xl">
-                <Flame className="w-6 h-6 text-orange-600" />
+          <div className="card hover:-translate-y-2 transition-all group relative overflow-hidden">
+            <div className="absolute -right-4 -top-4 w-20 h-20 bg-orange-500/5 rounded-full group-hover:scale-150 transition-transform duration-700"></div>
+            <div className="flex items-start justify-between mb-4 relative z-10">
+              <div className="bg-orange-50 p-4 rounded-2xl group-hover:bg-orange-500 transition-colors duration-300">
+                <Flame className="w-6 h-6 text-orange-600 group-hover:text-white" />
               </div>
             </div>
-            <h3 className="text-sm text-gray-600 mb-1">Calories</h3>
-            <p className="text-2xl font-bold text-gray-800">2,345</p>
-            <p className="text-xs text-orange-600 mt-2">Burned today</p>
+            <h3 className="text-sm font-bold text-gray-500 mb-1">Calories</h3>
+            <p className="text-3xl font-black text-gray-800 tracking-tighter">2,345</p>
+            <p className="text-[10px] font-bold text-orange-600 mt-3 uppercase tracking-widest">Today's burn</p>
           </div>
         </div>
 
@@ -1110,27 +1120,26 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                   <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-5 border-2 border-red-200">
                     <div className="flex items-center justify-between mb-4">
                       <h4 className="font-bold text-gray-800 mb-0 text-lg">Health Risk Overview</h4>
-                      <span className={`px-4 py-2 rounded-full font-bold text-sm ${
-                        riskAnalysis.overall_risk === 'Low' ? 'bg-green-100 text-green-700' :
-                        riskAnalysis.overall_risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-red-100 text-red-700'
-                      }`}>
+                      <span className={`px-4 py-2 rounded-full font-bold text-sm ${riskAnalysis.overall_risk === 'Low' ? 'bg-green-100 text-green-700' :
+                          riskAnalysis.overall_risk === 'Medium' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-red-100 text-red-700'
+                        }`}>
                         {riskAnalysis.overall_risk} Risk Overall
                       </span>
                     </div>
                     <p className="text-sm text-gray-600 mb-3">
                       Analysis Confidence: {riskAnalysis.confidence}% • Based on your latest health reports and activity metrics
                     </p>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {riskAnalysis.risk_areas.slice(0, 3).map((area: any, idx: number) => {
-                        const IconComponent = area.icon_suggestion === 'Heart' ? Heart : 
-                                             area.icon_suggestion === 'Moon' ? Moon :
-                                             area.icon_suggestion === 'Droplet' ? Droplet :
-                                             area.icon_suggestion === 'Shield' ? Shield : Activity;
-                        const riskColor = area.risk_level === 'Low' ? 'green' : 
-                                         area.risk_level === 'Medium' ? 'yellow' : 'red';
-                        
+                        const IconComponent = area.icon_suggestion === 'Heart' ? Heart :
+                          area.icon_suggestion === 'Moon' ? Moon :
+                            area.icon_suggestion === 'Droplet' ? Droplet :
+                              area.icon_suggestion === 'Shield' ? Shield : Activity;
+                        const riskColor = area.risk_level === 'Low' ? 'green' :
+                          area.risk_level === 'Medium' ? 'yellow' : 'red';
+
                         return (
                           <div key={idx} className={`bg-white rounded-lg p-4 text-center border-2 border-${riskColor}-200`}>
                             <div className={`w-16 h-16 mx-auto bg-${riskColor}-100 rounded-full flex items-center justify-center mb-2`}>
@@ -1149,13 +1158,13 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                     <h4 className="font-bold text-gray-800 mb-4 text-lg">Detailed Analysis</h4>
                     <div className="space-y-4">
                       {riskAnalysis.risk_areas.map((area: any, idx: number) => {
-                        const riskColor = area.risk_level === 'Low' ? 'green' : 
-                                         area.risk_level === 'Medium' ? 'yellow' : 'red';
-                        const IconComponent = area.icon_suggestion === 'Heart' ? Heart : 
-                                             area.icon_suggestion === 'Moon' ? Moon :
-                                             area.icon_suggestion === 'Droplet' ? Droplet :
-                                             area.icon_suggestion === 'Shield' ? Shield : Activity;
-                        
+                        const riskColor = area.risk_level === 'Low' ? 'green' :
+                          area.risk_level === 'Medium' ? 'yellow' : 'red';
+                        const IconComponent = area.icon_suggestion === 'Heart' ? Heart :
+                          area.icon_suggestion === 'Moon' ? Moon :
+                            area.icon_suggestion === 'Droplet' ? Droplet :
+                              area.icon_suggestion === 'Shield' ? Shield : Activity;
+
                         return (
                           <div key={idx} className={`bg-${riskColor}-50 rounded-xl p-5 border-2 border-${riskColor}-200`}>
                             <div className="flex items-center justify-between mb-3">
@@ -1196,7 +1205,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                           </ul>
                         </div>
                       )}
-                      
+
                       {riskAnalysis.areas_for_improvement?.length > 0 && (
                         <div className="bg-yellow-50 rounded-xl p-4 border-2 border-yellow-200">
                           <h4 className="font-bold text-gray-800 mb-2 flex items-center">
@@ -1233,7 +1242,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 <div className="text-center py-12 text-gray-500">
                   <AlertTriangle className="w-12 h-12 mx-auto mb-4 opacity-30" />
                   <p>Unable to load risk analysis</p>
-                  <button 
+                  <button
                     onClick={async () => {
                       const risk = await RiskAnalysisService.calculateLocalRisk();
                       setRiskAnalysis(risk);
