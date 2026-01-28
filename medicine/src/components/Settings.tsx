@@ -54,7 +54,6 @@ const Settings: React.FC<SettingsProps> = ({
   const [showTwoFactorForm, setShowTwoFactorForm] = useState(false);
   const [showLoginActivity, setShowLoginActivity] = useState(false);
   const [loginActivity, setLoginActivity] = useState<any[]>([]);
-  const [userId, setUserId] = useState<string>('');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
   const [feedbackHistory, setFeedbackHistory] = useState([
@@ -117,7 +116,6 @@ const Settings: React.FC<SettingsProps> = ({
 
       if (user) {
         setSessionEmail(user.email || '');
-        setUserId(user.id);
 
         const { data, error } = await supabase
           .from('profiles')
@@ -567,26 +565,7 @@ const Settings: React.FC<SettingsProps> = ({
                       />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">User ID (for Bridge App)</label>
-                      <div className="flex space-x-2">
-                        <input
-                          type="text"
-                          value={userId}
-                          readOnly
-                          className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none bg-gray-50 text-xs font-mono"
-                        />
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(userId);
-                            alert('User ID copied to clipboard!');
-                          }}
-                          className="px-4 py-2 bg-gray-800 text-white rounded-xl text-xs font-bold hover:bg-gray-900 transition-all"
-                        >
-                          Copy
-                        </button>
-                      </div>
-                    </div>
+
 
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-2">Age</label>
