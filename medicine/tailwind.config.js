@@ -25,6 +25,11 @@ export default {
           darkGreen: '#065f46',
         }
       },
+      boxShadow: {
+        'premium': '0 8px 30px rgba(0, 0, 0, 0.04)',
+        'premium-hover': '0 20px 50px rgba(8, 112, 184, 0.07)',
+        'button-primary': '0 10px 20px rgba(16, 185, 129, 0.3)',
+      },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in',
         'slide-up': 'slideUp 0.5s ease-out',

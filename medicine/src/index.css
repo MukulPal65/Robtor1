@@ -10,7 +10,7 @@
 
 @layer components {
   .card {
-    @apply bg-white/80 backdrop-blur-md rounded-[2rem] shadow-[0_8px_30px_rgba(0, 0, 0, 0.04)] p-6 hover:shadow-[0_20px_50px_rgba(8, 112, 184, 0.07)] transition-all duration-500 border border-white/50;
+    @apply bg-white/80 backdrop-blur-md rounded-[2rem] shadow-premium p-6 hover:shadow-premium-hover transition-all duration-500 border border-white/50;
   }
 
   .glass-card {
@@ -18,7 +18,7 @@
   }
 
   .btn-primary {
-    @apply bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-6 py-3 rounded-2xl font-bold hover:shadow-[0_10px_20px_rgba(16, 185, 129, 0.3)] hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
+    @apply bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-6 py-3 rounded-2xl font-bold shadow-button-primary hover:-translate-y-0.5 active:scale-95 transition-all duration-300;
   }
 
   .btn-secondary {
