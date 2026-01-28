@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mukulpal65.github.io/Robtor1/sitemap.xml

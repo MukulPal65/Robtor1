@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
+import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight, Shield } from 'lucide-react';
 
 interface LoginProps {
   onLogin: () => void;
@@ -256,15 +256,32 @@ For now, you can contact your administrator to reset your password manually in t
           </div>
         )}
 
-        {/* Legal Footer */}
+        {/* Legal & Support Footer */}
         <div className="mt-8 text-center space-y-4">
+          <div className="flex justify-center items-center space-x-4 mb-2">
+            <div className="flex items-center text-[10px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              <Shield className="w-3 h-3 mr-1 text-green-600" />
+              Secure Data Encryption
+            </div>
+            <div className="flex items-center text-[10px] text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              <Lock className="w-3 h-3 mr-1 text-blue-600" />
+              HIPAA Compliant Standard
+            </div>
+          </div>
+
           <p className="text-[10px] text-gray-400 max-w-sm mx-auto leading-tight italic">
             <strong>Medical Disclaimer:</strong> Robtor is an AI health assistant and does NOT provide medical diagnosis or professional advice. Always consult a doctor for medical concerns.
           </p>
-          <div className="flex justify-center space-x-4 text-xs text-gray-500">
-            <button onClick={onPrivacy} className="hover:text-green-600 transition-colors">Privacy Policy</button>
-            <span>•</span>
-            <button onClick={onTerms} className="hover:text-green-600 transition-colors">Terms of Service</button>
+
+          <div className="flex flex-col space-y-2">
+            <div className="flex justify-center space-x-4 text-xs text-gray-500">
+              <button onClick={onPrivacy} className="hover:text-green-600 transition-colors font-medium">Privacy Policy</button>
+              <span>•</span>
+              <button onClick={onTerms} className="hover:text-green-600 transition-colors font-medium">Terms of Service</button>
+            </div>
+            <p className="text-[10px] text-gray-400">
+              Support: <span className="font-medium">support@robtor.ai</span>
+            </p>
           </div>
         </div>
       </div>
