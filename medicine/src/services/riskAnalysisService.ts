@@ -15,12 +15,17 @@ interface RiskAnalysis {
     confidence: number;
     risk_areas: RiskArea[];
     summary: string;
+    positive_trends: string[];
+    action_plan: {
+        week_1_2: string;
+        week_3_4: string;
+    };
 }
 
 // Calculate risk score from health metrics (0-100, higher is riskier)
 function calculateHeartRisk(heartRate?: number): { score: number; level: string; reason: string } {
     if (!heartRate) return { score: 30, level: 'Medium', reason: 'No heart rate data available' };
-    
+
     if (heartRate < 60) return { score: 40, level: 'Medium', reason: `Heart rate ${heartRate} is below normal (60-100 bpm)` };
     if (heartRate <= 100) return { score: 10, level: 'Low', reason: `Heart rate ${heartRate} is in healthy range (60-100 bpm)` };
     if (heartRate <= 120) return { score: 60, level: 'Medium', reason: `Heart rate ${heartRate} is slightly elevated` };
@@ -29,7 +34,7 @@ function calculateHeartRisk(heartRate?: number): { score: number; level: string;
 
 function calculateOxygenRisk(bloodOxygen?: number): { score: number; level: string; reason: string } {
     if (!bloodOxygen) return { score: 30, level: 'Medium', reason: 'No blood oxygen data available' };
-    
+
     if (bloodOxygen >= 95) return { score: 5, level: 'Low', reason: `Blood oxygen ${bloodOxygen}% is excellent (95-100%)` };
     if (bloodOxygen >= 90) return { score: 40, level: 'Medium', reason: `Blood oxygen ${bloodOxygen}% is acceptable but could improve` };
     if (bloodOxygen >= 85) return { score: 75, level: 'High', reason: `Blood oxygen ${bloodOxygen}% is concerning (below 90%)` };
@@ -38,7 +43,7 @@ function calculateOxygenRisk(bloodOxygen?: number): { score: number; level: stri
 
 function calculateActivityRisk(steps?: number): { score: number; level: string; reason: string } {
     if (!steps) return { score: 50, level: 'Medium', reason: 'No activity data available' };
-    
+
     if (steps >= 10000) return { score: 5, level: 'Low', reason: `${steps} steps exceeds recommended 10,000 daily` };
     if (steps >= 7000) return { score: 25, level: 'Low', reason: `${steps} steps is good, aim for 10,000 daily` };
     if (steps >= 4000) return { score: 50, level: 'Medium', reason: `${steps} steps is below recommended 7,000-10,000` };
@@ -47,7 +52,7 @@ function calculateActivityRisk(steps?: number): { score: number; level: string; 
 
 function calculateSleepRisk(sleepHours?: number): { score: number; level: string; reason: string } {
     if (!sleepHours) return { score: 40, level: 'Medium', reason: 'No sleep data available' };
-    
+
     if (sleepHours >= 7 && sleepHours <= 9) return { score: 5, level: 'Low', reason: `${sleepHours}h sleep is optimal (7-9 hours)` };
     if (sleepHours >= 6 && sleepHours <= 10) return { score: 30, level: 'Medium', reason: `${sleepHours}h sleep is acceptable, aim for 7-9 hours` };
     if (sleepHours >= 5) return { score: 65, level: 'High', reason: `${sleepHours}h sleep is insufficient (need 7-9 hours)` };
@@ -77,7 +82,7 @@ function getRecommendation(category: string, level: string): string {
             'High': 'Address sleep issues with sleep specialist, create relaxing bedtime routine'
         }
     };
-    
+
     return recommendations[category]?.[level] || 'Maintain healthy lifestyle habits';
 }
 
@@ -162,7 +167,15 @@ export const RiskAnalysisService = {
                 overall_risk: overallRisk,
                 confidence: confidence,
                 risk_areas: riskAreas,
-                summary: this.generateSummary(overallRisk, riskAreas, healthScore)
+                summary: this.generateSummary(overallRisk, riskAreas, healthScore),
+                positive_trends: [
+                    metrics?.steps && metrics.steps > 8000 ? 'High physical activity level maintained' : 'Consistent health tracking active',
+                    metrics?.sleep_hours && metrics.sleep_hours >= 7 ? 'Optimal sleep duration achieved' : 'Health monitoring established'
+                ],
+                action_plan: {
+                    week_1_2: 'Focus on consistent hydration and maintaining current activity levels.',
+                    week_3_4: 'Gradually increase cardiovascular exercise duration by 10%.'
+                }
             };
 
         } catch (error) {
@@ -181,7 +194,12 @@ export const RiskAnalysisService = {
                         icon_suggestion: 'Shield'
                     }
                 ],
-                summary: 'Unable to calculate risk analysis. Please ensure your health data is up to date.'
+                summary: 'Unable to calculate risk analysis. Please ensure your health data is up to date.',
+                positive_trends: ['Continuous health monitoring enabled'],
+                action_plan: {
+                    week_1_2: 'Please update your daily health metrics for a personalized plan.',
+                    week_3_4: 'Consult with the AI assistant for specific health queries.'
+                }
             };
         }
     },
@@ -189,11 +207,10 @@ export const RiskAnalysisService = {
     generateSummary(overallRisk: string, riskAreas: RiskArea[], healthScore: number): string {
         const highRiskAreas = riskAreas.filter(a => a.risk_level === 'High').length;
         const mediumRiskAreas = riskAreas.filter(a => a.risk_level === 'Medium').length;
-        
+
         if (overallRisk === 'Low') {
-            return `Your overall health is in good condition with a health score of ${healthScore}/100. ${
-                mediumRiskAreas > 0 ? `There are ${mediumRiskAreas} areas that could use improvement.` : 'Keep up your healthy habits!'
-            }`;
+            return `Your overall health is in good condition with a health score of ${healthScore}/100. ${mediumRiskAreas > 0 ? `There are ${mediumRiskAreas} areas that could use improvement.` : 'Keep up your healthy habits!'
+                }`;
         } else if (overallRisk === 'Medium') {
             return `Your health requires attention with a health score of ${healthScore}/100. ${highRiskAreas} high-risk and ${mediumRiskAreas} medium-risk areas need improvement. Focus on the recommendations below.`;
         } else {

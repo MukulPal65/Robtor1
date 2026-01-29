@@ -288,7 +288,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               <span>AI Action Plan</span>
             </h4>
             <ul className="space-y-1.5 text-xs text-blue-50">
-              {riskAnalysis?.positive_trends.slice(0, 1).map((trend: string, i: number) => (
+              {(riskAnalysis?.positive_trends || []).slice(0, 1).map((trend: string, i: number) => (
                 <li key={i} className="flex items-start space-x-2">
                   <span>✨</span>
                   <span>{trend}</span>
