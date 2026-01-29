@@ -16,13 +16,15 @@ import {
   Globe,
   Trash2,
   Download,
-  Heart
+  Heart,
+  Smartphone
 } from 'lucide-react';
 
 interface SettingsProps {
   patientName?: string;
   patientEmail?: string;
   onLogout?: () => void;
+  onUpdate?: () => void;
 }
 
 interface ProfileData {
@@ -35,6 +37,7 @@ interface ProfileData {
   phone: string;
   dob: string;
   avatar_url?: string;
+  has_wearable?: boolean;
   subscription_tier?: 'free' | 'pro' | 'elite';
   subscription_status?: 'active' | 'expired' | 'trialing';
 }
@@ -42,7 +45,8 @@ interface ProfileData {
 const Settings: React.FC<SettingsProps> = ({
   patientName = '',
   patientEmail = '',
-  onLogout
+  onLogout,
+  onUpdate
 }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
@@ -61,6 +65,7 @@ const Settings: React.FC<SettingsProps> = ({
     phone: '',
     dob: '',
     avatar_url: '',
+    has_wearable: false,
     subscription_tier: 'free',
     subscription_status: 'active'
   });
@@ -104,6 +109,7 @@ const Settings: React.FC<SettingsProps> = ({
             phone: data.phone || '',
             dob: data.dob || '',
             avatar_url: data.avatar_url || '',
+            has_wearable: data.has_wearable || false,
             subscription_tier: data.subscription_tier || 'free',
             subscription_status: data.subscription_status || 'active'
           });
@@ -136,11 +142,13 @@ const Settings: React.FC<SettingsProps> = ({
           height: profile.height ? parseFloat(profile.height.toString()) : null,
           weight: profile.weight ? parseFloat(profile.weight.toString()) : null,
           blood_type: profile.blood_type,
+          has_wearable: profile.has_wearable,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
 
       if (error) throw error;
+      if (onUpdate) onUpdate();
       alert('Profile updated! ✨');
     } catch (error: any) {
       alert('Error: ' + error.message);
@@ -442,6 +450,22 @@ const Settings: React.FC<SettingsProps> = ({
                       >
                         Manage Sharing
                       </button>
+                    </div>
+
+                    <div className="p-8 bg-purple-500/5 rounded-[2.5rem] relative overflow-hidden border border-purple-500/10 group text-left col-span-1 md:col-span-2">
+                      <Smartphone className="text-purple-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h4 className="font-black text-white mb-2 uppercase tracking-tighter text-sm">Wearable Synchronization</h4>
+                          <p className="text-xs text-slate-400 mb-4 leading-relaxed max-w-md">Connect your fitness tracker or smartwatch to unlock the modern AI-driven dashboard and real-time health monitoring.</p>
+                        </div>
+                        <button
+                          onClick={() => setProfile({ ...profile, has_wearable: !profile.has_wearable })}
+                          className={`w-14 h-8 rounded-full transition-all duration-300 relative ${profile.has_wearable ? 'bg-purple-500 shadow-lg shadow-purple-500/20' : 'bg-slate-700'}`}
+                        >
+                          <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${profile.has_wearable ? 'left-7' : 'left-1'}`}></div>
+                        </button>
+                      </div>
                     </div>
                   </div>
 

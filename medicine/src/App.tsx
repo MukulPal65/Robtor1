@@ -163,7 +163,7 @@ function App() {
       case 'symptom':
         return <SymptomChecker />;
       case 'settings':
-        return <Settings patientName={patientData?.fullName} onLogout={handleLogout} />;
+        return <Settings patientName={patientData?.fullName} onLogout={handleLogout} onUpdate={handleDashboardRefresh} />;
       case 'emergency':
         return <EmergencyContacts />;
       case 'privacy':
