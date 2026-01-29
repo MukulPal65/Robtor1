@@ -92,7 +92,7 @@ const EmergencyContacts: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6 pb-24 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/5 rounded-full filter blur-[120px] animate-pulse"></div>
 

@@ -174,7 +174,7 @@ const Settings: React.FC<SettingsProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 relative overflow-hidden pb-32">
       {/* Decorative background components */}
       <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-emerald-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
       <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
