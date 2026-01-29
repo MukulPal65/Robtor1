@@ -5,7 +5,6 @@ import Login from './components/Login';
 import Signup from './components/Signup';
 import Onboarding, { PatientData } from './components/Onboarding';
 import DashboardNew from './components/DashboardNew';
-import DashboardSimple from './components/DashboardSimple';
 import ChatAssistant from './components/ChatAssistant';
 import ReportTranslator from './components/ReportTranslator';
 import SymptomChecker from './components/SymptomChecker';
@@ -150,12 +149,8 @@ function App() {
       case 'onboarding':
         return <Onboarding onComplete={handleOnboardingComplete} />;
       case 'dashboard':
-        // Show different dashboard based on wearable availability
-        if (patientData?.hasWearable) {
-          return <DashboardNew patientName={patientData?.fullName} />;
-        } else {
-          return <DashboardSimple patientName={patientData?.fullName} />;
-        }
+        // Modern AI-driven dashboard for all users
+        return <DashboardNew patientName={patientData?.fullName} />;
       case 'chat':
         return <ChatAssistant patientName={patientData?.fullName} />;
       case 'report':
