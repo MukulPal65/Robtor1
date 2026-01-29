@@ -92,7 +92,7 @@ const EmergencyContacts: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6 pb-24 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/5 rounded-full filter blur-[120px] animate-pulse"></div>
 
@@ -100,12 +100,12 @@ const EmergencyContacts: React.FC = () => {
         {/* Header */}
         <div className="mb-10 text-left">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="bg-slate-900 border border-white/5 p-4 rounded-[2rem] shadow-2xl">
+            <div className="bg-white shadow-lg border border-indigo-200 p-4 rounded-[2rem]">
               <Phone className="w-8 h-8 text-rose-500" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-white tracking-tight uppercase italic">SOS Protocols</h1>
-              <p className="text-slate-500 font-medium">Instant access to life-saving infrastructure</p>
+              <h1 className="text-3xl font-black text-gray-800 tracking-tight uppercase italic">SOS Protocols</h1>
+              <p className="text-gray-600 font-medium">Instant access to life-saving infrastructure</p>
             </div>
           </div>
         </div>
@@ -121,13 +121,13 @@ const EmergencyContacts: React.FC = () => {
               <button
                 key={service.number}
                 onClick={() => handleCall(service.number)}
-                className="group relative bg-slate-950/40 border border-white/5 rounded-[2rem] p-6 hover:bg-slate-900 transition-all active:scale-95 text-center overflow-hidden"
+                className="group relative bg-gray-50 border border-gray-200 rounded-[2rem] p-6 hover:bg-gray-100 transition-all active:scale-95 text-center overflow-hidden"
               >
                 <div className={`bg-gradient-to-r ${service.color} w-10 h-10 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:scale-110 transition-transform`}>
                   <service.icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">{service.name}</p>
-                <p className="text-2xl font-black text-white">{service.number}</p>
+                <p className="text-[10px] font-black text-gray-600 uppercase tracking-wider mb-1">{service.name}</p>
+                <p className="text-2xl font-black text-gray-800">{service.number}</p>
                 <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             ))}
@@ -138,8 +138,8 @@ const EmergencyContacts: React.FC = () => {
         <div className="card p-10 text-left">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-xl font-black text-white tracking-tight">Safe Network</h2>
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Authorized Neural Contacts</p>
+              <h2 className="text-xl font-black text-gray-800 tracking-tight">Safe Network</h2>
+              <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest mt-1">Authorized Neural Contacts</p>
             </div>
             <button
               onClick={() => setIsAdding(true)}
@@ -152,19 +152,19 @@ const EmergencyContacts: React.FC = () => {
 
           {/* Add/Edit Form - Integrated native feel */}
           {(isAdding || editingId) && (
-            <div className="mb-10 p-8 bg-slate-950/50 border border-white/5 rounded-[2.5rem] animate-fade-in relative">
+            <div className="mb-10 p-8 bg-gray-50 border border-gray-200 rounded-[2.5rem] animate-fade-in relative">
               <button
                 onClick={() => { setIsAdding(false); setEditingId(null); }}
                 className="absolute top-6 right-6 text-slate-500 hover:text-white"
               >
                 <X size={20} />
               </button>
-              <h3 className="text-sm font-black text-white mb-6 uppercase tracking-tighter italic">
+              <h3 className="text-sm font-black text-gray-800 mb-6 uppercase tracking-tighter italic">
                 {isAdding ? 'Configure New Signal' : 'Update Transmission Path'}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity</label>
+                  <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest ml-1">Identity</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -174,7 +174,7 @@ const EmergencyContacts: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Comms Link</label>
+                  <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest ml-1">Comms Link</label>
                   <input
                     type="tel"
                     value={formData.phone}
@@ -184,7 +184,7 @@ const EmergencyContacts: React.FC = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nexus Role</label>
+                  <label className="text-[10px] font-black text-gray-600 uppercase tracking-widest ml-1">Nexus Role</label>
                   <select
                     value={formData.relation}
                     onChange={(e) => setFormData({ ...formData, relation: e.target.value })}
@@ -217,9 +217,9 @@ const EmergencyContacts: React.FC = () => {
                 <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Synchronizing Vault...</p>
               </div>
             ) : contacts.length === 0 ? (
-              <div className="text-center py-16 bg-slate-950/30 rounded-[2.5rem] border border-dashed border-white/5">
-                <Activity className="w-12 h-12 text-slate-800 mx-auto mb-4" />
-                <p className="text-slate-500 font-bold">No active safety bridges detected</p>
+              <div className="text-center py-16 bg-gray-100 rounded-[2.5rem] border border-dashed border-gray-300">
+                <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 font-bold">No active safety bridges detected</p>
               </div>
             ) : (
               contacts.map((contact) => (
@@ -229,13 +229,13 @@ const EmergencyContacts: React.FC = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6 flex-1">
-                      <div className="bg-slate-800 w-16 h-16 rounded-[2rem] flex items-center justify-center text-emerald-400 font-black text-2xl border border-white/5 shadow-2xl group-hover:scale-105 transition-transform">
+                      <div className="bg-gradient-to-br from-blue-100 to-indigo-100 w-16 h-16 rounded-[2rem] flex items-center justify-center text-blue-600 font-black text-2xl border border-blue-200 shadow-lg group-hover:scale-105 transition-transform">
                         {contact.name.charAt(0)}
                       </div>
                       <div className="flex-1 text-left">
-                        <h3 className="text-lg font-black text-white tracking-tight">{contact.name}</h3>
-                        <p className="text-slate-400 font-bold mb-2">{contact.phone}</p>
-                        <span className="bg-slate-950 text-slate-500 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-white/5">{contact.relation}</span>
+                        <h3 className="text-lg font-black text-gray-800 tracking-tight">{contact.name}</h3>
+                        <p className="text-gray-600 font-bold mb-2">{contact.phone}</p>
+                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-gray-200">{contact.relation}</span>
                       </div>
                     </div>
                     <div className="flex space-x-3">
@@ -269,7 +269,7 @@ const EmergencyContacts: React.FC = () => {
         <div className="mt-12 p-10 bg-slate-900/50 rounded-[3rem] border border-blue-500/10 text-left">
           <div className="flex items-center space-x-4 mb-8">
             <Shield className="w-6 h-6 text-blue-400" />
-            <h3 className="text-xl font-black text-white tracking-tight italic uppercase">Safety Persistence</h3>
+            <h3 className="text-xl font-black text-gray-800 tracking-tight italic uppercase">Safety Persistence</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
@@ -278,9 +278,9 @@ const EmergencyContacts: React.FC = () => {
               'Archive local emergency bypass codes',
               'Activate priority voice links in high-stress zones'
             ].map((tip, index) => (
-              <div key={index} className="flex items-center space-x-4 p-4 bg-slate-950/40 rounded-2xl border border-white/5">
+              <div key={index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-2xl border border-gray-200">
                 <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
-                <span className="text-xs text-slate-400 font-bold">{tip}</span>
+                <span className="text-xs text-gray-700 font-bold">{tip}</span>
               </div>
             ))}
           </div>
