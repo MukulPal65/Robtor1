@@ -174,21 +174,21 @@ const Settings: React.FC<SettingsProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 relative overflow-hidden pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 relative overflow-hidden pb-32">
       {/* Decorative background components */}
       <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-emerald-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
       <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
 
       <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         <div className="mb-12 text-left">
-          <h1 className="text-4xl font-black text-white tracking-tight mb-3">Settings</h1>
-          <p className="text-slate-500 font-medium">Control your health data and account preferences</p>
+          <h1 className="text-4xl font-black text-gray-800 tracking-tight mb-3">Settings</h1>
+          <p className="text-gray-600 font-medium">Control your health data and account preferences</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Enhanced Navigation Sidebar */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="card p-4 space-y-2">
+            <div className="bg-white shadow-lg rounded-3xl p-4 space-y-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -197,17 +197,17 @@ const Settings: React.FC<SettingsProps> = ({
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full group flex items-start space-x-4 px-4 py-4 rounded-3xl transition-all duration-300 ${isActive
-                      ? 'bg-emerald-500 text-slate-950 shadow-xl shadow-emerald-500/20'
-                      : 'text-slate-400 hover:bg-white/5 hover:text-white'
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-xl shadow-blue-500/20'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                       }`}
                   >
-                    <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-slate-950/20' : 'bg-slate-800 group-hover:bg-slate-700'
+                    <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-white/20' : 'bg-gray-200 group-hover:bg-gray-300'
                       }`}>
-                      <Icon size={20} className={isActive ? 'text-slate-950' : 'text-slate-400'} />
+                      <Icon size={20} className={isActive ? 'text-white' : 'text-gray-600'} />
                     </div>
                     <div className="text-left">
                       <p className="font-bold text-sm tracking-tight">{tab.name}</p>
-                      <p className={`text-[10px] uppercase font-black tracking-widest mt-0.5 opacity-60 ${isActive ? 'text-slate-950' : 'text-slate-500'}`}>
+                      <p className={`text-[10px] uppercase font-black tracking-widest mt-0.5 opacity-60 ${isActive ? 'text-white' : 'text-gray-500'}`}>
                         {tab.desc}
                       </p>
                     </div>
@@ -229,20 +229,20 @@ const Settings: React.FC<SettingsProps> = ({
             </div>
 
             {/* Quick Status Card */}
-            <div className="card p-6 bg-gradient-to-br from-slate-800 to-slate-900 text-white">
+            <div className="bg-white shadow-lg rounded-3xl p-6 text-gray-800">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-white/10 rounded-xl">
-                  <Shield size={18} className="text-emerald-400" />
+                <div className="p-2 bg-blue-100 rounded-xl">
+                  <Shield size={18} className="text-blue-600" />
                 </div>
-                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Security Pulse</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-gray-600">Security Pulse</p>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-400">Account Type</span>
+                  <span className="text-gray-600">Account Type</span>
                   <span className="font-bold capitalize">{profile.subscription_tier}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-400">2FA Status</span>
+                  <span className="text-gray-600">2FA Status</span>
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${twoFactorEnabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
                     {twoFactorEnabled ? 'Protected' : 'Risk'}
                   </span>
@@ -253,14 +253,14 @@ const Settings: React.FC<SettingsProps> = ({
 
           {/* Main Workspace Area */}
           <div className="lg:col-span-8">
-            <div className="card p-10 min-h-[600px]">
+            <div className="bg-white shadow-lg rounded-3xl p-10 min-h-[600px]">
               {/* Profile Tab Workspace */}
               {activeTab === 'profile' && (
                 <div className="space-y-10 animate-fade-in text-left">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h2 className="text-2xl font-black text-white tracking-tight">Public Profile</h2>
-                      <p className="text-slate-500 text-sm mt-1">Manage how your health portal looks</p>
+                      <h2 className="text-2xl font-black text-gray-800 tracking-tight">Public Profile</h2>
+                      <p className="text-gray-600 text-sm mt-1">Manage how your health portal looks</p>
                     </div>
                     {loading && (
                       <div className="flex items-center space-x-2 text-emerald-400 bg-emerald-400/5 px-4 py-2 rounded-full border border-emerald-400/10">

@@ -149,7 +149,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 p-6 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6 pb-24">
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center justify-between mb-6">
