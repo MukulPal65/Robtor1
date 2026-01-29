@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Phone, UserPlus, AlertCircle, Shield, Heart, Edit2, Trash2, Save, X, Loader } from 'lucide-react';
+import { Phone, UserPlus, AlertCircle, Shield, Heart, Edit2, Trash2, Save, X, Loader, Activity } from 'lucide-react';
 import { ProfileService } from '../services/profileService';
 
 interface EmergencyContact {
@@ -25,7 +25,6 @@ const EmergencyContacts: React.FC = () => {
     try {
       const profile = await ProfileService.getProfile();
       if (profile?.emergency_contact) {
-        // Handle both single object (from onboarding) and array
         const contactData = profile.emergency_contact;
         if (Array.isArray(contactData)) {
           setContacts(contactData);
@@ -44,16 +43,15 @@ const EmergencyContacts: React.FC = () => {
     try {
       await ProfileService.updateProfile({ emergency_contact: updatedContacts });
     } catch (error) {
-      console.error('Error saving contacts to DB:', error);
       alert('Failed to save contacts. Please try again.');
     }
   };
 
   const governmentNumbers = [
-    { name: 'Emergency Services', number: '911', icon: AlertCircle, color: 'from-red-500 to-red-600', bgColor: 'bg-red-50', borderColor: 'border-red-200' },
-    { name: 'Police', number: '100', icon: Shield, color: 'from-blue-500 to-blue-600', bgColor: 'bg-blue-50', borderColor: 'border-blue-200' },
-    { name: 'Fire Department', number: '101', icon: AlertCircle, color: 'from-orange-500 to-orange-600', bgColor: 'bg-orange-50', borderColor: 'border-orange-200' },
-    { name: 'Medical Emergency', number: '102', icon: Heart, color: 'from-pink-500 to-pink-600', bgColor: 'bg-pink-50', borderColor: 'border-pink-200' },
+    { name: 'Emergency', number: '911', icon: AlertCircle, color: 'from-rose-500 to-rose-600' },
+    { name: 'Police', number: '100', icon: Shield, color: 'from-blue-500 to-blue-600' },
+    { name: 'Fire', number: '101', icon: AlertCircle, color: 'from-orange-500 to-orange-600' },
+    { name: 'Medical', number: '102', icon: Heart, color: 'from-emerald-500 to-emerald-600' },
   ];
 
   const handleAdd = async () => {
@@ -94,182 +92,168 @@ const EmergencyContacts: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-white pb-24">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-red-500 to-orange-600 text-white px-6 py-8 rounded-b-[2rem] shadow-lg">
-        <div className="flex items-center space-x-3 mb-2">
-          <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-            <Phone className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Emergency Contacts</h1>
-            <p className="text-red-100 text-sm mt-1">Quick access in critical situations</p>
+    <div className="min-h-screen bg-slate-950 p-6 pb-24 relative overflow-hidden">
+      {/* Background Glow */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-rose-500/5 rounded-full filter blur-[120px] animate-pulse"></div>
+
+      <div className="max-w-4xl mx-auto relative z-10">
+        {/* Header */}
+        <div className="mb-10 text-left">
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="bg-slate-900 border border-white/5 p-4 rounded-[2rem] shadow-2xl">
+              <Phone className="w-8 h-8 text-rose-500" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-white tracking-tight uppercase italic">SOS Protocols</h1>
+              <p className="text-slate-500 font-medium">Instant access to life-saving infrastructure</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="px-6 -mt-6">
-        {/* Government Emergency Numbers */}
-        <div className="card mb-6 bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200">
-          <div className="flex items-center space-x-2 mb-4">
-            <AlertCircle className="w-5 h-5 text-red-600" />
-            <h2 className="text-lg font-bold text-gray-800">Government Emergency Services</h2>
+        {/* Global Dispatch Controls */}
+        <div className="card p-10 bg-gradient-to-br from-rose-900/20 to-slate-900 border-rose-500/20 mb-8">
+          <div className="flex items-center space-x-3 mb-8 px-2">
+            <AlertCircle className="w-5 h-5 text-rose-500" />
+            <h2 className="text-xs font-black text-rose-500 uppercase tracking-widest">Priority Dispatch Services</h2>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {governmentNumbers.map((service) => (
               <button
                 key={service.number}
                 onClick={() => handleCall(service.number)}
-                className={`${service.bgColor} border-2 ${service.borderColor} rounded-xl p-4 hover:shadow-lg transition-all active:scale-95`}
+                className="group relative bg-slate-950/40 border border-white/5 rounded-[2rem] p-6 hover:bg-slate-900 transition-all active:scale-95 text-center overflow-hidden"
               >
-                <div className={`bg-gradient-to-r ${service.color} w-12 h-12 rounded-full flex items-center justify-center mb-3 mx-auto`}>
-                  <service.icon className="w-6 h-6 text-white" />
+                <div className={`bg-gradient-to-r ${service.color} w-10 h-10 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:scale-110 transition-transform`}>
+                  <service.icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-sm font-bold text-gray-800 mb-1">{service.name}</p>
-                <p className="text-2xl font-bold text-gray-900">{service.number}</p>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1">{service.name}</p>
+                <p className="text-2xl font-black text-white">{service.number}</p>
+                <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             ))}
           </div>
-          <div className="mt-4 bg-white rounded-lg p-3 border-2 border-red-200">
-            <div className="flex items-start space-x-2">
-              <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-gray-700">
-                <span className="font-bold">Important:</span> These numbers connect you to emergency services.
-                Use them only for genuine emergencies.
-              </p>
-            </div>
-          </div>
         </div>
 
-        {/* Personal Emergency Contacts */}
-        <div className="card mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-gray-800">Personal Contacts</h2>
+        {/* Personal Contacts */}
+        <div className="card p-10 text-left">
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h2 className="text-xl font-black text-white tracking-tight">Safe Network</h2>
+              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Authorized Neural Contacts</p>
+            </div>
             <button
               onClick={() => setIsAdding(true)}
-              className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center space-x-2"
+              className="bg-emerald-500 text-slate-950 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center space-x-2"
             >
               <UserPlus className="w-4 h-4" />
-              <span>Add Contact</span>
+              <span>Initialize Addition</span>
             </button>
           </div>
 
-          {/* Add/Edit Form */}
+          {/* Add/Edit Form - Integrated native feel */}
           {(isAdding || editingId) && (
-            <div className="mb-4 p-4 bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl">
-              <h3 className="text-sm font-bold text-gray-800 mb-3">
-                {isAdding ? 'Add New Contact' : 'Edit Contact'}
+            <div className="mb-10 p-8 bg-slate-950/50 border border-white/5 rounded-[2.5rem] animate-fade-in relative">
+              <button
+                onClick={() => { setIsAdding(false); setEditingId(null); }}
+                className="absolute top-6 right-6 text-slate-500 hover:text-white"
+              >
+                <X size={20} />
+              </button>
+              <h3 className="text-sm font-black text-white mb-6 uppercase tracking-tighter italic">
+                {isAdding ? 'Configure New Signal' : 'Update Transmission Path'}
               </h3>
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Name</label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Identity</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Full name"
-                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    placeholder="Subject Name"
+                    className="input-field"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Phone Number</label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Comms Link</label>
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder="+1 234-567-8900"
-                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    placeholder="+ PHONE"
+                    className="input-field"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">Relationship</label>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Nexus Role</label>
                   <select
                     value={formData.relation}
                     onChange={(e) => setFormData({ ...formData, relation: e.target.value })}
-                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                    className="input-field appearance-none cursor-pointer"
                   >
-                    <option value="">Select relationship</option>
+                    <option value="">Link Status...</option>
                     <option value="Spouse">Spouse</option>
                     <option value="Parent">Parent</option>
                     <option value="Sibling">Sibling</option>
-                    <option value="Child">Child</option>
                     <option value="Friend">Friend</option>
-                    <option value="Doctor">Doctor</option>
-                    <option value="Other">Other</option>
+                    <option value="Doctor">Clinical Professional</option>
                   </select>
                 </div>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={isAdding ? handleAdd : handleUpdate}
-                    className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white py-2 rounded-lg text-sm font-semibold hover:shadow-lg transition-all flex items-center justify-center space-x-2"
-                  >
-                    <Save className="w-4 h-4" />
-                    <span>Save</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsAdding(false);
-                      setEditingId(null);
-                      setFormData({ name: '', phone: '', relation: '' });
-                    }}
-                    className="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg text-sm font-semibold hover:bg-gray-300 transition-all flex items-center justify-center space-x-2"
-                  >
-                    <X className="w-4 h-4" />
-                    <span>Cancel</span>
-                  </button>
-                </div>
               </div>
+              <button
+                onClick={isAdding ? handleAdd : handleUpdate}
+                className="btn-primary w-full shadow-emerald-500/10"
+              >
+                <Save className="w-5 h-5 mr-3" />
+                Commit Protocol to Memory
+              </button>
             </div>
           )}
 
           {/* Contacts List */}
-          <div className="space-y-3">
+          <div className="space-y-4">
             {loading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <Loader className="w-10 h-10 text-red-500 animate-spin mb-4" />
-                <p className="text-gray-500 text-sm">Loading your contacts...</p>
+              <div className="flex flex-col items-center justify-center py-20">
+                <Loader className="w-8 h-8 text-rose-500 animate-spin mb-4" />
+                <p className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Synchronizing Vault...</p>
               </div>
             ) : contacts.length === 0 ? (
-              <div className="text-center py-8">
-                <UserPlus className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 text-sm">No emergency contacts added yet</p>
-                <p className="text-gray-400 text-xs mt-1">Add contacts for quick access during emergencies</p>
+              <div className="text-center py-16 bg-slate-950/30 rounded-[2.5rem] border border-dashed border-white/5">
+                <Activity className="w-12 h-12 text-slate-800 mx-auto mb-4" />
+                <p className="text-slate-500 font-bold">No active safety bridges detected</p>
               </div>
             ) : (
               contacts.map((contact) => (
                 <div
                   key={contact.id}
-                  className="bg-white border-2 border-gray-200 rounded-xl p-4 hover:shadow-md transition-all"
+                  className="bg-slate-900 border border-white/5 rounded-[2.5rem] p-8 hover:bg-slate-800/80 transition-all group"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3 flex-1">
-                      <div className="bg-gradient-to-br from-green-500 to-emerald-600 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                    <div className="flex items-center space-x-6 flex-1">
+                      <div className="bg-slate-800 w-16 h-16 rounded-[2rem] flex items-center justify-center text-emerald-400 font-black text-2xl border border-white/5 shadow-2xl group-hover:scale-105 transition-transform">
                         {contact.name.charAt(0)}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-bold text-gray-800">{contact.name}</h3>
-                        <p className="text-sm text-gray-600">{contact.phone}</p>
-                        <p className="text-xs text-gray-500 mt-1">
-                          <span className="bg-gray-100 px-2 py-0.5 rounded-full">{contact.relation}</span>
-                        </p>
+                      <div className="flex-1 text-left">
+                        <h3 className="text-lg font-black text-white tracking-tight">{contact.name}</h3>
+                        <p className="text-slate-400 font-bold mb-2">{contact.phone}</p>
+                        <span className="bg-slate-950 text-slate-500 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border border-white/5">{contact.relation}</span>
                       </div>
                     </div>
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-3">
                       <button
                         onClick={() => handleCall(contact.phone)}
-                        className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-full hover:shadow-lg transition-all active:scale-95"
+                        className="bg-emerald-500 text-slate-950 p-4 rounded-2xl hover:scale-110 transition-all active:scale-95 shadow-lg shadow-emerald-500/20"
                       >
                         <Phone className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => handleEdit(contact)}
-                        className="bg-blue-100 text-blue-600 p-3 rounded-full hover:bg-blue-200 transition-all"
+                        className="bg-slate-800 text-blue-400 p-4 rounded-2xl hover:bg-slate-700 transition-all border border-white/5"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(contact.id)}
-                        className="bg-red-100 text-red-600 p-3 rounded-full hover:bg-red-200 transition-all"
+                        className="bg-slate-800 text-rose-500 p-4 rounded-2xl hover:bg-slate-700 transition-all border border-white/5"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -281,25 +265,25 @@ const EmergencyContacts: React.FC = () => {
           </div>
         </div>
 
-        {/* Safety Tips */}
-        <div className="card bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200">
-          <div className="flex items-center space-x-2 mb-3">
-            <Shield className="w-5 h-5 text-blue-600" />
-            <h3 className="text-lg font-bold text-gray-800">Safety Tips</h3>
+        {/* Neural Safety Tips */}
+        <div className="mt-12 p-10 bg-slate-900/50 rounded-[3rem] border border-blue-500/10 text-left">
+          <div className="flex items-center space-x-4 mb-8">
+            <Shield className="w-6 h-6 text-blue-400" />
+            <h3 className="text-xl font-black text-white tracking-tight italic uppercase">Safety Persistence</h3>
           </div>
-          <ul className="space-y-2 text-sm text-gray-700">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[
-              'Keep your emergency contacts up to date',
-              'Share your medical information with emergency contacts',
-              'Know the local emergency numbers when traveling',
-              'In case of emergency, stay calm and call for help immediately'
+              'Monitor bridge integrity (Update monthly)',
+              'Share clinical telemetry with nexus core',
+              'Archive local emergency bypass codes',
+              'Activate priority voice links in high-stress zones'
             ].map((tip, index) => (
-              <li key={index} className="flex items-start space-x-2">
-                <span className="text-blue-600 font-bold mt-0.5">•</span>
-                <span>{tip}</span>
-              </li>
+              <div key={index} className="flex items-center space-x-4 p-4 bg-slate-950/40 rounded-2xl border border-white/5">
+                <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
+                <span className="text-xs text-slate-400 font-bold">{tip}</span>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       </div>
     </div>

@@ -87,22 +87,22 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
   const strength = passwordStrength();
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Premium Background Blobs */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob"></div>
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
 
       <div className="relative w-full max-w-xl z-10 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
 
           {/* Left Side: Info & Marketing */}
           <div className="hidden lg:block space-y-8 pr-8 scale-in-center">
-            <div className="inline-flex items-center justify-center p-3 bg-white rounded-2xl shadow-premium mb-4">
-              <Activity className="w-8 h-8 text-emerald-500" />
+            <div className="inline-flex items-center justify-center p-3 bg-slate-900 border border-white/5 rounded-2xl shadow-premium mb-4">
+              <Activity className="w-8 h-8 text-emerald-400" />
             </div>
-            <h2 className="text-4xl font-black text-slate-900 tracking-tight leading-tight">
+            <h2 className="text-4xl font-black text-white tracking-tight leading-tight">
               Unlock Your <br />
-              <span className="text-emerald-500">Health Potential.</span>
+              <span className="text-emerald-400">Health Potential.</span>
             </h2>
             <div className="space-y-4">
               {[
@@ -111,37 +111,37 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
                 "Custom Fitness & Diet Plans",
                 "Secure, Private Data Vault"
               ].map((item, idx) => (
-                <div key={idx} className="flex items-center space-x-3 text-slate-600 font-semibold">
-                  <CheckCircle2 className="text-emerald-500 w-5 h-5 flex-shrink-0" />
+                <div key={idx} className="flex items-center space-x-3 text-slate-400 font-semibold text-sm">
+                  <CheckCircle2 className="text-emerald-500 w-4 h-4 flex-shrink-0" />
                   <span>{item}</span>
                 </div>
               ))}
             </div>
-            <div className="pt-8 border-t border-slate-200">
+            <div className="pt-8 border-t border-slate-800">
               <div className="flex items-center space-x-2">
-                <Shield className="w-4 h-4 text-slate-400" />
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">HIPAA Compliant Standard</span>
+                <Shield className="w-4 h-4 text-slate-500" />
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">HIPAA Compliant Standard</span>
               </div>
             </div>
           </div>
 
           {/* Right Side: Signup Form */}
-          <div className="card p-10 bg-white/70 animate-slide-up">
-            <div className="mb-8">
-              <h2 className="text-2xl font-black text-slate-800 tracking-tight">Create Account</h2>
-              <p className="text-slate-500 text-sm mt-1">Join the future of personal health</p>
+          <div className="card p-10 animate-slide-up">
+            <div className="mb-8 text-left">
+              <h2 className="text-2xl font-black text-white tracking-tight">Create Account</h2>
+              <p className="text-slate-400 text-sm mt-1">Join the future of personal health</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
+            <form onSubmit={handleSubmit} className="space-y-5 text-left">
+              <div className="space-y-1">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
                 <div className="relative group">
-                  <User className="absolute left-5 top-4 w-5 h-5 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                  <User className="absolute left-5 top-3.5 w-5 h-5 text-slate-600 group-focus-within:text-emerald-500 transition-colors" />
                   <input
                     type="text"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="input-field pl-14 py-3.5"
+                    className="input-field pl-14 py-3"
                     placeholder="John Doe"
                     required
                   />

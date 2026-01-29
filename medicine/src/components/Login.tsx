@@ -83,28 +83,28 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup, onPrivacy, onTerms }) 
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Premium Background Blobs */}
-      <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-200 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+      <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob"></div>
+      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
 
       <div className="relative w-full max-w-md z-10">
         {/* Animated Brand Header */}
         <div className="text-center mb-10 scale-in-center">
-          <div className="inline-flex items-center justify-center p-4 bg-white rounded-[2.5rem] shadow-premium mb-6 animate-float">
-            <div className="bg-gradient-to-br from-emerald-500 to-teal-600 p-4 rounded-[2rem]">
-              <Activity className="w-10 h-10 text-white" />
+          <div className="inline-flex items-center justify-center p-4 bg-slate-900 border border-white/5 rounded-[2.5rem] shadow-2xl mb-6 animate-float">
+            <div className="bg-gradient-to-br from-emerald-400 to-teal-500 p-4 rounded-[2rem]">
+              <Activity className="w-10 h-10 text-slate-950" />
             </div>
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-slate-900 mb-2">
-            ROBTOR<span className="text-emerald-500">.</span>
+          <h1 className="text-4xl font-black tracking-tight text-white mb-2">
+            ROBTOR<span className="text-emerald-400">.</span>
           </h1>
-          <p className="text-slate-500 font-medium">Your Intelligence Health Partner</p>
+          <p className="text-slate-400 font-medium">Your Intelligence Health Partner</p>
         </div>
 
         {/* glass-card Login Box */}
-        <div className="card p-10 animate-slide-up bg-white/70">
+        <div className="card p-10 animate-slide-up">
           <div className="mb-8">
             <h2 className="text-2xl font-black text-slate-800 tracking-tight">Welcome Back</h2>
             <p className="text-slate-500 text-sm mt-1">Sign in to your health portal</p>

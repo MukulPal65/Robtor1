@@ -4,7 +4,7 @@ import SplashScreen from './components/SplashScreen';
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Onboarding, { PatientData } from './components/Onboarding';
-import Dashboard from './components/Dashboard';
+import DashboardNew from './components/DashboardNew';
 import DashboardSimple from './components/DashboardSimple';
 import ChatAssistant from './components/ChatAssistant';
 import ReportTranslator from './components/ReportTranslator';
@@ -152,7 +152,7 @@ function App() {
       case 'dashboard':
         // Show different dashboard based on wearable availability
         if (patientData?.hasWearable) {
-          return <Dashboard patientName={patientData?.fullName} />;
+          return <DashboardNew patientName={patientData?.fullName} />;
         } else {
           return <DashboardSimple patientName={patientData?.fullName} />;
         }
@@ -173,7 +173,7 @@ function App() {
       case 'apitest':
         return <APITestPanel />;
       default:
-        return <Dashboard />;
+        return <DashboardNew />;
     }
   };
 

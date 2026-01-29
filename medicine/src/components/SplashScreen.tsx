@@ -15,7 +15,7 @@ const SplashScreen: React.FC<{ onFinish: () => void }> = ({ onFinish }) => {
 
   return (
     <div
-      className={`fixed inset-0 z-[1000] flex items-center justify-center bg-slate-900 transition-all duration-1000 ease-in-out ${fadeOut ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
+      className={`fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950 transition-all duration-1000 ease-in-out ${fadeOut ? 'opacity-0 scale-110' : 'opacity-100 scale-100'
         }`}
     >
       {/* Decorative Background effects */}

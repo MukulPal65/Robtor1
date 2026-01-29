@@ -179,41 +179,41 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
   // ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-950 pb-24 relative overflow-hidden">
       <div className="container mx-auto px-4 mt-4">
 
       </div>
       {/* Decorative Background Elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-      <div className="absolute top-0 right-0 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-      <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      <div className="absolute top-0 left-0 w-96 h-96 bg-emerald-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
+      <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+      <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
       {/* Header */}
-      <div className="bg-gradient-to-br from-green-500 via-emerald-600 to-teal-600 text-white px-6 py-10 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
+      <div className="bg-slate-900 border-b border-white/5 text-white px-6 py-10 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
         {/* Header Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-48 h-48 border-2 border-white rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
-          <div className="absolute bottom-0 right-1/4 w-72 h-72 border-2 border-white rounded-full translate-y-1/2 opacity-20 animate-float"></div>
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 left-0 w-48 h-48 border-2 border-emerald-500 rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
+          <div className="absolute bottom-0 right-1/4 w-72 h-72 border-2 border-teal-500 rounded-full translate-y-1/2 opacity-20 animate-float"></div>
         </div>
 
         <div className="flex items-center justify-between mb-2 relative z-10 max-w-5xl mx-auto">
           <div>
-            <h1 className="text-2xl font-bold mb-1 drop-shadow-lg tracking-tight">Welcome back, {patientName}! 👋</h1>
-            <p className="text-green-100/90 text-sm font-medium">Your vitals are looking excellent today</p>
+            <h1 className="text-2xl font-black mb-1 tracking-tight text-white">Welcome back, {patientName}! 👋</h1>
+            <p className="text-emerald-400/80 text-sm font-bold">Your vitals are looking excellent today</p>
           </div>
           <div className="flex items-center space-x-4 relative z-10">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="bg-white/20 backdrop-blur-md p-4 rounded-3xl hover:bg-white/30 transition-all shadow-xl relative border border-white/20 active:scale-95"
+              className="bg-white/5 backdrop-blur-md p-4 rounded-3xl hover:bg-white/10 transition-all shadow-xl relative border border-white/10 active:scale-95 text-white"
             >
               <Bell className="w-6 h-6" />
               {notifications.filter(n => n.unread).length > 0 && (
-                <span className="absolute top-2 right-2 w-4 h-4 bg-red-500 border-2 border-green-500 rounded-full animate-bounce"></span>
+                <span className="absolute top-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full animate-bounce"></span>
               )}
             </button>
             <button
               onClick={handleRefresh}
-              className="bg-white/20 backdrop-blur-md p-4 rounded-3xl hover:bg-white/30 transition-all shadow-xl active:scale-95 border border-white/20"
+              className="bg-white/5 backdrop-blur-md p-4 rounded-3xl hover:bg-white/10 transition-all shadow-xl active:scale-95 border border-white/10 text-white"
             >
               <RefreshCw className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -224,35 +224,35 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       {/* Notification Drawer Overlay */}
       {showNotifications && (
         <div className="fixed inset-0 z-[110] flex justify-end">
-          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setShowNotifications(false)}></div>
-          <div className="relative w-full max-w-sm bg-white h-full shadow-2xl animate-fade-in-right overflow-y-auto">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-gray-800 flex items-center">
-                <Bell className="w-5 h-5 mr-2 text-green-600" />
+          <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setShowNotifications(false)}></div>
+          <div className="relative w-full max-w-sm bg-slate-900 h-full shadow-2xl animate-fade-in-right overflow-y-auto border-l border-white/5">
+            <div className="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10 text-white">
+              <h2 className="text-xl font-black flex items-center">
+                <Bell className="w-5 h-5 mr-2 text-emerald-400" />
                 Notifications
               </h2>
-              <button onClick={() => setShowNotifications(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-                <X className="w-5 h-5 text-gray-500" />
+              <button onClick={() => setShowNotifications(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+                <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>
             <div className="p-4 space-y-4">
               {notifications.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">No new notifications</div>
+                <div className="text-center py-12 text-slate-500 font-bold">No new notifications</div>
               ) : (
                 notifications.map(notification => (
                   <div
                     key={notification.id}
-                    className={`p-4 rounded-2xl border transition-all hover:shadow-md ${notification.unread ? 'bg-green-50/50 border-green-100' : 'bg-white border-gray-100'}`}
+                    className={`p-5 rounded-[2rem] border transition-all hover:border-emerald-500/30 ${notification.unread ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-slate-800/40 border-white/5'}`}
                   >
-                    <div className="flex justify-between items-start mb-1">
-                      <h3 className={`font-bold text-sm ${notification.unread ? 'text-green-800' : 'text-gray-700'}`}>{notification.title}</h3>
-                      <span className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{notification.time}</span>
+                    <div className="flex justify-between items-start mb-1 text-white">
+                      <h3 className={`font-black text-sm ${notification.unread ? 'text-emerald-400' : 'text-slate-200'}`}>{notification.title}</h3>
+                      <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">{notification.time}</span>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed">{notification.message}</p>
+                    <p className="text-xs text-slate-400 leading-relaxed font-medium">{notification.message}</p>
                     {notification.unread && (
                       <button
                         onClick={() => setNotifications(notifications.map(n => n.id === notification.id ? { ...n, unread: false } : n))}
-                        className="mt-2 text-[10px] font-bold text-green-600 uppercase hover:underline"
+                        className="mt-3 text-[10px] font-black text-emerald-400 uppercase hover:underline tracking-widest"
                       >
                         Mark as read
                       </button>

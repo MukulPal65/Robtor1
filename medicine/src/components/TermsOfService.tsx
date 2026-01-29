@@ -1,5 +1,5 @@
 import React from 'react';
-import { ArrowLeft, Scale, AlertTriangle, UserCheck, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, Scale, AlertTriangle, UserCheck, ShieldAlert, Activity } from 'lucide-react';
 
 interface TermsOfServiceProps {
     onBack: () => void;
@@ -7,67 +7,71 @@ interface TermsOfServiceProps {
 
 const TermsOfService: React.FC<TermsOfServiceProps> = ({ onBack }) => {
     return (
-        <div className="min-h-screen bg-gray-50 p-6 md:p-12">
-            <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl overflow-hidden">
-                <div className="bg-emerald-600 p-8 text-white relative">
+        <div className="min-h-screen bg-slate-950 p-6 md:p-12 relative overflow-hidden">
+            {/* Background Blur */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/5 rounded-full filter blur-[100px]"></div>
+
+            <div className="max-w-3xl mx-auto relative z-10">
+                <div className="flex items-center justify-between mb-10">
                     <button
                         onClick={onBack}
-                        className="absolute top-8 left-8 p-2 hover:bg-white/20 rounded-full transition-colors"
+                        className="bg-slate-900 border border-white/5 p-4 rounded-2xl hover:bg-slate-800 transition-all text-emerald-400 group"
                     >
-                        <ArrowLeft className="w-6 h-6" />
+                        <ArrowLeft className="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
                     </button>
-                    <div className="text-center">
-                        <Scale className="w-16 h-16 mx-auto mb-4 opacity-90" />
-                        <h1 className="text-3xl font-bold">Terms of Service</h1>
-                        <p className="mt-2 text-emerald-100">Last updated: January 27, 2026</p>
+                    <div className="text-right">
+                        <h1 className="text-3xl font-black text-white tracking-tight">Legal Protocol</h1>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Revision: Jan 2026</p>
                     </div>
                 </div>
 
-                <div className="p-8 md:p-12 space-y-8 text-gray-700 leading-relaxed">
-                    <section className="bg-yellow-50 p-6 rounded-2xl border border-yellow-200">
-                        <h2 className="text-xl font-bold text-yellow-900 mb-2 flex items-center">
-                            <AlertTriangle className="w-6 h-6 mr-2" />
-                            1. Not Medical Advice
-                        </h2>
-                        <p className="text-yellow-800">
-                            The services provided by Robtor, including AI-generated health metrics and report analysis, are for <strong>educational and informational purposes only</strong>. We do not provide professional medical advice, diagnosis, or treatment.
+                <div className="card p-10 space-y-12 text-left">
+                    <div className="text-center pb-8 border-b border-white/5">
+                        <div className="bg-slate-800 w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto mb-6 border border-white/5 shadow-2xl">
+                            <Scale size={40} className="text-emerald-400" />
+                        </div>
+                        <h2 className="text-2xl font-black text-white tracking-tight italic uppercase">Terms of Service</h2>
+                    </div>
+
+                    <section className="bg-amber-500/5 p-8 rounded-[2rem] border border-amber-500/10">
+                        <h3 className="text-lg font-black text-amber-500 mb-4 flex items-center uppercase tracking-tight">
+                            <AlertTriangle className="w-6 h-6 mr-3" />
+                            1. Regulatory Disclosure
+                        </h3>
+                        <p className="text-sm text-amber-200/50 leading-relaxed font-medium">
+                            The Robtor neural architecture provides <strong>informational data extraction only</strong>. This is not a clinical diagnosis system. Data output must be validated by licensed medical personnel before any health decisions are enacted.
                         </p>
                     </section>
 
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                            <UserCheck className="w-6 h-6 mr-2 text-emerald-600" />
-                            2. User Responsibilities
-                        </h2>
-                        <p>
-                            By using Robtor, you agree that you are responsible for your own health decisions. You should always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition.
+                    <section className="space-y-4">
+                        <h3 className="text-lg font-black text-white flex items-center uppercase tracking-tight">
+                            <UserCheck className="w-6 h-6 mr-3 text-emerald-400" />
+                            2. Human Governance
+                        </h3>
+                        <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                            The user maintains 100% autonomy and responsibility for all actions taken based on system insights. Robtor serves as a data aggregator and translator, not a decision-maker.
                         </p>
                     </section>
 
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                            <ShieldAlert className="w-6 h-6 mr-2 text-emerald-600" />
-                            3. Privacy and Data
-                        </h2>
-                        <p>
-                            Usage of our services is also governed by our Privacy Policy. You agree to provide accurate information and not to upload malicious files or deceptive content.
+                    <section className="space-y-4">
+                        <h3 className="text-lg font-black text-white flex items-center uppercase tracking-tight">
+                            <ShieldAlert className="w-6 h-6 mr-3 text-emerald-400" />
+                            3. Data Integrity
+                        </h3>
+                        <p className="text-sm text-slate-400 leading-relaxed font-medium">
+                            Users must provide authentic clinical records. Attempting to bypass diagnostic protocols or uploading corrupted datasets is strictly prohibited and may result in permanent access revocation.
                         </p>
                     </section>
 
-                    <section>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">4. Limitation of Liability</h2>
-                        <p>
-                            Robtor and its creators shall not be liable for any direct, indirect, incidental, or consequential damages resulting from the use or inability to use the service or for the cost of procurement of substitute goods and services.
-                        </p>
-                    </section>
-
-                    <div className="pt-8 border-t text-center">
+                    <div className="pt-10 border-t border-white/5 flex flex-col items-center">
                         <button
                             onClick={onBack}
-                            className="bg-emerald-600 text-white px-8 py-3 rounded-xl font-semibold hover:bg-emerald-700 transition-colors shadow-lg"
+                            className="btn-primary px-12 group"
                         >
-                            I Accept These Terms
+                            Confirm Protocol Acceptance
+                            <Activity className="ml-3 w-4 h-4 animate-pulse" />
                         </button>
+                        <p className="mt-6 text-[9px] font-black text-slate-600 uppercase tracking-[0.2em]">End of Document</p>
                     </div>
                 </div>
             </div>

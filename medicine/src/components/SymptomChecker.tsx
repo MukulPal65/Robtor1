@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Stethoscope, Search, AlertCircle, CheckCircle, Info, Loader, Activity, Pill, ShieldAlert } from 'lucide-react';
+import { Stethoscope, Search, AlertCircle, CheckCircle, Info, Loader, Activity, Pill, ShieldAlert, X } from 'lucide-react';
 import { GeminiService } from '../services/geminiService';
 
 interface Symptom {
@@ -43,7 +43,6 @@ const SymptomChecker: React.FC = () => {
       setAssessment(result);
       setShowResults(true);
     } catch (error) {
-      console.error("Error checking symptoms:", error);
       alert("Failed to analyze symptoms. Please try again.");
     } finally {
       setAnalyzing(false);
@@ -53,40 +52,49 @@ const SymptomChecker: React.FC = () => {
   const selectedCount = symptoms.filter((s) => s.selected).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 p-6 pb-24">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-slate-950 p-6 pb-24 relative overflow-hidden">
+      {/* Background Decor */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-red-500/5 rounded-full filter blur-[150px] pointer-events-none"></div>
+
+      <div className="max-w-4xl mx-auto relative z-10">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="bg-gradient-to-br from-red-500 to-pink-600 p-3 rounded-2xl">
-              <Stethoscope className="w-8 h-8 text-white" />
+        <div className="mb-10 text-left">
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="bg-slate-900 border border-white/5 p-4 rounded-[2rem] shadow-2xl animate-float">
+              <Stethoscope className="w-8 h-8 text-rose-400" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-gray-800">AI Symptom Checker</h1>
-              <p className="text-gray-600">Get instant guidance on your symptoms</p>
+              <h1 className="text-3xl font-black text-white tracking-tight">AI Differential</h1>
+              <p className="text-slate-500 font-medium">Neural symptom mapping & triage</p>
             </div>
           </div>
         </div>
 
-        {/* Search Bar */}
-        <div className="card mb-6">
-          <div className="relative">
-            <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
+        {/* Search Bar - Integrated style */}
+        <div className="card p-2 mb-8 bg-slate-900/80">
+          <div className="relative group">
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-rose-400 transition-colors" />
             <input
               type="text"
-              placeholder="Search for symptoms..."
+              placeholder="Filter symptoms..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="w-full pl-16 pr-6 py-5 bg-transparent border-none text-white focus:ring-0 placeholder-slate-600 font-bold"
             />
           </div>
         </div>
 
         {/* Symptoms Grid */}
         {!showResults && (
-          <div className="card mb-6">
-            <h3 className="text-xl font-bold text-gray-800 mb-4">Select Your Symptoms</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="space-y-8 animate-fade-in">
+            <div className="flex items-center justify-between px-4">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">Active Database</h3>
+              <span className="text-[10px] font-black text-rose-500 bg-rose-500/10 px-3 py-1 rounded-full uppercase tracking-tighter">
+                {selectedCount} Selected
+              </span>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {symptoms
                 .filter((symptom) =>
                   symptom.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -95,31 +103,34 @@ const SymptomChecker: React.FC = () => {
                   <button
                     key={symptom.id}
                     onClick={() => toggleSymptom(symptom.id)}
-                    className={`p-4 rounded-xl border-2 transition-all text-left ${symptom.selected
-                        ? 'border-red-500 bg-red-50'
-                        : 'border-gray-200 hover:border-red-300 bg-white'
+                    className={`p-6 rounded-[2rem] border-2 transition-all duration-300 text-left relative overflow-hidden group ${symptom.selected
+                      ? 'border-rose-500 bg-rose-500/10 text-white shadow-xl shadow-rose-500/10'
+                      : 'border-white/5 bg-slate-900/40 text-slate-500 hover:border-emerald-500/20'
                       }`}
                   >
-                    <div className="flex items-center justify-between">
-                      <span className={symptom.selected ? 'text-red-700 font-semibold' : 'text-gray-700'}>
-                        {symptom.name}
-                      </span>
-                      {symptom.selected && (
-                        <CheckCircle className="w-5 h-5 text-red-500" />
-                      )}
-                    </div>
+                    <span className={`text-sm font-black tracking-tight ${symptom.selected ? '' : 'group-hover:text-slate-300'}`}>
+                      {symptom.name}
+                    </span>
+                    {symptom.selected && (
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                        <div className="bg-rose-500 p-1 rounded-full shadow-lg">
+                          <CheckCircle className="w-3 h-3 text-white" />
+                        </div>
+                      </div>
+                    )}
                   </button>
                 ))}
             </div>
 
             {selectedCount > 0 && (
-              <div className="mt-6 flex items-center justify-between bg-red-50 rounded-xl p-4">
-                <p className="text-gray-700">
-                  <strong>{selectedCount}</strong> symptom{selectedCount !== 1 ? 's' : ''} selected
-                </p>
-                <button onClick={handleAnalyze} disabled={analyzing} className="btn-primary flex items-center">
-                  {analyzing && <Loader className="w-4 h-4 mr-2 animate-spin" />}
-                  {analyzing ? 'Analyzing...' : 'Analyze Symptoms'}
+              <div className="pt-10 flex justify-center sticky bottom-32 z-[100]">
+                <button
+                  onClick={handleAnalyze}
+                  disabled={analyzing}
+                  className="btn-primary min-w-[300px] shadow-emerald-500/30 text-lg py-5 px-10"
+                >
+                  {analyzing ? <Loader size={20} className="animate-spin mr-3" /> : <Activity size={20} className="mr-3" />}
+                  {analyzing ? 'Processing Telemetry...' : 'Initialize AI Analysis'}
                 </button>
               </div>
             )}
@@ -128,96 +139,85 @@ const SymptomChecker: React.FC = () => {
 
         {/* Results */}
         {showResults && assessment && (
-          <div className="space-y-6 animate-slide-up">
-            {/* Main Assessment */}
-            <div className="card bg-gradient-to-br from-red-50 to-orange-50 border-2 border-red-200">
-              <div className="flex items-start space-x-4">
-                <div className="bg-red-500 p-3 rounded-2xl shadow-lg">
-                  <AlertCircle className="w-8 h-8 text-white flex-shrink-0" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-1">AI Assessment</h3>
-                  <p className="text-2xl font-bold text-red-700 mb-2">{assessment.possible_condition}</p>
-                  <div className="flex items-center space-x-2 bg-red-100 rounded-lg px-3 py-1 inline-flex">
-                    <span className="text-sm font-bold text-red-800">Match Confidence: {assessment.confidence_score}%</span>
+          <div className="space-y-8 animate-slide-up text-left">
+            <div className="card p-10 bg-gradient-to-br from-rose-900/40 to-slate-900 border-rose-500/20">
+              <div className="flex items-start justify-between mb-8">
+                <div className="flex items-center space-x-6">
+                  <div className="bg-rose-500 p-5 rounded-[2rem] shadow-premium">
+                    <AlertCircle className="w-10 h-10 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] mb-2">Identified Condition</p>
+                    <h3 className="text-3xl font-black text-white tracking-tight uppercase italic">{assessment.possible_condition}</h3>
                   </div>
                 </div>
+                <div className="bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-2xl">
+                  <span className="text-xs font-black text-rose-500 uppercase tracking-widest">{assessment.confidence_score}% Confidence</span>
+                </div>
+              </div>
+              <div className="bg-slate-950/40 p-8 rounded-[2rem] border border-white/5">
+                <div className="flex items-center space-x-2 mb-4">
+                  <Info size={16} className="text-emerald-400" />
+                  <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Clinical Explanation</h4>
+                </div>
+                <p className="text-sm text-slate-400 leading-relaxed font-medium">{assessment.explanation}</p>
               </div>
             </div>
 
-            {/* Description */}
-            <div className="card border-2 border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center">
-                <Info className="w-5 h-5 mr-2 text-blue-500" />
-                What This Means
-              </h3>
-              <p className="text-gray-700 leading-relaxed text-sm">
-                {assessment.explanation}
-              </p>
-            </div>
-
-            {/* Recommendations */}
-            <div className="card border-2 border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center">
-                <Activity className="w-5 h-5 mr-2 text-green-500" />
-                Recommended Actions
-              </h3>
-              <div className="space-y-4">
+            {/* Recommendations Grid */}
+            <div className="space-y-4">
+              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Deployment Directives</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {assessment.recommendations?.map((rec: any, i: number) => (
-                  <div key={i} className={`flex items-start space-x-3 p-4 rounded-xl border ${rec.type === 'medication' ? 'bg-blue-50 border-blue-100' :
-                      rec.type === 'lifestyle' ? 'bg-green-50 border-green-100' :
-                        'bg-purple-50 border-purple-100'
-                    }`}>
-                    {rec.type === 'medication' ? <Pill className="w-6 h-6 text-blue-600 mt-0.5" /> :
-                      rec.type === 'lifestyle' ? <CheckCircle className="w-6 h-6 text-green-600 mt-0.5" /> :
-                        <Activity className="w-6 h-6 text-purple-600 mt-0.5" />}
-                    <div>
-                      <h4 className="font-bold text-gray-800 mb-1">{rec.title}</h4>
-                      <p className="text-sm text-gray-600">{rec.description}</p>
+                  <div key={i} className="card p-8 border-white/5 hover:border-emerald-500/10 transition-colors">
+                    <div className="flex items-center space-x-4 mb-6">
+                      <div className="p-3 bg-slate-800 rounded-2xl border border-white/5">
+                        {rec.type === 'medication' ? <Pill className="w-6 h-6 text-blue-400" /> :
+                          rec.type === 'lifestyle' ? <CheckCircle className="w-6 h-6 text-emerald-400" /> :
+                            <Activity className="w-6 h-6 text-purple-400" />}
+                      </div>
+                      <h4 className="font-black text-white uppercase tracking-tight text-sm">{rec.title}</h4>
                     </div>
+                    <p className="text-xs text-slate-500 font-medium leading-relaxed">{rec.description}</p>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Emergency Signs */}
-            <div className="card bg-gradient-to-br from-red-600 to-pink-700 text-white border-0 shadow-xl">
-              <div className="flex items-start space-x-3">
-                <ShieldAlert className="w-8 h-8 text-white mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="text-xl font-bold mb-3">Seek Immediate Care If:</h3>
-                  <ul className="space-y-2">
-                    {assessment.urgent_signs?.map((sign: string, i: number) => (
-                      <li key={i} className="flex items-start">
-                        <span className="mr-2 text-white/70">•</span>
-                        <span className="font-medium">{sign}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+            {/* Emergency Signals */}
+            <div className="card p-10 bg-rose-600 text-white shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full translate-x-1/2 -translate-y-1/2 blur-2xl group-hover:scale-150 transition-transform duration-1000" />
+              <div className="flex items-center space-x-6 mb-8 relative z-10">
+                <ShieldAlert size={48} className="text-white animate-pulse" />
+                <h3 className="text-2xl font-black italic uppercase tracking-tight">Critical Indicators</h3>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative z-10">
+                {assessment.urgent_signs?.map((sign: string, i: number) => (
+                  <div key={i} className="flex items-center space-x-4 p-4 bg-white/10 rounded-2xl backdrop-blur-md">
+                    <div className="w-1.5 h-1.5 bg-white rounded-full" />
+                    <span className="font-black text-xs uppercase tracking-tighter">{sign}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="mt-10 text-[9px] font-black text-white/50 uppercase tracking-[0.3em] text-center border-t border-white/10 pt-6">Emergency Protocol: If present, contact 911 immediately</p>
             </div>
 
-            {/* Disclaimer */}
-            <div className="card bg-gray-50 border-2 border-gray-200">
-              <p className="text-xs text-gray-500 text-center leading-relaxed">
-                <strong>IMPORTANT:</strong> {assessment.disclaimer}
-              </p>
+            {/* Reset Button */}
+            <div className="pt-6 pb-12 flex justify-center">
+              <button
+                onClick={() => {
+                  setShowResults(false);
+                  setAssessment(null);
+                  setSymptoms(symptoms.map((s) => ({ ...s, selected: false })));
+                }}
+                className="btn-secondary min-w-[250px] shadow-sm flex items-center justify-center p-5"
+              >
+                <X size={18} className="mr-3" />
+                New Assessment Session
+              </button>
             </div>
-
-            <button
-              onClick={() => {
-                setShowResults(false);
-                setAssessment(null);
-                setSymptoms(symptoms.map((s) => ({ ...s, selected: false })));
-              }}
-              className="w-full bg-gray-100 text-gray-700 py-4 rounded-xl font-bold hover:bg-gray-200 transition-all shadow-sm"
-            >
-              Start New Check
-            </button>
           </div>
         )}
-
       </div>
     </div>
   );

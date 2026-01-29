@@ -50,7 +50,7 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
       <nav
         role="navigation"
         aria-label="Main Navigation"
-        className="bg-white/70 backdrop-blur-2xl border border-white/40 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.15)] rounded-[2.5rem] p-2"
+        className="bg-slate-900/80 backdrop-blur-2xl border border-white/5 shadow-2xl rounded-[2.5rem] p-2"
       >
         <div className="flex items-center justify-between px-2">
           {navItems.map((item) => {
