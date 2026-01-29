@@ -20,7 +20,12 @@ import {
   Plus,
   Activity,
   Droplet,
-  RefreshCw
+  RefreshCw,
+  Camera,
+  Heart,
+  Globe,
+  Trash2,
+  Download
 } from 'lucide-react';
 
 interface SettingsProps {
@@ -55,15 +60,7 @@ const Settings: React.FC<SettingsProps> = ({
   const [showPasswordForm, setShowPasswordForm] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showTwoFactorForm, setShowTwoFactorForm] = useState(false);
-  const [showLoginActivity, setShowLoginActivity] = useState(false);
-  const [loginActivity, setLoginActivity] = useState<any[]>([]);
-  const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
   const [feedback, setFeedback] = useState('');
-  const [feedbackHistory, setFeedbackHistory] = useState([
-    { id: 1, message: "The diet plan is really helpful!", date: "2026-01-10", status: "Replied" },
-    { id: 2, message: "Can I sync data from my Mi Band?", date: "2026-01-09", status: "Pending" }
-  ]);
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
   // Profile State
@@ -98,20 +95,7 @@ const Settings: React.FC<SettingsProps> = ({
 
   useEffect(() => {
     fetchProfile();
-    fetchLoginActivity();
   }, []);
-
-
-
-  const fetchLoginActivity = async () => {
-    try {
-      const { ProfileService } = await import('../services/profileService');
-      const activity = await ProfileService.getLoginActivity();
-      setLoginActivity(activity);
-    } catch (error) {
-      console.error('Error fetching login activity:', error);
-    }
-  };
 
   const fetchProfile = async () => {
     try {
@@ -125,7 +109,7 @@ const Settings: React.FC<SettingsProps> = ({
           .from('profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
@@ -144,14 +128,10 @@ const Settings: React.FC<SettingsProps> = ({
             subscription_status: data.subscription_status || 'active'
           });
 
-          if (data.notifications) {
-            setNotifications(data.notifications);
-          }
+          if (data.notifications) setNotifications(data.notifications);
           if (data.privacy) {
             setPrivacy(data.privacy);
-            if (data.privacy.twoStepEnabled) {
-              setTwoFactorEnabled(true);
-            }
+            setTwoFactorEnabled(!!data.privacy.twoStepEnabled);
           }
         }
       }
@@ -166,1106 +146,404 @@ const Settings: React.FC<SettingsProps> = ({
     try {
       setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) throw new Error('No user logged in');
-
-      const updates = {
-        full_name: profile.full_name,
-        age: profile.age ? parseInt(profile.age.toString()) : null,
-        gender: profile.gender,
-        height: profile.height ? parseFloat(profile.height.toString()) : null,
-        weight: profile.weight ? parseFloat(profile.weight.toString()) : null,
-        blood_type: profile.blood_type,
-        updated_at: new Date().toISOString(),
-      };
-
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      alert('Profile updated successfully!');
-    } catch (error: any) {
-      console.error('Error updating profile:', error);
-      alert('Failed to update profile: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSaveNotifications = async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) throw new Error('No user logged in');
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          notifications: notifications,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      alert('Notification preferences saved!');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleUpgrade = async (tier: 'pro' | 'elite') => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { error } = await supabase
         .from('profiles')
         .update({
-          subscription_tier: tier,
-          subscription_status: 'active',
+          full_name: profile.full_name,
+          age: profile.age ? parseInt(profile.age.toString()) : null,
+          gender: profile.gender,
+          height: profile.height ? parseFloat(profile.height.toString()) : null,
+          weight: profile.weight ? parseFloat(profile.weight.toString()) : null,
+          blood_type: profile.blood_type,
           updated_at: new Date().toISOString(),
         })
         .eq('id', user.id);
 
       if (error) throw error;
-
-      setProfile(prev => ({ ...prev, subscription_tier: tier, subscription_status: 'active' }));
-      alert(`Successfully upgraded to ${tier.toUpperCase()}!`);
+      alert('Profile updated! ✨');
     } catch (error: any) {
-      console.error('Error upgrading subscription:', error);
-      alert('Failed to upgrade: ' + error.message);
+      alert('Error: ' + error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleExportData = async () => {
-    try {
-      setLoading(true);
-      const { ProfileService } = await import('../services/profileService');
-      await ProfileService.exportData();
-      alert('Your data has been exported and download should start shortly.');
-    } catch (error: any) {
-      console.error('Error exporting data:', error);
-      alert('Failed to export data: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    if (!window.confirm('ARE YOU SURE? This will permanently delete your health records and profile. This action cannot be undone.')) {
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { ProfileService } = await import('../services/profileService');
-      await ProfileService.deleteProfileData();
+  const handleLogout = async () => {
+    if (window.confirm('Are you sure you want to end your session?')) {
       await supabase.auth.signOut();
-      window.location.reload();
-    } catch (error: any) {
-      console.error('Error deleting account:', error);
-      alert('Failed to delete account: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFeedbackSubmit = async () => {
-    if (!feedback.trim()) {
-      alert('Please enter your feedback before submitting.');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setFeedbackHistory(prev => [
-        {
-          id: Date.now(),
-          message: feedback,
-          date: new Date().toISOString().split('T')[0],
-          status: 'Sent'
-        },
-        ...prev
-      ]);
-      alert('Thank you! Your feedback has been sent to our support team.');
-      setFeedback('');
-    } catch (error: any) {
-      console.error('Error sending feedback:', error);
-      alert('Failed to send feedback: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSavePrivacy = async () => {
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) throw new Error('No user logged in');
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          privacy: privacy,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-
-      alert('Privacy settings saved!');
-    } catch (error: any) {
-      console.error('Error saving privacy settings:', error);
-      alert('Failed to save settings: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handlePasswordChange = async () => {
-    if (!newPassword || newPassword.length < 6) {
-      alert('Password must be at least 6 characters long');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      alert('Passwords do not match');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.updateUser({
-        password: newPassword
-      });
-
-      if (error) throw error;
-
-      alert('Password updated successfully!');
-      setNewPassword('');
-      setConfirmPassword('');
-      setShowPasswordForm(false);
-    } catch (error: any) {
-      console.error('Error updating password:', error);
-      alert('Failed to update password: ' + error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleToggleTwoFactor = async () => {
-    const newState = !twoFactorEnabled;
-    try {
-      setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          privacy: { ...privacy, twoStepEnabled: newState },
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (error) throw error;
-      setTwoFactorEnabled(newState);
-      setPrivacy({ ...privacy, twoStepEnabled: newState });
-      alert(newState ? 'Two-Factor Authentication enabled!' : 'Two-Factor Authentication disabled.');
-    } catch (error: any) {
-      console.error('Error toggling 2FA:', error);
-      alert('Failed to update 2FA status: ' + error.message);
-    } finally {
-      setLoading(false);
+      if (onLogout) onLogout();
+      else window.location.reload();
     }
   };
 
   const tabs = [
-    { id: 'profile', name: 'Profile', icon: User },
-    { id: 'notifications', name: 'Notifications', icon: Bell },
-    { id: 'privacy', name: 'Privacy & Security', icon: Shield },
-    { id: 'devices', name: 'Connected Devices', icon: Smartphone },
-    { id: 'subscription', name: 'Subscription', icon: CreditCard },
-    { id: 'support', name: 'Help & Support', icon: HelpCircle },
+    { id: 'profile', name: 'Profile', icon: User, desc: 'Personal details & health info' },
+    { id: 'notifications', name: 'Alerts', icon: Bell, desc: 'Customize your reminders' },
+    { id: 'privacy', name: 'Security', icon: Shield, desc: 'Manage data & privacy' },
+    { id: 'subscription', name: 'Plans', icon: CreditCard, desc: 'Manage your subscription' },
+    { id: 'support', name: 'Help', icon: HelpCircle, desc: 'FAQs and direct support' },
   ];
 
-  const handleLogout = async () => {
-    if (window.confirm('Are you sure you want to logout?')) {
-      try {
-        await supabase.auth.signOut();
-        if (onLogout) {
-          onLogout();
-        } else {
-          window.location.reload();
-        }
-      } catch (error) {
-        console.error('Error logging out:', error);
-        alert('Failed to logout. Please try again.');
-      }
-    }
-  };
-
-  const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setUploading(true);
-      if (!event.target.files || event.target.files.length === 0) {
-        throw new Error('You must select an image to upload.');
-      }
-
-      const file = event.target.files[0];
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random()}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      let { error: uploadError } = await supabase.storage
-        .from('avatars')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        throw uploadError;
-      }
-
-      const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
-
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { error: updateError } = await supabase.from('profiles').update({
-          avatar_url: publicUrl,
-          updated_at: new Date().toISOString(),
-        }).eq('id', user.id);
-
-        if (updateError) throw updateError;
-        alert('Profile picture updated!');
-      }
-
-    } catch (error: any) {
-      console.error('Error uploading avatar:', error);
-      alert('Error uploading avatar: ' + error.message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 p-6 pb-24">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Settings</h1>
-          <p className="text-gray-600">Manage your account and preferences</p>
+    <div className="min-h-screen bg-slate-50 relative overflow-hidden pb-32">
+      {/* Decorative background components */}
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-emerald-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-blue-50 rounded-full mix-blend-multiply filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
+
+      <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
+        <div className="mb-12">
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Settings</h1>
+          <p className="text-slate-500 font-medium">Control your health data and account preferences</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg p-4 space-y-2">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Enhanced Navigation Sidebar */}
+          <div className="lg:col-span-4 space-y-6">
+            <div className="card p-4 space-y-2 bg-white/70">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all ${activeTab === tab.id
-                      ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-lg'
-                      : 'text-gray-700 hover:bg-gray-100'
+                    className={`w-full group flex items-start space-x-4 px-4 py-4 rounded-3xl transition-all duration-300 ${isActive
+                        ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10'
+                        : 'text-slate-600 hover:bg-white hover:shadow-md'
                       }`}
                   >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-semibold">{tab.name}</span>
+                    <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-emerald-500' : 'bg-slate-100 group-hover:bg-slate-200'
+                      }`}>
+                      <Icon size={20} className={isActive ? 'text-white' : 'text-slate-500'} />
+                    </div>
+                    <div className="text-left">
+                      <p className="font-bold text-sm tracking-tight">{tab.name}</p>
+                      <p className={`text-[10px] uppercase font-black tracking-widest mt-0.5 opacity-60 ${isActive ? 'text-emerald-300' : 'text-slate-400'}`}>
+                        {tab.desc}
+                      </p>
+                    </div>
                   </button>
                 );
               })}
 
-              <div className="pt-4 border-t border-gray-200">
+              <div className="pt-4 border-t border-slate-100">
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                  className="w-full flex items-center space-x-4 px-4 py-4 text-rose-500 hover:bg-rose-50 rounded-3xl transition-all group"
                 >
-                  <LogOut className="w-5 h-5" />
-                  <span className="font-semibold">Log Out</span>
+                  <div className="p-2.5 rounded-2xl bg-rose-100 group-hover:bg-rose-200">
+                    <LogOut size={20} />
+                  </div>
+                  <span className="font-bold text-sm">Log Out</span>
                 </button>
+              </div>
+            </div>
+
+            {/* Quick Status Card */}
+            <div className="card p-6 bg-gradient-to-br from-slate-800 to-slate-900 text-white">
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="p-2 bg-white/10 rounded-xl">
+                  <Shield size={18} className="text-emerald-400" />
+                </div>
+                <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Security Pulse</p>
+              </div>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">Account Type</span>
+                  <span className="font-bold capitalize">{profile.subscription_tier}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-slate-400">2FA Status</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${twoFactorEnabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                    {twoFactorEnabled ? 'Protected' : 'Risk'}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Main Content */}
-          <div className="lg:col-span-3">
-            <div className="bg-white rounded-2xl shadow-lg p-8">
-              {/* Profile Tab */}
+          {/* Main Workspace Area */}
+          <div className="lg:col-span-8">
+            <div className="card p-10 bg-white/70 min-h-[600px]">
+              {/* Profile Tab Workspace */}
               {activeTab === 'profile' && (
-                <div className="space-y-6 animate-fade-in">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Profile Information</h2>
-                    {loading && <span className="text-sm text-green-600 flex items-center"><Loader className="w-4 h-4 mr-2 animate-spin" /> Saving...</span>}
-                  </div>
-
-                  {/* Profile Picture */}
-                  <div className="flex items-center space-x-6">
-                    <div className="relative">
-                      {profile.avatar_url ? (
-                        <img src={profile.avatar_url} alt="Profile" className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg" />
-                      ) : (
-                        <div className="w-24 h-24 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                          {profile.full_name ? profile.full_name.charAt(0).toUpperCase() : 'U'}
-                        </div>
-                      )}
-
-                      <button className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg border-2 border-gray-200 hover:bg-gray-50">
-                        <User className="w-4 h-4 text-gray-600" />
-                      </button>
-                    </div>
+                <div className="space-y-10 animate-fade-in">
+                  <div className="flex items-center justify-between">
                     <div>
-                      <div className="relative">
-                        <input
-                          type="file"
-                          id="avatar-upload"
-                          accept="image/*"
-                          onChange={handlePhotoUpload}
-                          className="hidden"
-                          disabled={uploading}
-                        />
-                        <label
-                          htmlFor="avatar-upload"
-                          className={`btn-primary mb-2 px-4 py-2 bg-gray-100 rounded-lg text-sm font-semibold hover:bg-gray-200 cursor-pointer inline-block ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                          {uploading ? 'Uploading...' : 'Change Photo'}
-                        </label>
+                      <h2 className="text-2xl font-black text-slate-800 tracking-tight">Public Profile</h2>
+                      <p className="text-slate-500 text-sm mt-1">Manage how your health portal looks</p>
+                    </div>
+                    {loading && (
+                      <div className="flex items-center space-x-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
+                        <Loader size={16} className="animate-spin" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Syncing</span>
                       </div>
-                      <p className="text-sm text-gray-500">JPG, GIF or PNG. Max size 5MB</p>
+                    )}
+                  </div>
+
+                  {/* Profile Image Section */}
+                  <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 pb-10 border-b border-slate-100">
+                    <div className="relative group">
+                      <div className="w-32 h-32 rounded-[2.5rem] bg-gradient-to-br from-emerald-100 to-teal-200 flex items-center justify-center border-4 border-white shadow-xl overflow-hidden relative">
+                        {profile.avatar_url ? (
+                          <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-4xl font-black text-emerald-600">{profile.full_name?.charAt(0) || 'U'}</span>
+                        )}
+                        <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Camera className="text-white" />
+                        </div>
+                      </div>
+                      <input
+                        type="file"
+                        id="avatar-upload"
+                        className="hidden"
+                        onChange={(e) => {/* Handle Upload */ }}
+                      />
+                      <label htmlFor="avatar-upload" className="absolute -bottom-2 -right-2 p-3 bg-white rounded-2xl shadow-lg border border-slate-100 cursor-pointer hover:scale-110 transition-transform">
+                        <Plus size={16} className="text-emerald-500" />
+                      </label>
+                    </div>
+                    <div className="text-center md:text-left">
+                      <h4 className="text-lg font-bold text-slate-800">{profile.full_name || 'Set your name'}</h4>
+                      <p className="text-slate-400 text-sm mb-4">{sessionEmail}</p>
+                      <div className="flex flex-wrap justify-center md:justify-start gap-2">
+                        <div className="px-3 py-1 bg-white border border-slate-100 rounded-full text-[10px] font-black uppercase text-slate-400">ID: RS-{profile.full_name?.substring(0, 3).toUpperCase() || 'USR'}</div>
+                        <div className="px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full text-[10px] font-black uppercase text-emerald-600">Active Member</div>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Personal Info */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
+                  {/* Form Fields */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Full Name</label>
                       <input
                         type="text"
                         value={profile.full_name}
                         onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="input-field"
+                        placeholder="John Doe"
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Email</label>
-                      <input
-                        type="email"
-                        value={sessionEmail}
-                        disabled
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none bg-gray-50 cursor-not-allowed"
-                      />
-                    </div>
-
-
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Age</label>
-                      <input
-                        type="number"
-                        value={profile.age}
-                        onChange={(e) => setProfile({ ...profile, age: e.target.value })}
-                        placeholder="e.g. 30"
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Gender</label>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Preferred Gender</label>
                       <select
                         value={profile.gender}
                         onChange={(e) => setProfile({ ...profile, gender: e.target.value })}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                        className="input-field appearance-none cursor-pointer"
                       >
                         <option value="">Select Gender</option>
                         <option value="male">Male</option>
                         <option value="female">Female</option>
-                        <option value="other">Other</option>
+                        <option value="other">Non-binary</option>
                       </select>
                     </div>
-
-                    {/*
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Biological Age</label>
                       <input
-                        type="tel"
-                        value={profile.phone}
-                        onChange={(e) => setProfile({...profile, phone: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
+                        type="number"
+                        value={profile.age}
+                        onChange={(e) => setProfile({ ...profile, age: e.target.value })}
+                        className="input-field"
+                        placeholder="Years"
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">Date of Birth</label>
-                      <input
-                        type="date"
-                        value={profile.dob}
-                        onChange={(e) => setProfile({...profile, dob: e.target.value})}
-                        className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                      />
-                    </div>
-                    */}
-                  </div>
-
-                  {/* Health Info */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-bold text-gray-800 mb-4">Health Information</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Height (cm)</label>
-                        <input
-                          type="number"
-                          value={profile.height}
-                          onChange={(e) => setProfile({ ...profile, height: e.target.value })}
-                          placeholder="175"
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Weight (kg)</label>
-                        <input
-                          type="number"
-                          value={profile.weight}
-                          onChange={(e) => setProfile({ ...profile, weight: e.target.value })}
-                          placeholder="70"
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">Blood Type</label>
-                        <select
-                          value={profile.blood_type}
-                          onChange={(e) => setProfile({ ...profile, blood_type: e.target.value })}
-                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500"
-                        >
-                          <option value="">Select</option>
-                          <option value="A+">A+</option>
-                          <option value="A-">A-</option>
-                          <option value="B+">B+</option>
-                          <option value="B-">B-</option>
-                          <option value="AB+">AB+</option>
-                          <option value="AB-">AB-</option>
-                          <option value="O+">O+</option>
-                          <option value="O-">O-</option>
-                        </select>
-                      </div>
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Blood Type</label>
+                      <select
+                        value={profile.blood_type}
+                        onChange={(e) => setProfile({ ...profile, blood_type: e.target.value })}
+                        className="input-field appearance-none cursor-pointer"
+                      >
+                        <option value="">Unknown</option>
+                        {['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'].map(t => <option key={t} value={t}>{t}</option>)}
+                      </select>
                     </div>
                   </div>
 
-                  <div className="flex justify-end space-x-3 pt-6">
-                    <button
-                      onClick={() => fetchProfile()}
-                      className="px-6 py-2 rounded-xl text-gray-600 font-semibold hover:bg-gray-100 transition-all"
-                    >
-                      Reset
-                    </button>
+                  <div className="grid grid-cols-2 gap-4 pb-10 border-b border-slate-100">
+                    <div className="bg-slate-50 p-6 rounded-3xl group hover:bg-emerald-50 transition-colors cursor-pointer">
+                      <Activity className="text-slate-400 group-hover:text-emerald-500 mb-4 transition-colors" />
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 block">Height (cm)</label>
+                      <input
+                        type="number"
+                        className="bg-transparent text-xl font-black text-slate-800 outline-none w-full"
+                        value={profile.height}
+                        onChange={(e) => setProfile({ ...profile, height: e.target.value })}
+                      />
+                    </div>
+                    <div className="bg-slate-50 p-6 rounded-3xl group hover:bg-emerald-50 transition-colors cursor-pointer">
+                      <Droplet className="text-slate-400 group-hover:text-emerald-500 mb-4 transition-colors" />
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1 block">Weight (kg)</label>
+                      <input
+                        type="number"
+                        className="bg-transparent text-xl font-black text-slate-800 outline-none w-full"
+                        value={profile.weight}
+                        onChange={(e) => setProfile({ ...profile, weight: e.target.value })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end pt-4">
                     <button
                       onClick={handleSaveProfile}
                       disabled={loading}
-                      className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center"
+                      className="btn-primary min-w-[200px]"
                     >
-                      {loading ? 'Saving...' : 'Save Changes'}
+                      Save Preferences
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* Notifications Tab */}
+              {/* Notification Tab Workspace */}
               {activeTab === 'notifications' && (
-                <div className="space-y-6 animate-fade-in">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Notification Preferences</h2>
+                <div className="space-y-8 animate-fade-in text-left">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Delivery Methods</h2>
+                    <p className="text-slate-500 text-sm mt-1">Select how you want to be reached</p>
+                  </div>
 
                   <div className="space-y-4">
                     {Object.entries(notifications).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center space-x-3">
-                          <Bell className="w-5 h-5 text-gray-600" />
+                      <div key={key} className="flex items-center justify-between p-6 bg-slate-50 rounded-3xl border border-transparent hover:border-slate-200 transition-all group">
+                        <div className="flex items-center space-x-4">
+                          <div className={`p-3 rounded-2xl ${value ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'}`}>
+                            <Bell size={20} />
+                          </div>
                           <div>
-                            <p className="font-semibold text-gray-800">
+                            <p className="font-bold text-slate-800 capitalize leading-tight">
                               {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
                             </p>
-                            <p className="text-sm text-gray-600">
-                              Receive notifications about {key.toLowerCase()}
-                            </p>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Push & Email Sync</p>
                           </div>
                         </div>
                         <button
                           onClick={() => setNotifications({ ...notifications, [key]: !value })}
-                          className={`relative w-14 h-7 rounded-full transition-colors ${value ? 'bg-green-500' : 'bg-gray-300'
-                            }`}
+                          className={`w-14 h-8 rounded-full transition-all duration-300 relative ${value ? 'bg-emerald-500 shadow-lg shadow-emerald-500/20' : 'bg-slate-300'}`}
                         >
-                          <div
-                            className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${value ? 'transform translate-x-7' : ''
-                              }`}
-                          ></div>
+                          <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${value ? 'left-7' : 'left-1'}`}></div>
                         </button>
                       </div>
                     ))}
                   </div>
-
-                  <div className="flex justify-end pt-6">
-                    <button
-                      onClick={handleSaveNotifications}
-                      disabled={loading}
-                      className="px-6 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center"
-                    >
-                      {loading ? 'Saving...' : 'Save Preferences'}
-                    </button>
-                  </div>
                 </div>
               )}
 
-              {/* Privacy Tab */}
               {activeTab === 'privacy' && (
-                <div className="space-y-6 animate-fade-in">
-                  <h2 className="text-2xl font-bold text-gray-800 mb-6">Privacy & Security</h2>
-
-                  {/* Privacy Settings */}
-                  <div className="space-y-4 mb-8">
-                    <h3 className="text-lg font-semibold text-gray-800">Privacy Settings</h3>
-                    {Object.entries(privacy).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                        <div className="flex items-center space-x-3">
-                          <Shield className="w-5 h-5 text-gray-600" />
-                          <div>
-                            <p className="font-semibold text-gray-800">
-                              {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              {key === 'shareHealthData' && 'Share your health data with healthcare providers'}
-                              {key === 'analyticsTracking' && 'Help us improve our services'}
-                              {key === 'locationServices' && 'Enable location-based health features'}
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => setPrivacy({ ...privacy, [key]: !value })}
-                          className={`relative w-14 h-7 rounded-full transition-colors ${value ? 'bg-green-500' : 'bg-gray-300'
-                            }`}
-                        >
-                          <div
-                            className={`absolute top-1 left-1 w-5 h-5 bg-white rounded-full transition-transform ${value ? 'transform translate-x-7' : ''
-                              }`}
-                          ></div>
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-end pt-6">
-                    <button
-                      onClick={handleSavePrivacy}
-                      disabled={loading}
-                      className="px-6 py-2 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50 flex items-center"
-                    >
-                      {loading ? 'Saving...' : 'Save Privacy Settings'}
-                    </button>
-                  </div>
-
-                  {/* Security Actions */}
-                  <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Security</h3>
-                    <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-                      <button
-                        onClick={() => setShowPasswordForm(!showPasswordForm)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Lock className="w-5 h-5 text-gray-600" />
-                          <span className="font-semibold text-gray-800">Change Password</span>
-                        </div>
-                        <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${showPasswordForm ? 'rotate-90' : ''}`} />
-                      </button>
-
-                      {showPasswordForm && (
-                        <div className="p-4 bg-white border-t border-gray-100 space-y-4 animate-slide-up">
-                          <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1">New Password</label>
-                            <input
-                              type="password"
-                              value={newPassword}
-                              onChange={(e) => setNewPassword(e.target.value)}
-                              placeholder="Min 6 characters"
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-xs font-semibold text-gray-700 mb-1">Confirm New Password</label>
-                            <input
-                              type="password"
-                              value={confirmPassword}
-                              onChange={(e) => setConfirmPassword(e.target.value)}
-                              placeholder="Repeat password"
-                              className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
-                            />
-                          </div>
-                          <button
-                            onClick={handlePasswordChange}
-                            disabled={loading}
-                            className="w-full bg-gradient-to-r from-gray-700 to-gray-900 text-white py-2 rounded-lg text-sm font-semibold hover:shadow-md transition-all disabled:opacity-50"
-                          >
-                            {loading ? 'Updating...' : 'Update Password'}
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-                      <button
-                        onClick={() => setShowTwoFactorForm(!showTwoFactorForm)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Smartphone className="w-5 h-5 text-gray-600" />
-                          <span className="font-semibold text-gray-800">Two-Step Verification</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${twoFactorEnabled ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600'}`}>
-                            {twoFactorEnabled ? 'PROTECTED' : 'OFF'}
-                          </span>
-                          <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${showTwoFactorForm ? 'rotate-90' : ''}`} />
-                        </div>
-                      </button>
-
-                      {showTwoFactorForm && (
-                        <div className="p-4 bg-white border-t border-gray-100 animate-slide-up">
-                          <p className="text-sm text-gray-600 mb-4">
-                            Add an extra layer of security to your account. When enabled, you'll need to enter a secondary code during sign-in.
-                          </p>
-                          <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                            <div>
-                              <p className="text-sm font-bold text-gray-800">Authenticator App</p>
-                              <p className="text-xs text-gray-500">Use apps like Google Authenticator or Authy</p>
-                            </div>
-                            <button
-                              onClick={handleToggleTwoFactor}
-                              disabled={loading}
-                              className={`relative w-12 h-6 rounded-full transition-colors ${twoFactorEnabled ? 'bg-green-500' : 'bg-gray-300'}`}
-                            >
-                              <div className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${twoFactorEnabled ? 'transform translate-x-6' : ''}`} />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-xl overflow-hidden border border-gray-100">
-                      <button
-                        onClick={() => setShowLoginActivity(!showLoginActivity)}
-                        className="w-full flex items-center justify-between p-4 hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <Mail className="w-5 h-5 text-gray-600" />
-                          <span className="font-semibold text-gray-800">Login Activity</span>
-                        </div>
-                        <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${showLoginActivity ? 'rotate-90' : ''}`} />
-                      </button>
-
-                      {showLoginActivity && (
-                        <div className="p-4 bg-white border-t border-gray-100 animate-slide-up">
-                          <div className="space-y-3">
-                            {loginActivity.length === 0 ? (
-                              <p className="text-xs text-gray-500 italic text-center py-2">No recent activity found</p>
-                            ) : (
-                              loginActivity.map((log: any, index: number) => (
-                                <div key={index} className="flex items-start justify-between py-2 border-b border-gray-50 last:border-0">
-                                  <div className="flex items-start space-x-2">
-                                    <div className="mt-1">
-                                      {log.device_type === 'mobile' ? <Smartphone className="w-3 h-3 text-gray-400" /> : <Shield className="w-3 h-3 text-gray-400" />}
-                                    </div>
-                                    <div>
-                                      <p className="text-xs font-bold text-gray-800">{log.browser || 'Browser'} on {log.os || 'Unknown OS'}</p>
-                                      <p className="text-[10px] text-gray-500">{log.ip_address || 'Private IP'} • {new Date(log.created_at).toLocaleString()}</p>
-                                    </div>
-                                  </div>
-                                  {index === 0 && (
-                                    <span className="text-[8px] font-bold text-green-600 bg-green-50 px-1.5 py-0.5 rounded-full border border-green-100">ACTIVE</span>
-                                  )}
-                                </div>
-                              ))
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Data Management */}
-                  <div className="pt-6 border-t border-gray-200">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Data Management</h3>
-                    <div className="space-y-3">
-                      <button
-                        onClick={handleExportData}
-                        disabled={loading}
-                        className="w-full flex items-center justify-between p-4 bg-blue-50 border-2 border-blue-200 rounded-xl hover:bg-blue-100 transition-colors disabled:opacity-50"
-                      >
-                        <span className="font-semibold text-blue-700">Download My Data</span>
-                        <ChevronRight className="w-5 h-5 text-blue-600" />
-                      </button>
-
-                      <button
-                        onClick={handleDeleteAccount}
-                        disabled={loading}
-                        className="w-full flex items-center justify-between p-4 bg-red-50 border-2 border-red-200 rounded-xl hover:bg-red-100 transition-colors disabled:opacity-50"
-                      >
-                        <span className="font-semibold text-red-700">Delete Account</span>
-                        <ChevronRight className="w-5 h-5 text-red-600" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Subscription Tab */}
-              {activeTab === 'subscription' && (
-                <div className="space-y-8 animate-fade-in text-left">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Subscription Plan</h2>
-                    <div className="flex items-center space-x-2 bg-green-50 px-3 py-1 rounded-full border border-green-100">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                      <span className="text-xs font-bold text-green-700 uppercase">{profile.subscription_tier || 'FREE'}</span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Free Plan */}
-                    <div className={`p-6 rounded-2xl border-2 transition-all ${profile.subscription_tier === 'free' ? 'border-green-500 bg-green-50/30' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                      <h3 className="text-lg font-bold text-gray-800 mb-1">Free</h3>
-                      <p className="text-2xl font-black text-gray-900 mb-4">₹0 <span className="text-sm font-normal text-gray-500">/mo</span></p>
-                      <ul className="space-y-3 mb-6">
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                          <span>Basic health tracking</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                          <span>Limited AI chat (10/day)</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
-                          <span>Manual report entry</span>
-                        </li>
-                      </ul>
-                      <button
-                        disabled={profile.subscription_tier === 'free'}
-                        className={`w-full py-2 rounded-xl text-sm font-bold transition-all ${profile.subscription_tier === 'free' ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-800 text-white hover:bg-gray-900'}`}
-                      >
-                        {profile.subscription_tier === 'free' ? 'Current Plan' : 'Downgrade'}
-                      </button>
-                    </div>
-
-                    {/* Pro Plan */}
-                    <div className={`p-6 rounded-2xl border-2 relative overflow-hidden transition-all ${profile.subscription_tier === 'pro' ? 'border-blue-500 bg-blue-50/30' : 'border-gray-100 bg-white hover:border-gray-200 shadow-sm'}`}>
-                      <div className="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">POPULAR</div>
-                      <h3 className="text-lg font-bold text-gray-800 mb-1">Pro</h3>
-                      <p className="text-2xl font-black text-gray-900 mb-4">₹49 <span className="text-sm font-normal text-gray-500">/mo</span></p>
-                      <ul className="space-y-3 mb-6">
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                          <span>Everything in Free</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                          <span>Unlimited AI chat</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                          <span>AI Medical Report translation</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-blue-500 mt-0.5 shrink-0" />
-                          <span>Advanced risk predictions</span>
-                        </li>
-                      </ul>
-                      <button
-                        onClick={() => handleUpgrade('pro')}
-                        disabled={loading || profile.subscription_tier === 'pro'}
-                        className={`w-full py-2 rounded-xl text-sm font-bold transition-all ${profile.subscription_tier === 'pro' ? 'bg-blue-100 text-blue-600 cursor-not-allowed' : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md'}`}
-                      >
-                        {profile.subscription_tier === 'pro' ? 'Current Plan' : profile.subscription_tier === 'elite' ? 'Downgrade' : 'Upgrade to Pro'}
-                      </button>
-                    </div>
-
-                    {/* Elite Plan */}
-                    <div className={`p-6 rounded-2xl border-2 transition-all ${profile.subscription_tier === 'elite' ? 'border-purple-600 bg-purple-50/30' : 'border-gray-100 bg-white hover:border-gray-200'}`}>
-                      <h3 className="text-lg font-bold text-gray-800 mb-1">Elite</h3>
-                      <p className="text-2xl font-black text-gray-900 mb-4">₹99 <span className="text-sm font-normal text-gray-500">/mo</span></p>
-                      <ul className="space-y-3 mb-6">
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 shrink-0" />
-                          <span>Everything in Pro</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 shrink-0" />
-                          <span>24/7 Priority Support</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 shrink-0" />
-                          <span>Wearable device integration</span>
-                        </li>
-                        <li className="flex items-start space-x-2 text-xs text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-purple-600 mt-0.5 shrink-0" />
-                          <span>Family sharing (up to 4 accounts)</span>
-                        </li>
-                      </ul>
-                      <button
-                        onClick={() => handleUpgrade('elite')}
-                        disabled={loading || profile.subscription_tier === 'elite'}
-                        className={`w-full py-2 rounded-xl text-sm font-bold transition-all ${profile.subscription_tier === 'elite' ? 'bg-purple-100 text-purple-700 cursor-not-allowed' : 'bg-purple-600 text-white hover:bg-purple-700 shadow-md'}`}
-                      >
-                        {profile.subscription_tier === 'elite' ? 'Current Plan' : 'Upgrade to Elite'}
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="mt-8 p-4 bg-gray-50 rounded-2xl border border-gray-100">
-                    <h4 className="font-bold text-gray-800 mb-2 flex items-center">
-                      <HelpCircle className="w-4 h-4 mr-2 text-gray-500" />
-                      Subscription Information
-                    </h4>
-                    <p className="text-xs text-gray-600">
-                      Your subscription is currently billed monthly. You can cancel or change your plan at any time.
-                      Changes to your subscription will take effect at the start of your next billing cycle.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Help & Support Tab */}
-              {activeTab === 'support' && (
-                <div className="space-y-8 animate-fade-in text-left">
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">Help & Support Center</h2>
-                    <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">24/7 AI ASSISTANCE</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* FAQ Section */}
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-bold text-gray-800 flex items-center">
-                        <HelpCircle className="w-5 h-5 mr-2 text-green-600" />
-                        Frequently Asked Questions
-                      </h3>
-                      <div className="space-y-2">
-                        {[
-                          { q: "How does Robtor protect my data?", a: "Your health data is encrypted at rest and in transit. We use Supabase security protocols and never share your identifiable data without permission." },
-                          { q: "Is the AI medical analysis accurate?", a: "Our AI (powered by Gemini) provides high-accuracy translations of reports, but it is intended for informational purposes and NOT as a medical diagnosis." },
-                          { q: "Can I connect my smartwatch?", a: "Yes! If you have a Pro or Elite plan, you can sync data from Google Fit, Apple Health, and other major wearable platforms." }
-                        ].map((faq, i) => (
-                          <div key={i} className="border border-gray-100 rounded-xl overflow-hidden">
-                            <button
-                              onClick={() => setExpandedFaq(expandedFaq === i ? null : i)}
-                              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 transition-colors"
-                            >
-                              <span className="text-sm font-semibold text-gray-800">{faq.q}</span>
-                              {expandedFaq === i ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
-                            </button>
-                            {expandedFaq === i && (
-                              <div className="p-4 bg-white border-t border-gray-100 animate-slide-up">
-                                <p className="text-xs text-gray-600 leading-relaxed">{faq.a}</p>
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Contact & Feedback */}
-                    <div className="space-y-6">
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-gray-800 flex items-center">
-                          <Mail className="w-5 h-5 mr-2 text-blue-600" />
-                          Contact Support
-                        </h3>
-                        <div className="grid grid-cols-2 gap-3">
-                          <a href="mailto:support@robtor.ai" className="flex flex-col items-center justify-center p-4 bg-white border border-gray-100 rounded-2xl hover:border-blue-200 hover:shadow-md transition-all group">
-                            <Mail className="w-6 h-6 text-blue-500 mb-2 group-hover:scale-110 transition-transform" />
-                            <span className="text-xs font-bold text-gray-800">Email Us</span>
-                            <span className="text-[10px] text-gray-500 text-center mt-1">Response &lt; 24h</span>
-                          </a>
-                          <button
-                            onClick={() => alert('Live Chat starting... Reconnecting to support representative.')}
-                            className="flex flex-col items-center justify-center p-4 bg-white border border-gray-100 rounded-2xl hover:border-green-200 hover:shadow-md transition-all group"
-                          >
-                            <MessageSquare className="w-6 h-6 text-green-500 mb-2 group-hover:scale-110 transition-transform" />
-                            <span className="text-xs font-bold text-gray-800">Live Chat</span>
-                            <span className="text-[10px] text-gray-500 text-center mt-1">Avg 2 min wait</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-gray-800 flex items-center">
-                          <MessageSquare className="w-5 h-5 mr-2 text-purple-600" />
-                          Send Feedback
-                        </h3>
-                        <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                          <textarea
-                            value={feedback}
-                            onChange={(e) => setFeedback(e.target.value)}
-                            placeholder="Tell us how we can improve..."
-                            className="w-full h-24 p-3 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none resize-none transition-all"
-                          />
-                          <button
-                            onClick={handleFeedbackSubmit}
-                            disabled={loading}
-                            className={`w-full mt-3 py-2 rounded-xl text-sm font-bold shadow-md transition-all ${!feedback.trim() ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:shadow-lg'}`}
-                          >
-                            {loading ? 'Sending...' : !feedback.trim() ? 'Write Feedback First' : 'Submit Feedback'}
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Feedback History */}
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-bold text-gray-800 flex items-center">
-                          <MessageSquare className="w-5 h-5 mr-2 text-indigo-600" />
-                          My Recent Feedback
-                        </h3>
-                        <div className="space-y-3">
-                          {feedbackHistory.length === 0 ? (
-                            <p className="text-xs text-gray-400 text-center py-4 bg-gray-50 rounded-xl border border-dashed border-gray-200">No feedback sent yet</p>
-                          ) : (
-                            feedbackHistory.map(item => (
-                              <div key={item.id} className="p-3 bg-white border border-gray-100 rounded-xl shadow-sm">
-                                <div className="flex justify-between items-start mb-1">
-                                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">{item.date}</span>
-                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${item.status === 'Replied' ? 'bg-green-100 text-green-700' : item.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'}`}>
-                                    {item.status}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-gray-700 italic">"{item.message}"</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-gray-100 flex flex-wrap gap-4">
-                    <button onClick={() => alert('Documentation coming soon!')} className="flex items-center text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors">
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      Help Center
-                    </button>
-                    <button onClick={() => alert('Privacy Policy coming soon!')} className="flex items-center text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors">
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      Privacy Policy
-                    </button>
-                    <button onClick={() => alert('Terms of Service coming soon!')} className="flex items-center text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors">
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      Terms of Service
-                    </button>
-                    <button onClick={() => alert('API Documentation coming soon!')} className="flex items-center text-xs font-semibold text-gray-500 hover:text-blue-600 transition-colors">
-                      <ExternalLink className="w-4 h-4 mr-1" />
-                      API Documentation
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Connected Devices Tab */}
-              {activeTab === 'devices' && (
-                <div className="space-y-8 animate-fade-in">
-                  <div className="flex justify-between items-center mb-6">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-800">Connected Devices</h2>
-                      <p className="text-sm text-gray-500">Manage your wearables and health sensors</p>
-                    </div>
-                    <button
-                      onClick={() => alert('Searching for nearby devices...')}
-                      className="flex items-center space-x-2 bg-green-50 text-green-700 px-4 py-2 rounded-xl font-bold border border-green-200 hover:bg-green-100 transition-all"
-                    >
-                      <Plus className="w-4 h-4" />
-                      <span>Pair New</span>
-                    </button>
+                <div className="space-y-10 animate-fade-in">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Data Governance</h2>
+                    <p className="text-slate-500 text-sm mt-1">Control your data visibility and security protocols</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[
-                      { name: 'Apple Watch Series 9', type: 'Smartwatch', status: 'Connected', battery: '85%', color: 'blue', icon: Smartphone },
-                      { name: 'Oura Ring Gen 3', type: 'Health Ring', status: 'Connected', battery: '42%', color: 'purple', icon: Activity },
-                    ].map((device, i) => (
-                      <div key={i} className="card relative group overflow-hidden">
-                        <div className={`absolute top-0 right-0 w-24 h-24 bg-${device.color}-500/10 rounded-full blur-2xl -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700`}></div>
+                    <div className="p-8 bg-emerald-50 rounded-[2.5rem] relative overflow-hidden border border-emerald-100 group">
+                      <Shield className="text-emerald-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
+                      <h4 className="font-black text-slate-900 mb-2 uppercase tracking-tighter text-sm">Two-Factor Auth</h4>
+                      <p className="text-xs text-slate-600 mb-6 leading-relaxed">Adds an extra layer of security to your health records.</p>
+                      <button
+                        onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
+                        className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${twoFactorEnabled ? 'bg-slate-900 text-white' : 'bg-white text-emerald-600 shadow-md'
+                          }`}
+                      >
+                        {twoFactorEnabled ? 'Enabled' : 'Activate Now'}
+                      </button>
+                    </div>
 
-                        <div className="flex items-start justify-between relative z-10">
-                          <div className="flex items-start space-x-4">
-                            <div className={`bg-${device.color}-100 p-4 rounded-2xl`}>
-                              <device.icon className={`w-8 h-8 text-${device.color}-600`} />
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-gray-800 text-lg">{device.name}</h3>
-                              <p className="text-sm text-gray-500">{device.type}</p>
-                              <div className="flex items-center space-x-2 mt-2">
-                                <span className="flex h-2 w-2 relative">
-                                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
-                                </span>
-                                <span className="text-[10px] font-bold text-green-600 uppercase tracking-widest">{device.status}</span>
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="flex items-center space-x-1 justify-end">
-                              <Droplet className="w-3 h-3 text-green-500 rotate-180" />
-                              <span className="text-xs font-bold text-gray-600">{device.battery}</span>
-                            </div>
-                            <p className="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-tighter">Battery</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center space-x-3 mt-8 relative z-10">
-                          <button className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-xl font-bold text-sm transition-all">
-                            Settings
-                          </button>
-                          <button className="flex-1 bg-white border border-red-100 text-red-600 hover:bg-red-50 py-3 rounded-xl font-bold text-sm transition-all">
-                            Disconnect
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                    <div className="p-8 bg-blue-50 rounded-[2.5rem] relative overflow-hidden border border-blue-100 group">
+                      <Globe className="text-blue-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
+                      <h4 className="font-black text-slate-900 mb-2 uppercase tracking-tighter text-sm">Health Network</h4>
+                      <p className="text-xs text-slate-600 mb-6 leading-relaxed">Anonymously share data for medical research advancement.</p>
+                      <button
+                        className="px-6 py-2.5 rounded-2xl bg-white text-blue-600 shadow-md text-[10px] font-black uppercase tracking-widest"
+                      >
+                        Manage Sharing
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Sync Status Section */}
-                  <div className="card bg-gradient-to-br from-indigo-50 to-blue-50 border-2 border-indigo-100">
-                    <div className="flex items-center justify-between">
+                  <div className="pt-10 border-t border-slate-100 space-y-4">
+                    <button className="w-full flex items-center justify-between p-6 bg-slate-50 rounded-3xl hover:bg-slate-100 transition-colors group">
                       <div className="flex items-center space-x-4">
-                        <div className="bg-indigo-500 p-3 rounded-2xl shadow-lg animate-pulse">
-                          <RefreshCw className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-lg font-bold text-gray-800">Background Sync</h3>
-                          <p className="text-sm text-gray-600">Your health data is automatically syncing every 15 minutes</p>
-                        </div>
+                        <div className="p-3 bg-white rounded-2xl shadow-sm"><Download size={20} className="text-slate-600" /></div>
+                        <span className="font-bold text-slate-700 text-sm">Request Health Data Export</span>
                       </div>
-                      <div className="text-right">
-                        <p className="text-xs text-gray-400 font-bold uppercase tracking-widest">Last Synced</p>
-                        <p className="text-sm font-bold text-indigo-600">2 minutes ago</p>
+                      <ChevronRight size={18} className="text-slate-300 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                    <button className="w-full flex items-center justify-between p-6 bg-slate-50 rounded-3xl hover:bg-rose-50 transition-colors group">
+                      <div className="flex items-center space-x-4">
+                        <div className="p-3 bg-white rounded-2xl shadow-sm text-rose-500"><Trash2 size={20} /></div>
+                        <span className="font-bold text-rose-500 text-sm">Permanently Deactivate Account</span>
                       </div>
+                      <ChevronRight size={18} className="text-rose-200 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Simplified Support Area */}
+              {activeTab === 'support' && (
+                <div className="space-y-10 animate-fade-in">
+                  <div>
+                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Priority Support</h2>
+                    <p className="text-slate-500 text-sm mt-1">How can we help you today?</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    <textarea
+                      rows={6}
+                      value={feedback}
+                      onChange={(e) => setFeedback(e.target.value)}
+                      className="input-field p-8"
+                      placeholder="Describe your issue or suggest a feature..."
+                    />
+                    <button className="btn-primary w-full shadow-emerald-500/20">Send Secure Message</button>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-6 bg-slate-50 rounded-3xl text-center border border-slate-100">
+                      <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Live Chat</p>
+                      <p className="font-bold text-slate-800">10 Min Wait</p>
+                    </div>
+                    <div className="p-6 bg-slate-50 rounded-3xl text-center border border-slate-100">
+                      <p className="text-xs font-black uppercase tracking-widest text-slate-400 mb-2">Email Resp</p>
+                      <p className="font-bold text-slate-800">4 Hours</p>
                     </div>
                   </div>
                 </div>
               )}
 
+              {/* Subscription placeholder */}
+              {activeTab === 'subscription' && (
+                <div className="space-y-10 animate-fade-in py-10 text-center">
+                  <div className="inline-flex items-center justify-center p-6 bg-emerald-50 rounded-[3rem] mb-6">
+                    <Heart size={64} className="text-emerald-500 fill-emerald-500" />
+                  </div>
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">You're on our <span className="text-emerald-500 italic">Elite</span> Plan</h2>
+                  <p className="text-slate-500 max-w-sm mx-auto font-medium">Enjoy unlimited AI analysis, priority support, and real-time medical insights.</p>
+                  <div className="pt-10 flex justify-center">
+                    <button className="btn-secondary px-10">Manage Billing</button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
+
+      <style>{`
+        .scale-in-center {
+            animation: scale-in-center 0.5s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+        }
+        @keyframes scale-in-center {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+      `}</style>
     </div>
   );
 };
