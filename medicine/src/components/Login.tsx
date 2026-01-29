@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { Heart, Mail, Lock, Eye, EyeOff, ArrowRight, Shield, Activity } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ArrowRight, Shield, Activity } from 'lucide-react';
 
 interface LoginProps {
   onLogin: () => void;
@@ -20,8 +20,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, onSignup, onPrivacy, onTerms }) 
   const [resetLoading, setResetLoading] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (_e: React.FormEvent) => {
+    _e.preventDefault();
 
     const email = emailRef.current?.value.trim();
     const password = passwordRef.current?.value.trim();

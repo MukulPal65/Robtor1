@@ -4,28 +4,19 @@ import {
   User,
   Bell,
   Shield,
-  Lock,
-  Mail,
-  Smartphone,
   CreditCard,
   HelpCircle,
   LogOut,
   ChevronRight,
   Loader,
-  CheckCircle,
-  MessageSquare,
-  ChevronDown,
-  ChevronUp,
-  ExternalLink,
   Plus,
   Activity,
   Droplet,
-  RefreshCw,
   Camera,
-  Heart,
   Globe,
   Trash2,
-  Download
+  Download,
+  Heart
 } from 'lucide-react';
 
 interface SettingsProps {
@@ -55,11 +46,7 @@ const Settings: React.FC<SettingsProps> = ({
 }) => {
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
-  const [uploading, setUploading] = useState(false);
   const [sessionEmail, setSessionEmail] = useState(patientEmail);
-  const [showPasswordForm, setShowPasswordForm] = useState(false);
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [feedback, setFeedback] = useState('');
   const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
 
@@ -84,13 +71,6 @@ const Settings: React.FC<SettingsProps> = ({
     appointmentReminders: true,
     weeklyReports: true,
     marketingEmails: false,
-  });
-
-  const [privacy, setPrivacy] = useState({
-    shareHealthData: false,
-    analyticsTracking: true,
-    locationServices: false,
-    twoStepEnabled: false,
   });
 
   useEffect(() => {
@@ -130,7 +110,6 @@ const Settings: React.FC<SettingsProps> = ({
 
           if (data.notifications) setNotifications(data.notifications);
           if (data.privacy) {
-            setPrivacy(data.privacy);
             setTwoFactorEnabled(!!data.privacy.twoStepEnabled);
           }
         }
@@ -210,8 +189,8 @@ const Settings: React.FC<SettingsProps> = ({
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full group flex items-start space-x-4 px-4 py-4 rounded-3xl transition-all duration-300 ${isActive
-                        ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10'
-                        : 'text-slate-600 hover:bg-white hover:shadow-md'
+                      ? 'bg-slate-900 text-white shadow-xl shadow-slate-900/10'
+                      : 'text-slate-600 hover:bg-white hover:shadow-md'
                       }`}
                   >
                     <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-emerald-500' : 'bg-slate-100 group-hover:bg-slate-200'
@@ -300,7 +279,7 @@ const Settings: React.FC<SettingsProps> = ({
                         type="file"
                         id="avatar-upload"
                         className="hidden"
-                        onChange={(e) => {/* Handle Upload */ }}
+                        onChange={() => {/* Handle Upload */ }}
                       />
                       <label htmlFor="avatar-upload" className="absolute -bottom-2 -right-2 p-3 bg-white rounded-2xl shadow-lg border border-slate-100 cursor-pointer hover:scale-110 transition-transform">
                         <Plus size={16} className="text-emerald-500" />
