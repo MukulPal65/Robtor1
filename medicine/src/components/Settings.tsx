@@ -175,21 +175,21 @@ const Settings: React.FC<SettingsProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 relative overflow-hidden pb-32">
+    <div className="min-h-screen bg-gray-50 relative overflow-hidden pb-32">
       {/* Decorative background components */}
       <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
       <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-indigo-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
 
       <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         <div className="mb-12 text-left">
-          <h1 className="text-4xl font-black text-white tracking-tight mb-3">Settings</h1>
-          <p className="text-slate-400 font-medium">Control your health data and account preferences</p>
+          <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Settings</h1>
+          <p className="text-slate-600 font-medium">Control your health data and account preferences</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Enhanced Navigation Sidebar */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-slate-900/80 backdrop-blur-xl shadow-xl border border-white/10 rounded-3xl p-4 space-y-2">
+            <div className="bg-white shadow-xl border border-gray-200 rounded-3xl p-4 space-y-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -199,12 +199,12 @@ const Settings: React.FC<SettingsProps> = ({
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full group flex items-start space-x-4 px-4 py-4 rounded-3xl transition-all duration-300 ${isActive
                       ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/30'
-                      : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                      : 'text-slate-500 hover:bg-gray-100 hover:text-slate-900'
                       }`}
                   >
-                    <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-white/20' : 'bg-slate-800 group-hover:bg-slate-700'
+                    <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-white/20' : 'bg-gray-100 group-hover:bg-gray-200'
                       }`}>
-                      <Icon size={20} className={isActive ? 'text-white' : 'text-blue-700'} />
+                      <Icon size={20} className={isActive ? 'text-white' : 'text-blue-600'} />
                     </div>
                     <div className="text-left">
                       <p className="font-bold text-sm tracking-tight">{tab.name}</p>
@@ -216,12 +216,12 @@ const Settings: React.FC<SettingsProps> = ({
                 );
               })}
 
-              <div className="pt-4 border-t border-white/5">
+              <div className="pt-4 border-t border-gray-100">
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center space-x-4 px-4 py-4 text-rose-500 hover:bg-rose-500/10 rounded-3xl transition-all group"
+                  className="w-full flex items-center space-x-4 px-4 py-4 text-rose-500 hover:bg-rose-50 rounded-3xl transition-all group"
                 >
-                  <div className="p-2.5 rounded-2xl bg-rose-500/10 group-hover:bg-rose-500/20">
+                  <div className="p-2.5 rounded-2xl bg-rose-50 group-hover:bg-rose-100">
                     <LogOut size={20} />
                   </div>
                   <span className="font-bold text-sm">Log Out</span>
@@ -230,21 +230,21 @@ const Settings: React.FC<SettingsProps> = ({
             </div>
 
             {/* Quick Status Card */}
-            <div className="bg-slate-900/80 backdrop-blur-xl shadow-xl border border-white/10 rounded-3xl p-6 text-white">
+            <div className="bg-white shadow-xl border border-gray-200 rounded-3xl p-6 text-slate-900">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-slate-800 rounded-xl">
-                  <Shield size={18} className="text-blue-500" />
+                <div className="p-2 bg-gray-50 rounded-xl">
+                  <Shield size={18} className="text-blue-600" />
                 </div>
                 <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Security Pulse</p>
               </div>
               <div className="space-y-4">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-400">Account Type</span>
+                  <span className="text-slate-500">Account Type</span>
                   <span className="font-bold capitalize">{profile.subscription_tier}</span>
                 </div>
                 <div className="flex justify-between items-center text-sm">
-                  <span className="text-slate-400">2FA Status</span>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${twoFactorEnabled ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                  <span className="text-slate-500">2FA Status</span>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-black uppercase ${twoFactorEnabled ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                     {twoFactorEnabled ? 'Protected' : 'Risk'}
                   </span>
                 </div>
@@ -254,17 +254,17 @@ const Settings: React.FC<SettingsProps> = ({
 
           {/* Main Workspace Area */}
           <div className="lg:col-span-8">
-            <div className="bg-slate-900/80 backdrop-blur-xl shadow-xl border border-white/10 rounded-3xl p-10 min-h-[600px]">
+            <div className="bg-white shadow-xl border border-gray-200 rounded-3xl p-10 min-h-[600px]">
               {/* Profile Tab Workspace */}
               {activeTab === 'profile' && (
                 <div className="space-y-10 animate-fade-in text-left">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h2 className="text-2xl font-black text-white tracking-tight">Public Profile</h2>
-                      <p className="text-slate-400 text-sm mt-1">Manage how your health portal looks</p>
+                      <h2 className="text-2xl font-black text-slate-900 tracking-tight">Public Profile</h2>
+                      <p className="text-slate-600 text-sm mt-1">Manage how your health portal looks</p>
                     </div>
                     {loading && (
-                      <div className="flex items-center space-x-2 text-emerald-400 bg-emerald-400/5 px-4 py-2 rounded-full border border-emerald-400/10">
+                      <div className="flex items-center space-x-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-full border border-emerald-100">
                         <Loader size={16} className="animate-spin" />
                         <span className="text-[10px] font-black uppercase tracking-wider">Syncing</span>
                       </div>
@@ -272,16 +272,16 @@ const Settings: React.FC<SettingsProps> = ({
                   </div>
 
                   {/* Profile Image Section */}
-                  <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 pb-10 border-b border-white/5">
+                  <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8 pb-10 border-b border-gray-100">
                     <div className="relative group">
-                      <div className="w-32 h-32 rounded-[2.5rem] bg-slate-800 flex items-center justify-center border-4 border-slate-900 shadow-2xl overflow-hidden relative">
+                      <div className="w-32 h-32 rounded-[2.5rem] bg-gray-100 flex items-center justify-center border-4 border-white shadow-2xl overflow-hidden relative">
                         {profile.avatar_url ? (
                           <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-4xl font-black text-emerald-400">{profile.full_name?.charAt(0) || 'U'}</span>
+                          <span className="text-4xl font-black text-emerald-600">{profile.full_name?.charAt(0) || 'U'}</span>
                         )}
-                        <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                          <Camera className="text-white" />
+                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Camera className="text-slate-900" />
                         </div>
                       </div>
                       <input
@@ -290,16 +290,16 @@ const Settings: React.FC<SettingsProps> = ({
                         className="hidden"
                         onChange={() => {/* Handle Upload */ }}
                       />
-                      <label htmlFor="avatar-upload" className="absolute -bottom-2 -right-2 p-3 bg-slate-800 text-emerald-400 rounded-2xl shadow-lg border border-white/5 cursor-pointer hover:scale-110 transition-transform">
+                      <label htmlFor="avatar-upload" className="absolute -bottom-2 -right-2 p-3 bg-white text-emerald-600 rounded-2xl shadow-lg border border-gray-100 cursor-pointer hover:scale-110 transition-transform">
                         <Plus size={16} />
                       </label>
                     </div>
                     <div className="text-center md:text-left">
-                      <h4 className="text-lg font-bold text-white">{profile.full_name || 'Set your name'}</h4>
+                      <h4 className="text-lg font-bold text-slate-900">{profile.full_name || 'Set your name'}</h4>
                       <p className="text-slate-500 text-sm mb-4">{sessionEmail}</p>
                       <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                        <div className="px-3 py-1 bg-slate-800 border border-white/5 rounded-full text-[10px] font-black uppercase text-slate-500">ID: RS-{profile.full_name?.substring(0, 3).toUpperCase() || 'USR'}</div>
-                        <div className="px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full text-[10px] font-black uppercase text-emerald-400">Active Member</div>
+                        <div className="px-3 py-1 bg-gray-100 border border-gray-200 rounded-full text-[10px] font-black uppercase text-slate-500">ID: RS-{profile.full_name?.substring(0, 3).toUpperCase() || 'USR'}</div>
+                        <div className="px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full text-[10px] font-black uppercase text-emerald-600">Active Member</div>
                       </div>
                     </div>
                   </div>
@@ -352,23 +352,23 @@ const Settings: React.FC<SettingsProps> = ({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4 pb-10 border-b border-white/5">
-                    <div className="bg-slate-800 p-6 rounded-3xl group hover:bg-slate-700 transition-colors cursor-pointer border border-white/5 shadow-sm">
+                  <div className="grid grid-cols-2 gap-4 pb-10 border-b border-gray-100">
+                    <div className="bg-gray-50 p-6 rounded-3xl group hover:bg-white hover:shadow-md transition-all cursor-pointer border border-gray-100 shadow-sm text-left">
                       <Activity className="text-gray-400 group-hover:text-blue-500 mb-4 transition-colors" />
                       <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Height (cm)</label>
                       <input
                         type="number"
-                        className="bg-transparent text-xl font-black text-gray-800 outline-none w-full placeholder-gray-400"
+                        className="bg-transparent text-xl font-black text-slate-900 outline-none w-full placeholder-gray-400"
                         value={profile.height}
                         onChange={(e) => setProfile({ ...profile, height: e.target.value })}
                       />
                     </div>
-                    <div className="bg-slate-800 p-6 rounded-3xl group hover:bg-slate-700 transition-colors cursor-pointer border border-white/5 shadow-sm">
+                    <div className="bg-gray-50 p-6 rounded-3xl group hover:bg-white hover:shadow-md transition-all cursor-pointer border border-gray-100 shadow-sm text-left">
                       <Droplet className="text-gray-400 group-hover:text-blue-500 mb-4 transition-colors" />
                       <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Weight (kg)</label>
                       <input
                         type="number"
-                        className="bg-transparent text-xl font-black text-gray-800 outline-none w-full placeholder-gray-400"
+                        className="bg-transparent text-xl font-black text-slate-900 outline-none w-full placeholder-gray-400"
                         value={profile.weight}
                         onChange={(e) => setProfile({ ...profile, weight: e.target.value })}
                       />
@@ -391,7 +391,7 @@ const Settings: React.FC<SettingsProps> = ({
               {activeTab === 'devices' && (
                 <div className="space-y-10 animate-fade-in text-left">
                   <div>
-                    <h2 className="text-2xl font-black text-white tracking-tight">Health Devices</h2>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Health Devices</h2>
                     <p className="text-slate-500 text-sm mt-1">Connect wearables to sync vitals automatically</p>
                   </div>
 
@@ -403,18 +403,18 @@ const Settings: React.FC<SettingsProps> = ({
                       </div>
                       <div className="relative z-10">
                         <div className="flex items-center space-x-4 mb-6">
-                          <div className={`p-4 rounded-2xl ${profile.has_wearable ? 'bg-purple-500 text-white' : 'bg-slate-800 text-slate-500'}`}>
+                          <div className={`p-4 rounded-2xl ${profile.has_wearable ? 'bg-purple-600 text-white' : 'bg-gray-100 text-slate-400'}`}>
                             <Activity size={32} />
                           </div>
                           <div>
-                            <h3 className="text-lg font-black text-white">Universal Health Bridge</h3>
-                            <p className="text-sm font-medium text-purple-400">
+                            <h3 className="text-lg font-black text-slate-900">Universal Health Bridge</h3>
+                            <p className="text-sm font-medium text-purple-600">
                               {profile.has_wearable ? 'Device Connected & Syncing' : 'No Device Connected'}
                             </p>
                           </div>
                         </div>
 
-                        <p className="text-slate-400 text-sm mb-8 max-w-lg leading-relaxed">
+                        <p className="text-slate-600 text-sm mb-8 max-w-lg leading-relaxed">
                           Connect any supported fitness tracker (Fitbit, Garmin, Apple Watch) or health app (Google Fit, Apple Health) to unlock AI-powered insights on your dashboard.
                         </p>
 
@@ -426,7 +426,7 @@ const Settings: React.FC<SettingsProps> = ({
                             {profile.has_wearable ? 'Disconnect Device' : 'Connect New Device'}
                           </button>
                           {profile.has_wearable && (
-                            <div className="flex items-center space-x-2 text-emerald-400 bg-emerald-400/10 px-4 py-2 rounded-xl">
+                            <div className="flex items-center space-x-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl">
                               <Activity size={16} className="animate-pulse" />
                               <span className="text-xs font-bold uppercase tracking-wider">Live</span>
                             </div>
@@ -437,23 +437,23 @@ const Settings: React.FC<SettingsProps> = ({
 
                     {/* Other Integrations List */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-6 bg-slate-800/40 rounded-3xl border border-white/5 opacity-80">
+                      <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 opacity-80">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-white rounded-lg"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Google_Fit_icon_2018.svg" alt="Google Fit" className="w-5 h-5" /></div>
-                            <span className="font-bold text-white">Google Fit</span>
+                            <div className="p-2 bg-white rounded-lg shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Google_Fit_icon_2018.svg" alt="Google Fit" className="w-5 h-5" /></div>
+                            <span className="font-bold text-slate-900">Google Fit</span>
                           </div>
-                          <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-800 px-2 py-1 rounded">Coming Soon</span>
+                          <span className="text-[10px] font-black uppercase text-slate-400 bg-gray-200 px-2 py-1 rounded">Coming Soon</span>
                         </div>
                         <p className="text-xs text-slate-500">Direct integration for Android users.</p>
                       </div>
-                      <div className="p-6 bg-slate-800/40 rounded-3xl border border-white/5 opacity-80">
+                      <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 opacity-80">
                         <div className="flex items-center justify-between mb-4">
                           <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-white rounded-lg"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Apple_Health_icon.svg" alt="Apple Health" className="w-5 h-5" /></div>
-                            <span className="font-bold text-white">Apple Health</span>
+                            <div className="p-2 bg-white rounded-lg shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Apple_Health_icon.svg" alt="Apple Health" className="w-5 h-5" /></div>
+                            <span className="font-bold text-slate-900">Apple Health</span>
                           </div>
-                          <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-800 px-2 py-1 rounded">Coming Soon</span>
+                          <span className="text-[10px] font-black uppercase text-slate-400 bg-gray-200 px-2 py-1 rounded">Coming Soon</span>
                         </div>
                         <p className="text-xs text-slate-500">Direct integration for iOS users.</p>
                       </div>
@@ -466,19 +466,19 @@ const Settings: React.FC<SettingsProps> = ({
               {activeTab === 'notifications' && (
                 <div className="space-y-8 animate-fade-in text-left">
                   <div>
-                    <h2 className="text-2xl font-black text-white tracking-tight">Delivery Methods</h2>
-                    <p className="text-slate-400 text-sm mt-1">Select how you want to be reached</p>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Delivery Methods</h2>
+                    <p className="text-slate-600 text-sm mt-1">Select how you want to be reached</p>
                   </div>
 
                   <div className="space-y-4">
                     {Object.entries(notifications).map(([key, value]) => (
-                      <div key={key} className="flex items-center justify-between p-6 bg-slate-900 border border-white/10 rounded-3xl hover:shadow-lg transition-all group shadow-sm">
+                      <div key={key} className="flex items-center justify-between p-6 bg-gray-50 border border-gray-100 rounded-3xl hover:shadow-lg transition-all group shadow-sm">
                         <div className="flex items-center space-x-4">
-                          <div className={`p-3 rounded-2xl ${value ? 'bg-blue-600 text-white' : 'bg-slate-800 text-slate-500'}`}>
+                          <div className={`p-3 rounded-2xl ${value ? 'bg-blue-600 text-white' : 'bg-gray-200 text-slate-400'}`}>
                             <Bell size={20} className={value ? 'animate-pulse' : ''} />
                           </div>
                           <div>
-                            <p className="font-bold text-white capitalize leading-tight">
+                            <p className="font-bold text-slate-900 capitalize leading-tight">
                               {key.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())}
                             </p>
                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1 text-left">Push & Email Sync</p>
@@ -499,44 +499,44 @@ const Settings: React.FC<SettingsProps> = ({
               {activeTab === 'privacy' && (
                 <div className="space-y-10 animate-fade-in text-left">
                   <div>
-                    <h2 className="text-2xl font-black text-white tracking-tight">Data Governance</h2>
-                    <p className="text-slate-400 text-sm mt-1">Control your data visibility and security protocols</p>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Data Governance</h2>
+                    <p className="text-slate-600 text-sm mt-1">Control your data visibility and security protocols</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-8 bg-emerald-500/10 rounded-[2.5rem] relative overflow-hidden border border-emerald-500/20 group text-left">
-                      <Shield className="text-emerald-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
-                      <h4 className="font-black text-white mb-2 uppercase tracking-tighter text-sm">Two-Factor Auth</h4>
+                    <div className="p-8 bg-emerald-50 rounded-[2.5rem] relative overflow-hidden border border-emerald-100 group text-left">
+                      <Shield className="text-emerald-600 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
+                      <h4 className="font-black text-slate-900 mb-2 uppercase tracking-tighter text-sm">Two-Factor Auth</h4>
                       <p className="text-xs text-gray-500 mb-6 leading-relaxed">Adds an extra layer of security to your health records.</p>
                       <button
                         onClick={() => setTwoFactorEnabled(!twoFactorEnabled)}
-                        className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${twoFactorEnabled ? 'bg-emerald-500 text-white shadow-emerald-200' : 'bg-slate-800 text-slate-400 shadow-md border border-white/5'
+                        className={`px-6 py-2.5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${twoFactorEnabled ? 'bg-emerald-600 text-white shadow-emerald-200' : 'bg-gray-100 text-slate-400 shadow-md border border-gray-200'
                           }`}
                       >
                         {twoFactorEnabled ? 'Enabled' : 'Activate Now'}
                       </button>
                     </div>
 
-                    <div className="p-8 bg-blue-500/10 rounded-[2.5rem] relative overflow-hidden border border-blue-500/20 group text-left">
-                      <Globe className="text-blue-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
-                      <h4 className="font-black text-white mb-2 uppercase tracking-tighter text-sm">Health Network</h4>
+                    <div className="p-8 bg-blue-50 rounded-[2.5rem] relative overflow-hidden border border-blue-100 group text-left">
+                      <Globe className="text-blue-600 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
+                      <h4 className="font-black text-slate-900 mb-2 uppercase tracking-tighter text-sm">Health Network</h4>
                       <p className="text-xs text-gray-500 mb-6 leading-relaxed">Anonymously share data for medical research advancement.</p>
                       <button
-                        className="px-6 py-2.5 rounded-2xl bg-slate-800 text-blue-400 shadow-md border border-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-colors"
+                        className="px-6 py-2.5 rounded-2xl bg-gray-100 text-blue-600 shadow-md border border-gray-200 text-[10px] font-black uppercase tracking-widest hover:bg-gray-200 transition-colors"
                       >
                         Manage Sharing
                       </button>
                     </div>
 
-                    <div className="p-8 bg-purple-500/10 rounded-[2.5rem] relative overflow-hidden border border-purple-500/20 group text-left col-span-1 md:col-span-2">
-                      <CreditCard className="text-purple-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
+                    <div className="p-8 bg-purple-50 rounded-[2.5rem] relative overflow-hidden border border-purple-100 group text-left col-span-1 md:col-span-2">
+                      <CreditCard className="text-purple-600 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-black text-white mb-2 uppercase tracking-tighter text-sm">Payment Methods</h4>
+                          <h4 className="font-black text-slate-900 mb-2 uppercase tracking-tighter text-sm">Payment Methods</h4>
                           <p className="text-xs text-gray-500 mb-4 leading-relaxed max-w-md">Securely manage your saved cards and billing details.</p>
                         </div>
                         <button
-                          className="px-6 py-2.5 rounded-2xl bg-slate-800 text-purple-400 shadow-md border border-white/5 text-[10px] font-black uppercase tracking-widest hover:bg-slate-700 transition-colors"
+                          className="px-6 py-2.5 rounded-2xl bg-gray-100 text-purple-600 shadow-md border border-gray-200 text-[10px] font-black uppercase tracking-widest hover:bg-gray-200 transition-colors"
                         >
                           Manage Cards
                         </button>
@@ -544,20 +544,20 @@ const Settings: React.FC<SettingsProps> = ({
                     </div>
                   </div>
 
-                  <div className="pt-10 border-t border-white/10 space-y-4">
-                    <button className="w-full flex items-center justify-between p-6 bg-slate-900 rounded-3xl hover:bg-slate-800 transition-colors group border border-white/10 shadow-sm">
+                  <div className="pt-10 border-t border-gray-100 space-y-4">
+                    <button className="w-full flex items-center justify-between p-6 bg-gray-50 rounded-3xl hover:bg-gray-100 transition-colors group border border-gray-100 shadow-sm">
                       <div className="flex items-center space-x-4">
-                        <div className="p-3 bg-slate-800 rounded-2xl shadow-sm"><Download size={20} className="text-slate-400" /></div>
-                        <span className="font-bold text-slate-300 text-sm">Request Health Data Export</span>
+                        <div className="p-3 bg-white rounded-2xl shadow-sm"><Download size={20} className="text-slate-400" /></div>
+                        <span className="font-bold text-slate-700 text-sm">Request Health Data Export</span>
                       </div>
-                      <ChevronRight size={18} className="text-slate-600 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight size={18} className="text-slate-400 group-hover:translate-x-1 transition-transform" />
                     </button>
-                    <button className="w-full flex items-center justify-between p-6 bg-slate-900 rounded-3xl hover:bg-rose-900/10 transition-colors group border border-white/10 shadow-sm">
+                    <button className="w-full flex items-center justify-between p-6 bg-rose-50 rounded-3xl hover:bg-rose-100 transition-colors group border border-rose-100 shadow-sm">
                       <div className="flex items-center space-x-4">
-                        <div className="p-3 bg-rose-50 rounded-2xl shadow-sm text-rose-500"><Trash2 size={20} /></div>
-                        <span className="font-bold text-rose-500 text-sm">Permanently Deactivate Account</span>
+                        <div className="p-3 bg-white rounded-2xl shadow-sm text-rose-500"><Trash2 size={20} /></div>
+                        <span className="font-bold text-rose-600 text-sm">Permanently Deactivate Account</span>
                       </div>
-                      <ChevronRight size={18} className="text-rose-300 group-hover:translate-x-1 transition-transform" />
+                      <ChevronRight size={18} className="text-rose-400 group-hover:translate-x-1 transition-transform" />
                     </button>
                   </div>
                 </div>
@@ -567,8 +567,8 @@ const Settings: React.FC<SettingsProps> = ({
               {activeTab === 'support' && (
                 <div className="space-y-10 animate-fade-in text-left">
                   <div>
-                    <h2 className="text-2xl font-black text-white tracking-tight">Priority Support</h2>
-                    <p className="text-slate-400 text-sm mt-1">How can we help you today?</p>
+                    <h2 className="text-2xl font-black text-slate-900 tracking-tight">Priority Support</h2>
+                    <p className="text-slate-600 text-sm mt-1">How can we help you today?</p>
                   </div>
 
                   <div className="space-y-6">
@@ -576,20 +576,20 @@ const Settings: React.FC<SettingsProps> = ({
                       rows={6}
                       value={feedback}
                       onChange={(e) => setFeedback(e.target.value)}
-                      className="input-field p-8 bg-slate-900 border-slate-800 text-white placeholder-slate-600 focus:border-blue-500"
+                      className="w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none transition-all duration-300"
                       placeholder="Describe your issue or suggest a feature..."
                     />
                     <button className="btn-primary w-full shadow-emerald-500/20">Send Secure Message</button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-6 bg-slate-900 rounded-3xl text-center border border-white/5 shadow-sm">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Live Chat</p>
-                      <p className="font-bold text-white">10 Min Wait</p>
+                    <div className="p-6 bg-gray-50 rounded-3xl text-center border border-gray-100 shadow-sm">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Live Chat</p>
+                      <p className="font-bold text-slate-900">10 Min Wait</p>
                     </div>
-                    <div className="p-6 bg-slate-900 rounded-3xl text-center border border-white/5 shadow-sm">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2">Email Resp</p>
-                      <p className="font-bold text-white">4 Hours</p>
+                    <div className="p-6 bg-gray-50 rounded-3xl text-center border border-gray-100 shadow-sm">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Email Resp</p>
+                      <p className="font-bold text-slate-900">4 Hours</p>
                     </div>
                   </div>
                 </div>
@@ -598,13 +598,13 @@ const Settings: React.FC<SettingsProps> = ({
               {/* Subscription placeholder */}
               {activeTab === 'subscription' && (
                 <div className="space-y-10 animate-fade-in py-10 text-center">
-                  <div className="inline-flex items-center justify-center p-6 bg-emerald-500/10 with-border border-emerald-500/20 rounded-[3rem] mb-6 shadow-sm">
+                  <div className="inline-flex items-center justify-center p-6 bg-emerald-50 border border-emerald-100 rounded-[3rem] mb-6 shadow-sm">
                     <Heart size={64} className="text-emerald-500 fill-emerald-500" />
                   </div>
-                  <h2 className="text-3xl font-black text-white tracking-tight">You're on our <span className="text-emerald-500 italic">Elite</span> Plan</h2>
-                  <p className="text-slate-400 max-w-sm mx-auto font-medium">Enjoy unlimited AI analysis, priority support, and real-time medical insights.</p>
+                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">You're on our <span className="text-emerald-500 italic">Elite</span> Plan</h2>
+                  <p className="text-slate-600 max-w-sm mx-auto font-medium">Enjoy unlimited AI analysis, priority support, and real-time medical insights.</p>
                   <div className="pt-10 flex justify-center">
-                    <button className="btn-secondary px-10 bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700">Manage Billing</button>
+                    <button className="btn-secondary px-10 bg-gray-100 text-slate-800 border border-gray-200 hover:bg-gray-200">Manage Billing</button>
                   </div>
                 </div>
               )}

@@ -179,7 +179,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
   // ];
 
   return (
-    <div className="min-h-screen bg-slate-950 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-50 pb-24 relative overflow-hidden">
       <div className="container mx-auto px-4 mt-4">
 
       </div>
@@ -189,7 +189,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       <div className="absolute bottom-0 left-1/2 w-96 h-96 bg-cyan-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
 
       {/* Header */}
-      <div className="bg-slate-900 border-b border-white/5 text-white px-6 py-10 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
+      <div className="bg-white border-b border-gray-100 text-slate-900 px-6 py-10 rounded-b-[3rem] shadow-2xl relative overflow-hidden">
         {/* Header Background Pattern */}
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-0 left-0 w-48 h-48 border-2 border-emerald-500 rounded-full -translate-x-1/2 -translate-y-1/2 animate-pulse-slow"></div>
@@ -198,22 +198,22 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
 
         <div className="flex items-center justify-between mb-2 relative z-10 max-w-5xl mx-auto">
           <div>
-            <h1 className="text-2xl font-black mb-1 tracking-tight text-white">Welcome back, {patientName}! 👋</h1>
-            <p className="text-emerald-400/80 text-sm font-bold">Your vitals are looking excellent today</p>
+            <h1 className="text-2xl font-black mb-1 tracking-tight text-slate-900">Welcome back, {patientName}! 👋</h1>
+            <p className="text-emerald-600/80 text-sm font-bold">Your vitals are looking excellent today</p>
           </div>
           <div className="flex items-center space-x-4 relative z-10">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="bg-white/5 backdrop-blur-md p-4 rounded-3xl hover:bg-white/10 transition-all shadow-xl relative border border-white/10 active:scale-95 text-white"
+              className="bg-gray-100 p-4 rounded-3xl hover:bg-gray-200 transition-all shadow-xl relative border border-gray-200 active:scale-95 text-slate-900"
             >
               <Bell className="w-6 h-6" />
               {notifications.filter(n => n.unread).length > 0 && (
-                <span className="absolute top-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full animate-bounce"></span>
+                <span className="absolute top-2 right-2 w-4 h-4 bg-emerald-500 border-2 border-white rounded-full animate-bounce"></span>
               )}
             </button>
             <button
               onClick={handleRefresh}
-              className="bg-white/5 backdrop-blur-md p-4 rounded-3xl hover:bg-white/10 transition-all shadow-xl active:scale-95 border border-white/10 text-white"
+              className="bg-gray-100 p-4 rounded-3xl hover:bg-gray-200 transition-all shadow-xl active:scale-95 border border-gray-200 text-slate-900"
             >
               <RefreshCw className={`w-6 h-6 ${loading ? 'animate-spin' : ''}`} />
             </button>
@@ -225,13 +225,13 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       {showNotifications && (
         <div className="fixed inset-0 z-[110] flex justify-end">
           <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm" onClick={() => setShowNotifications(false)}></div>
-          <div className="relative w-full max-w-sm bg-slate-900 h-full shadow-2xl animate-fade-in-right overflow-y-auto border-l border-white/5">
-            <div className="p-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-slate-900 z-10 text-white">
+          <div className="relative w-full max-w-sm bg-white h-full shadow-2xl animate-fade-in-right overflow-y-auto border-l border-gray-100">
+            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10 text-slate-900">
               <h2 className="text-xl font-black flex items-center">
-                <Bell className="w-5 h-5 mr-2 text-emerald-400" />
+                <Bell className="w-5 h-5 mr-2 text-emerald-600" />
                 Notifications
               </h2>
-              <button onClick={() => setShowNotifications(false)} className="p-2 hover:bg-white/5 rounded-full transition-colors">
+              <button onClick={() => setShowNotifications(false)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
                 <X className="w-5 h-5 text-slate-400" />
               </button>
             </div>

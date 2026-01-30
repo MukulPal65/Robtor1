@@ -7,16 +7,14 @@
     --brand-primary: #10b981;
     --brand-secondary: #065f46;
     --brand-accent: #3b82f6;
-    --bg-main: #020617;
-    /* Slate-950 - Stronger Dark Background */
-    --card-bg: rgba(15, 23, 42, 0.7);
-    /* Slate-900 with transparency */
-    --glass-border: rgba(255, 255, 255, 0.08);
-    /* Finer dark border */
+    --bg-main: #f8fafc;
+    /* Changed to light */
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: rgba(0, 0, 0, 0.05);
   }
 
   body {
-    @apply bg-slate-950 min-h-screen text-slate-100 antialiased;
+    @apply bg-gray-50 min-h-screen text-slate-900 antialiased;
     font-family: 'Inter', sans-serif;
   }
 
@@ -27,37 +25,37 @@
   h5,
   h6 {
     font-family: 'Outfit', sans-serif;
-    @apply text-white font-black tracking-tight;
+    @apply text-slate-900 font-black tracking-tight;
   }
 }
 
 @layer components {
   .card {
-    @apply bg-slate-900 bg-opacity-50 backdrop-blur-2xl rounded-[2.5rem] shadow-2xl p-6 hover:bg-opacity-70 transition-all duration-500 border border-white border-opacity-5;
+    @apply bg-white rounded-[2.5rem] shadow-xl p-6 transition-all duration-500 border border-gray-100;
   }
 
   .glass-card {
-    @apply bg-white bg-opacity-5 backdrop-blur-xl rounded-[2.5rem] border border-white border-opacity-10 shadow-2xl;
+    @apply bg-white bg-opacity-70 backdrop-blur-xl rounded-[2.5rem] border border-gray-200 shadow-2xl;
   }
 
   .btn-primary {
-    @apply bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-500 text-slate-950 px-8 py-4 rounded-2xl font-black shadow-lg hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center;
+    @apply bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 text-white px-8 py-4 rounded-2xl font-black shadow-lg hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center;
   }
 
   .btn-secondary {
-    @apply bg-slate-800 bg-opacity-80 backdrop-blur-sm text-emerald-400 px-8 py-4 rounded-2xl font-bold border border-emerald-500 border-opacity-20 hover:bg-opacity-100 hover:border-opacity-40 hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center;
+    @apply bg-white text-slate-900 px-8 py-4 rounded-2xl font-bold border border-gray-200 hover:bg-gray-50 hover:-translate-y-1 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-sm;
   }
 
   .feature-card {
-    @apply bg-slate-900 bg-opacity-40 backdrop-blur-md rounded-[2.5rem] p-8 shadow-xl transition-all duration-500 cursor-pointer border border-white border-opacity-5 hover:border-emerald-500 hover:border-opacity-30 hover:-translate-y-2;
+    @apply bg-white rounded-[2.5rem] p-8 shadow-xl transition-all duration-500 cursor-pointer border border-gray-100 hover:border-blue-500 hover:-translate-y-2;
   }
 
   .nav-item {
-    @apply transition-all duration-300 text-slate-500 hover:text-emerald-400;
+    @apply transition-all duration-300 text-slate-600 hover:text-blue-600;
   }
 
   .input-field {
-    @apply w-full px-5 py-4 bg-slate-800 border-2 border-slate-700 rounded-2xl text-white placeholder-slate-500 focus:border-blue-500 focus:border-opacity-100 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-20 transition-all duration-300;
+    @apply w-full px-5 py-4 bg-gray-50 border-2 border-gray-100 rounded-2xl text-slate-900 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-20 transition-all duration-300;
   }
 }
 
