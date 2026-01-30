@@ -151,30 +151,30 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 pb-24">
+    <div className="min-h-screen bg-slate-950 p-4 pb-24 md:p-6">
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-1">
+            <h1 className="text-3xl font-bold text-white mb-1">
               Welcome back, {patientName}! 👋
             </h1>
-            <p className="text-gray-600">Your AI-powered health companion</p>
+            <p className="text-slate-400">Your AI-powered health companion</p>
           </div>
           <div className="flex items-center space-x-3">
             <button
               onClick={() => onNavigate && onNavigate('settings')}
-              className="hidden md:flex items-center space-x-2 px-4 py-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-all border border-blue-100 group"
+              className="hidden md:flex items-center space-x-2 px-4 py-3 bg-slate-900 border border-slate-800 rounded-xl shadow-md hover:shadow-lg transition-all group"
             >
-              <Smartphone className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" />
-              <span className="text-sm font-bold text-gray-700">Connect Device</span>
+              <Smartphone className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-bold text-slate-200">Connect Device</span>
             </button>
             <button
               onClick={() => setShowNotifications(!showNotifications)}
-              className="relative p-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-all border border-blue-100"
+              className="relative p-3 bg-slate-900 border border-slate-800 rounded-xl shadow-md hover:shadow-lg transition-all"
             >
-              <Bell className="w-6 h-6 text-gray-700" />
-              <span className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full border-2 border-white animate-pulse"></span>
+              <Bell className="w-6 h-6 text-slate-200" />
+              <span className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full border-2 border-slate-900 animate-pulse"></span>
             </button>
             <button
               onClick={() => onNavigate && onNavigate('settings')}
@@ -234,18 +234,18 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
 
       {/* Early Risk Prediction - MAIN FEATURE */}
       <div className="mb-6">
-        <div className="card bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 border-2 border-amber-300 shadow-xl hover:shadow-2xl transition-all">
+        <div className="card bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-2 border-amber-500/20 shadow-xl hover:shadow-2xl transition-all">
           <div className="flex items-start justify-between mb-4">
             <div className="flex items-center space-x-3">
               <div className="bg-gradient-to-br from-amber-500 to-orange-600 p-3 rounded-2xl shadow-lg">
                 <Shield className="w-8 h-8 text-white" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-800 flex items-center space-x-2">
+                <h3 className="text-xl font-bold text-white flex items-center space-x-2">
                   <span>AI Health Risk Prediction</span>
-                  <Sparkles className="w-5 h-5 text-amber-600" />
+                  <Sparkles className="w-5 h-5 text-amber-500" />
                 </h3>
-                <p className="text-sm text-gray-600">Powered by advanced AI analysis</p>
+                <p className="text-sm text-slate-400">Powered by advanced AI analysis</p>
               </div>
             </div>
             {riskAnalysis && (
@@ -335,7 +335,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
         {/* Custom Diet Plan */}
         <div
           onClick={() => setShowDietPlan(true)}
-          className="card bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 hover:shadow-xl transition-all cursor-pointer">
+          className="card bg-slate-900/50 backdrop-blur-xl border border-green-500/20 hover:border-green-500/40 hover:shadow-xl transition-all cursor-pointer">
           <div className="flex items-center space-x-3 mb-4">
             <div className="bg-gradient-to-br from-green-500 to-emerald-600 p-3 rounded-xl shadow-lg">
               <Apple className="w-7 h-7 text-white" />
@@ -346,27 +346,27 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 mb-3 border border-green-200">
-            <h4 className="font-bold text-sm text-gray-800 mb-2">Today's Meal Plan</h4>
+          <div className="bg-slate-800/50 rounded-xl p-4 mb-3 border border-white/5">
+            <h4 className="font-bold text-sm text-white mb-2">Today's Meal Plan</h4>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600">🍳 Breakfast</span>
-                <span className="font-semibold text-gray-800 truncate ml-2">
+                <span className="text-slate-400">🍳 Breakfast</span>
+                <span className="font-semibold text-slate-200 truncate ml-2">
                   {latestReport?.analysis_result?.diet_plan?.breakfast || 'Protein Oatmeal'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-xs">
-                <span className="text-gray-600">🥗 Lunch</span>
-                <span className="font-semibold text-gray-800 truncate ml-2">
+                <span className="text-slate-400">🥗 Lunch</span>
+                <span className="font-semibold text-slate-200 truncate ml-2">
                   {latestReport?.analysis_result?.diet_plan?.lunch || 'Chicken Breast Salad'}
                 </span>
               </div>
             </div>
           </div>
 
-          <div className="bg-green-100 rounded-lg p-3 mb-3">
-            <p className="text-[10px] text-green-800 font-bold mb-0.5 uppercase tracking-wide">AI Tip</p>
-            <p className="text-[11px] text-green-700 line-clamp-2">
+          <div className="bg-green-500/10 rounded-lg p-3 mb-3 border border-green-500/20">
+            <p className="text-[10px] text-green-400 font-bold mb-0.5 uppercase tracking-wide">AI Tip</p>
+            <p className="text-[11px] text-green-300 line-clamp-2">
               {recommendations?.diet.hydration || "Drink 8-10 glasses of water for optimal metabolism."}
             </p>
           </div>
@@ -380,7 +380,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
         {/* Custom Fitness Plan */}
         <div
           onClick={() => setShowFitnessPlan(true)}
-          className="card bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 hover:shadow-xl transition-all cursor-pointer">
+          className="card bg-slate-900/50 backdrop-blur-xl border border-blue-500/20 hover:border-blue-500/40 hover:shadow-xl transition-all cursor-pointer">
           <div className="flex items-center space-x-3 mb-4">
             <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-3 rounded-xl shadow-lg">
               <Dumbbell className="w-7 h-7 text-white" />
@@ -391,32 +391,32 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 mb-3 border border-blue-200">
-            <h4 className="font-bold text-sm text-gray-800 mb-2">Today's Workout</h4>
+          <div className="bg-slate-800/50 rounded-xl p-4 mb-3 border border-white/5">
+            <h4 className="font-bold text-sm text-white mb-2">Today's Workout</h4>
             <div className="space-y-2">
               {latestReport?.analysis_result?.fitness_plan?.exercises?.slice(0, 2).map((ex: any, i: number) => (
                 <div key={i} className="flex items-center justify-between text-xs">
-                  <span className="text-gray-600 truncate">{ex.name}</span>
-                  <span className="font-semibold text-gray-800 ml-2">{ex.duration}</span>
+                  <span className="text-slate-400 truncate">{ex.name}</span>
+                  <span className="font-semibold text-slate-200 ml-2">{ex.duration}</span>
                 </div>
               )) || (
                   <>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-600">🏃 Cardio</span>
-                      <span className="font-semibold text-gray-800">30 min</span>
+                      <span className="text-slate-400">🏃 Cardio</span>
+                      <span className="font-semibold text-slate-200">30 min</span>
                     </div>
                     <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-600">💪 Strength</span>
-                      <span className="font-semibold text-gray-800">20 min</span>
+                      <span className="text-slate-400">💪 Strength</span>
+                      <span className="font-semibold text-slate-200">20 min</span>
                     </div>
                   </>
                 )}
             </div>
           </div>
 
-          <div className="bg-blue-100 rounded-lg p-3 mb-3">
-            <p className="text-[10px] text-blue-800 font-bold mb-0.5 uppercase tracking-wide">AI Recommendation</p>
-            <p className="text-[11px] text-blue-700 line-clamp-2">
+          <div className="bg-blue-500/10 rounded-lg p-3 mb-3 border border-blue-500/20">
+            <p className="text-[10px] text-blue-400 font-bold mb-0.5 uppercase tracking-wide">AI Recommendation</p>
+            <p className="text-[11px] text-blue-300 line-clamp-2">
               {recommendations?.exercise.duration || "Try 30 mins of moderate activity."} {recommendations?.exercise.frequency}
             </p>
           </div>
@@ -429,7 +429,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
       </div>
 
       {/* Daily Progress Rings */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {/* Steps Progress */}
         {/* Steps Progress */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
@@ -439,7 +439,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
                 cx="64"
                 cy="64"
                 r="56"
-                stroke="#f1f5f9"
+                stroke="#1e293b"
                 strokeWidth="10"
                 fill="none"
               />
@@ -461,23 +461,23 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center z-10">
-              <Activity className="w-10 h-10 text-emerald-600" />
+              <Activity className="w-10 h-10 text-emerald-500" />
             </div>
           </div>
-          <h4 className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">Steps</h4>
-          <p className="text-2xl font-black text-gray-800">{Math.round(stepsProgress)}%</p>
+          <h4 className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-widest">Steps</h4>
+          <p className="text-2xl font-black text-white">{Math.round(stepsProgress)}%</p>
         </div>
 
         {/* Water Progress */}
         {/* Water Progress */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
+        <div className="bg-slate-900/50 backdrop-blur-xl rounded-[2rem] p-6 text-center hover:bg-slate-800/50 transition-all flex flex-col items-center justify-center border border-white/5">
           <div className="relative w-32 h-32 mb-4 mx-auto">
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
               <circle
                 cx="64"
                 cy="64"
                 r="56"
-                stroke="#f1f5f9"
+                stroke="#1e293b"
                 strokeWidth="10"
                 fill="none"
               />
@@ -502,20 +502,20 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
               <Droplets className="w-10 h-10 text-cyan-600" />
             </div>
           </div>
-          <h4 className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">Water</h4>
-          <p className="text-2xl font-black text-gray-800">{waterIntake}/{waterGoal}</p>
+          <h4 className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-widest">Water</h4>
+          <p className="text-2xl font-black text-white">{waterIntake}/{waterGoal}</p>
         </div>
 
         {/* Calories Progress */}
         {/* Calories Progress */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
+        <div className="bg-slate-900/50 backdrop-blur-xl rounded-[2rem] p-6 text-center hover:bg-slate-800/50 transition-all flex flex-col items-center justify-center border border-white/5">
           <div className="relative w-32 h-32 mb-4 mx-auto">
             <svg className="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
               <circle
                 cx="64"
                 cy="64"
                 r="56"
-                stroke="#f1f5f9"
+                stroke="#1e293b"
                 strokeWidth="10"
                 fill="none"
               />
@@ -540,18 +540,18 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
               <Flame className="w-10 h-10 text-orange-600" />
             </div>
           </div>
-          <h4 className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">Calories</h4>
-          <p className="text-2xl font-black text-gray-800">{caloriesProgress}%</p>
+          <h4 className="text-xs font-bold text-slate-400 mb-1 uppercase tracking-widest">Calories</h4>
+          <p className="text-2xl font-black text-white">{caloriesProgress}%</p>
         </div>
       </div>
 
       {/* Analytics Charts */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         {/* Weekly Steps */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200">
-          <h4 className="font-semibold text-gray-800 mb-4 flex items-center justify-between">
+        <div className="bg-slate-900/50 backdrop-blur-xl rounded-[2rem] p-6 border border-white/5">
+          <h4 className="font-semibold text-white mb-4 flex items-center justify-between">
             <span>Weekly Steps</span>
-            <TrendingUp className="w-5 h-5 text-emerald-600" />
+            <TrendingUp className="w-5 h-5 text-emerald-500" />
           </h4>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={processedWeeklySteps}>

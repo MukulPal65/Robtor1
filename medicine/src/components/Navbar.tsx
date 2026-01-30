@@ -50,7 +50,7 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
       <nav
         role="navigation"
         aria-label="Main Navigation"
-        className="bg-white/90 backdrop-blur-2xl border border-blue-100 shadow-2xl rounded-[2.5rem] p-2"
+        className="bg-slate-900/80 backdrop-blur-2xl border border-white/10 shadow-2xl rounded-[2.5rem] p-2"
       >
         <div className="flex items-center justify-between px-2">
           {navItems.map((item) => {
@@ -63,7 +63,7 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
                 onClick={() => setCurrentView(item.view)}
                 aria-label={item.label}
                 aria-current={isActive ? 'page' : undefined}
-                className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500 group ${isActive ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/30' : 'hover:bg-blue-50'
+                className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500 group ${isActive ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/30' : 'hover:bg-slate-800'
                   }`}
               >
                 <Icon
