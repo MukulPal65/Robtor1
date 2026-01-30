@@ -87,22 +87,22 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
   const strength = passwordStrength();
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex items-center justify-center p-6 relative overflow-hidden">
       {/* Premium Background Blobs */}
-      <div className="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob"></div>
-      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+      <div className="absolute -top-24 -right-24 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-60 animate-blob"></div>
+      <div className="absolute -bottom-24 -left-24 w-96 h-96 bg-indigo-500/10 rounded-full mix-blend-screen filter blur-3xl opacity-60 animate-blob animation-delay-2000"></div>
 
-      <div className="relative w-full max-w-xl z-10 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+      <div className="relative w-full max-w-5xl z-10 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
 
           {/* Left Side: Info & Marketing */}
           <div className="hidden lg:block space-y-8 pr-8 scale-in-center">
-            <div className="inline-flex items-center justify-center p-3 bg-slate-900 border border-white/5 rounded-2xl shadow-premium mb-4">
-              <Activity className="w-8 h-8 text-emerald-400" />
+            <div className="inline-flex items-center justify-center p-3 bg-white border border-blue-100 rounded-2xl shadow-xl mb-4">
+              <Activity className="w-8 h-8 text-blue-500" />
             </div>
-            <h2 className="text-4xl font-black text-white tracking-tight leading-tight">
+            <h2 className="text-5xl font-black text-gray-800 tracking-tight leading-tight">
               Unlock Your <br />
-              <span className="text-emerald-400">Health Potential.</span>
+              <span className="text-blue-500">Health Potential.</span>
             </h2>
             <div className="space-y-4">
               {[
@@ -111,37 +111,39 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
                 "Custom Fitness & Diet Plans",
                 "Secure, Private Data Vault"
               ].map((item, idx) => (
-                <div key={idx} className="flex items-center space-x-3 text-slate-400 font-semibold text-sm">
-                  <CheckCircle2 className="text-emerald-500 w-4 h-4 flex-shrink-0" />
+                <div key={idx} className="flex items-center space-x-3 text-gray-600 font-semibold text-sm">
+                  <div className="bg-emerald-100 p-1 rounded-full">
+                    <CheckCircle2 className="text-emerald-600 w-4 h-4 flex-shrink-0" />
+                  </div>
                   <span>{item}</span>
                 </div>
               ))}
             </div>
-            <div className="pt-8 border-t border-slate-800">
+            <div className="pt-8 border-t border-blue-100">
               <div className="flex items-center space-x-2">
-                <Shield className="w-4 h-4 text-slate-500" />
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">HIPAA Compliant Standard</span>
+                <Shield className="w-4 h-4 text-gray-400" />
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">HIPAA Compliant Standard</span>
               </div>
             </div>
           </div>
 
           {/* Right Side: Signup Form */}
-          <div className="card p-10 animate-slide-up">
+          <div className="bg-white/80 backdrop-blur-md p-10 rounded-[2.5rem] shadow-2xl border border-white/50 animate-slide-up">
             <div className="mb-8 text-left">
-              <h2 className="text-2xl font-black text-white tracking-tight">Create Account</h2>
-              <p className="text-slate-400 text-sm mt-1">Join the future of personal health</p>
+              <h2 className="text-2xl font-black text-gray-800 tracking-tight">Create Account</h2>
+              <p className="text-gray-500 text-sm mt-1">Join the future of personal health</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5 text-left">
               <div className="space-y-1">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest ml-1">Full Name</label>
                 <div className="relative group">
-                  <User className="absolute left-5 top-3.5 w-5 h-5 text-slate-600 group-focus-within:text-emerald-500 transition-colors" />
+                  <User className="absolute left-5 top-3.5 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   <input
                     type="text"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="input-field pl-14 py-3"
+                    className="w-full px-5 py-3 bg-slate-50 border-2 border-slate-200 rounded-2xl text-gray-800 placeholder-slate-400 pl-14 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
                     placeholder="John Doe"
                     required
                   />
@@ -149,14 +151,14 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Email Address</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Email Address</label>
                 <div className="relative group">
-                  <Mail className="absolute left-5 top-4 w-5 h-5 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                  <Mail className="absolute left-5 top-4 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="input-field pl-14 py-3.5"
+                    className="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-gray-800 placeholder-slate-400 pl-14 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
                     placeholder="name@example.com"
                     required
                   />
@@ -164,21 +166,21 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Password</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Password</label>
                 <div className="relative group">
-                  <Lock className="absolute left-5 top-4 w-5 h-5 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                  <Lock className="absolute left-5 top-4 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="input-field pl-14 pr-14 py-3.5"
+                    className="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-gray-800 placeholder-slate-400 pl-14 pr-14 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
                     placeholder="••••••••"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-5 top-4 text-slate-300 hover:text-slate-600"
+                    className="absolute right-5 top-4 text-gray-400 hover:text-gray-700"
                   >
                     {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                   </button>
@@ -186,11 +188,11 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
 
                 {formData.password && (
                   <div className="px-1 mt-1">
-                    <div className="h-1 w-full bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
                       <div className={`h-full ${strength.color} transition-all duration-500`} style={{ width: `${strength.strength}%` }}></div>
                     </div>
                     <div className="flex justify-between mt-1.5 font-bold uppercase tracking-tighter text-[9px]">
-                      <span className="text-slate-400">Security Strength</span>
+                      <span className="text-gray-400">Security Strength</span>
                       <span className={`${strength.color.replace('bg-', 'text-')}`}>{strength.label}</span>
                     </div>
                   </div>
@@ -198,14 +200,14 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Confirm Access</label>
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Confirm Access</label>
                 <div className="relative group">
-                  <Lock className="absolute left-5 top-4 w-5 h-5 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                  <Lock className="absolute left-5 top-4 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   <input
                     type="password"
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="input-field pl-14 pr-14 py-3.5"
+                    className="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-gray-800 placeholder-slate-400 pl-14 pr-14 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
                     placeholder="••••••••"
                     required
                   />
@@ -213,22 +215,27 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">Security Question</label>
-                <select
-                  value={formData.securityQuestion}
-                  onChange={(e) => setFormData({ ...formData, securityQuestion: e.target.value })}
-                  className="input-field py-3.5 appearance-none cursor-pointer"
-                >
-                  {securityQuestions.map(q => <option key={q} value={q}>{q}</option>)}
-                </select>
-                <div className="relative group">
-                  <Lock className="absolute left-5 top-4 w-5 h-5 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+                <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Security Question</label>
+                <div className="relative">
+                  <select
+                    value={formData.securityQuestion}
+                    onChange={(e) => setFormData({ ...formData, securityQuestion: e.target.value })}
+                    className="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-gray-800 placeholder-slate-400 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium appearance-none cursor-pointer"
+                  >
+                    {securityQuestions.map(q => <option key={q} value={q}>{q}</option>)}
+                  </select>
+                  <div className="absolute right-5 top-4 pointer-events-none">
+                    <ArrowRight className="w-4 h-4 text-gray-400 rotate-90" />
+                  </div>
+                </div>
+                <div className="relative group mt-2">
+                  <Lock className="absolute left-5 top-4 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                   <input
                     type="text"
                     value={formData.securityAnswer}
                     onChange={(e) => setFormData({ ...formData, securityAnswer: e.target.value })}
                     placeholder="Secure answer"
-                    className="input-field pl-14 py-3.5"
+                    className="w-full px-5 py-3.5 bg-slate-50 border-2 border-slate-200 rounded-2xl text-gray-800 placeholder-slate-400 pl-14 focus:border-blue-500 focus:outline-none focus:ring-4 focus:ring-blue-500/10 transition-all font-medium"
                     required
                   />
                 </div>
@@ -241,13 +248,13 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
                     type="checkbox"
                     checked={agreedToTerms}
                     onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    className="w-4 h-4 text-emerald-600 border-slate-200 rounded focus:ring-emerald-500"
+                    className="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div className="ml-3 text-xs leading-relaxed">
-                  <label htmlFor="terms" className="font-medium text-slate-500">
-                    I agree to the <button type="button" onClick={onTerms} className="text-emerald-600 font-bold hover:underline">Terms</button> & <button type="button" onClick={onPrivacy} className="text-emerald-600 font-bold hover:underline">Privacy Policy</button>
+                  <label htmlFor="terms" className="font-medium text-gray-500">
+                    I agree to the <button type="button" onClick={onTerms} className="text-blue-600 font-bold hover:underline">Terms</button> & <button type="button" onClick={onPrivacy} className="text-blue-600 font-bold hover:underline">Privacy Policy</button>
                   </label>
                 </div>
               </div>
@@ -255,7 +262,7 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
               <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary w-full group relative overflow-hidden text-sm"
+                className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white w-full py-4 rounded-2xl font-black shadow-lg hover:shadow-blue-500/30 hover:-translate-y-1 active:scale-95 transition-all duration-300 group relative overflow-hidden text-sm"
               >
                 <span className="relative z-10 flex items-center justify-center">
                   {loading ? 'Processing...' : 'Complete Registration'}
@@ -265,11 +272,11 @@ const Signup: React.FC<SignupProps> = ({ onSignup, onLogin, onPrivacy, onTerms }
             </form>
 
             <div className="mt-8 text-center pt-6 border-t border-slate-100">
-              <p className="text-slate-500 text-sm font-medium">
+              <p className="text-gray-500 text-sm font-medium">
                 Already registered?{" "}
                 <button
                   onClick={onLogin}
-                  className="text-emerald-600 font-bold hover:underline underline-offset-4"
+                  className="text-blue-600 font-bold hover:underline underline-offset-4"
                 >
                   Log In
                 </button>
