@@ -50,7 +50,7 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
       <nav
         role="navigation"
         aria-label="Main Navigation"
-        className="bg-slate-900/80 backdrop-blur-2xl border border-white/5 shadow-2xl rounded-[2.5rem] p-2"
+        className="bg-white/90 backdrop-blur-2xl border border-blue-100 shadow-2xl rounded-[2.5rem] p-2"
       >
         <div className="flex items-center justify-between px-2">
           {navItems.map((item) => {
@@ -63,24 +63,24 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
                 onClick={() => setCurrentView(item.view)}
                 aria-label={item.label}
                 aria-current={isActive ? 'page' : undefined}
-                className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500 group ${isActive ? 'bg-slate-900 shadow-lg shadow-slate-900/20' : 'hover:bg-slate-50'
+                className={`relative flex flex-col items-center justify-center w-14 h-14 rounded-2xl transition-all duration-500 group ${isActive ? 'bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/30' : 'hover:bg-blue-50'
                   }`}
               >
                 <Icon
                   size={isActive ? 22 : 24}
-                  className={`transition-all duration-500 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-600'
+                  className={`transition-all duration-500 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-blue-600'
                     }`}
                 />
 
-                {/* Active Dot indicator */}
+                {/* Active Dot indicator - Only if NOT active (bg indicates active) or change style */}
                 {isActive && (
-                  <div className="absolute -bottom-1.5 w-1 h-1 bg-emerald-500 rounded-full animate-pulse" aria-hidden />
+                  <div className="absolute -bottom-1 w-1 h-1 bg-white rounded-full opacity-50" aria-hidden />
                 )}
 
                 {/* Floating Label - Only on Hover */}
-                <span className="absolute -top-12 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl opacity-0 scale-50 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none shadow-xl border border-white/10">
+                <span className="absolute -top-12 bg-white text-slate-800 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl opacity-0 scale-50 group-hover:opacity-100 group-hover:scale-100 transition-all duration-300 pointer-events-none shadow-xl border border-blue-100">
                   {item.label}
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-slate-900 rotate-45 border-r border-b border-white/10" />
+                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-white rotate-45 border-r border-b border-blue-100" />
                 </span>
               </button>
             );
