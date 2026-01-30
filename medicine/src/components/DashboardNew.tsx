@@ -17,7 +17,8 @@ import {
   Zap,
   Plus,
   X,
-  PlayCircle
+  PlayCircle,
+  Smartphone
 } from 'lucide-react';
 import { AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { HealthService, HealthMetric } from '../services/healthService';
@@ -27,9 +28,10 @@ import { RiskAnalysisService } from '../services/riskAnalysisService';
 
 interface DashboardProps {
   patientName?: string;
+  onNavigate?: (view: string) => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
+const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate }) => {
   // Real data states
   const [weeklyMetrics, setWeeklyMetrics] = useState<HealthMetric[]>([]);
   const [todayMetric, setTodayMetric] = useState<HealthMetric | null>(null);
@@ -149,7 +151,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 p-6 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 pb-24">
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center justify-between mb-6">
@@ -159,13 +161,22 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
             </h1>
             <p className="text-gray-600">Your AI-powered health companion</p>
           </div>
-          <button
-            onClick={() => setShowNotifications(!showNotifications)}
-            className="relative p-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-all"
-          >
-            <Bell className="w-6 h-6 text-gray-700" />
-            <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></span>
-          </button>
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => onNavigate && onNavigate('settings')}
+              className="hidden md:flex items-center space-x-2 px-4 py-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-all border border-blue-100 group"
+            >
+              <Smartphone className="w-5 h-5 text-indigo-500 group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-bold text-gray-700">Connect Device</span>
+            </button>
+            <button
+              onClick={() => setShowNotifications(!showNotifications)}
+              className="relative p-3 bg-white rounded-xl shadow-md hover:shadow-lg transition-all border border-blue-100"
+            >
+              <Bell className="w-6 h-6 text-gray-700" />
+              <span className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full border-2 border-white animate-pulse"></span>
+            </button>
+          </div>
         </div>
 
         {/* Stats Overview */}

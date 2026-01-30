@@ -167,6 +167,7 @@ const Settings: React.FC<SettingsProps> = ({
 
   const tabs = [
     { id: 'profile', name: 'Profile', icon: User, desc: 'Personal details & health info' },
+    { id: 'devices', name: 'Devices', icon: Smartphone, desc: 'Manage wearables & apps' },
     { id: 'notifications', name: 'Alerts', icon: Bell, desc: 'Customize your reminders' },
     { id: 'privacy', name: 'Security', icon: Shield, desc: 'Manage data & privacy' },
     { id: 'subscription', name: 'Plans', icon: CreditCard, desc: 'Manage your subscription' },
@@ -386,6 +387,81 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
               )}
 
+              {/* Devices Tab Workspace */}
+              {activeTab === 'devices' && (
+                <div className="space-y-10 animate-fade-in text-left">
+                  <div>
+                    <h2 className="text-2xl font-black text-white tracking-tight">Health Devices</h2>
+                    <p className="text-slate-500 text-sm mt-1">Connect wearables to sync vitals automatically</p>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Primary Connection Card - Wearable */}
+                    <div className="p-8 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 rounded-[2.5rem] relative overflow-hidden border border-purple-500/10 group">
+                      <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-40 transition-opacity">
+                        <Smartphone size={120} className="text-purple-500" />
+                      </div>
+                      <div className="relative z-10">
+                        <div className="flex items-center space-x-4 mb-6">
+                          <div className={`p-4 rounded-2xl ${profile.has_wearable ? 'bg-purple-500 text-white' : 'bg-slate-800 text-slate-500'}`}>
+                            <Activity size={32} />
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-black text-white">Universal Health Bridge</h3>
+                            <p className="text-sm font-medium text-purple-400">
+                              {profile.has_wearable ? 'Device Connected & Syncing' : 'No Device Connected'}
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-slate-400 text-sm mb-8 max-w-lg leading-relaxed">
+                          Connect any supported fitness tracker (Fitbit, Garmin, Apple Watch) or health app (Google Fit, Apple Health) to unlock AI-powered insights on your dashboard.
+                        </p>
+
+                        <div className="flex items-center space-x-4">
+                          <button
+                            onClick={() => setProfile({ ...profile, has_wearable: !profile.has_wearable })}
+                            className={`px-8 py-3 rounded-2xl font-bold shadow-lg transition-all transform hover:-translate-y-1 ${profile.has_wearable ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-purple-600 text-white hover:bg-purple-700'}`}
+                          >
+                            {profile.has_wearable ? 'Disconnect Device' : 'Connect New Device'}
+                          </button>
+                          {profile.has_wearable && (
+                            <div className="flex items-center space-x-2 text-emerald-400 bg-emerald-400/10 px-4 py-2 rounded-xl">
+                              <Activity size={16} className="animate-pulse" />
+                              <span className="text-xs font-bold uppercase tracking-wider">Live</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Other Integrations List */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-6 bg-slate-800/40 rounded-3xl border border-white/5 opacity-60">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-white rounded-lg"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Google_Fit_icon_2018.svg" alt="Google Fit" className="w-5 h-5" /></div>
+                            <span className="font-bold text-white">Google Fit</span>
+                          </div>
+                          <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-800 px-2 py-1 rounded">Coming Soon</span>
+                        </div>
+                        <p className="text-xs text-slate-500">Direct integration for Android users.</p>
+                      </div>
+                      <div className="p-6 bg-slate-800/40 rounded-3xl border border-white/5 opacity-60">
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-white rounded-lg"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Apple_Health_icon.svg" alt="Apple Health" className="w-5 h-5" /></div>
+                            <span className="font-bold text-white">Apple Health</span>
+                          </div>
+                          <span className="text-[10px] font-black uppercase text-slate-500 bg-slate-800 px-2 py-1 rounded">Coming Soon</span>
+                        </div>
+                        <p className="text-xs text-slate-500">Direct integration for iOS users.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Notification Tab Workspace */}
               {activeTab === 'notifications' && (
                 <div className="space-y-8 animate-fade-in text-left">
@@ -453,17 +529,16 @@ const Settings: React.FC<SettingsProps> = ({
                     </div>
 
                     <div className="p-8 bg-purple-500/5 rounded-[2.5rem] relative overflow-hidden border border-purple-500/10 group text-left col-span-1 md:col-span-2">
-                      <Smartphone className="text-purple-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
+                      <CreditCard className="text-purple-500 mb-6 group-hover:scale-110 transition-transform duration-500" size={32} />
                       <div className="flex items-center justify-between">
                         <div>
-                          <h4 className="font-black text-white mb-2 uppercase tracking-tighter text-sm">Wearable Synchronization</h4>
-                          <p className="text-xs text-slate-400 mb-4 leading-relaxed max-w-md">Connect your fitness tracker or smartwatch to unlock the modern AI-driven dashboard and real-time health monitoring.</p>
+                          <h4 className="font-black text-white mb-2 uppercase tracking-tighter text-sm">Payment Methods</h4>
+                          <p className="text-xs text-slate-400 mb-4 leading-relaxed max-w-md">Securely manage your saved cards and billing details.</p>
                         </div>
                         <button
-                          onClick={() => setProfile({ ...profile, has_wearable: !profile.has_wearable })}
-                          className={`w-14 h-8 rounded-full transition-all duration-300 relative ${profile.has_wearable ? 'bg-purple-500 shadow-lg shadow-purple-500/20' : 'bg-slate-700'}`}
+                          className="px-6 py-2.5 rounded-2xl bg-slate-800 text-purple-400 shadow-md text-[10px] font-black uppercase tracking-widest"
                         >
-                          <div className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow-md transition-all duration-300 ${profile.has_wearable ? 'left-7' : 'left-1'}`}></div>
+                          Manage Cards
                         </button>
                       </div>
                     </div>

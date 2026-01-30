@@ -150,7 +150,7 @@ function App() {
         return <Onboarding onComplete={handleOnboardingComplete} />;
       case 'dashboard':
         // Modern AI-driven dashboard for all users
-        return <DashboardNew patientName={patientData?.fullName} />;
+        return <DashboardNew patientName={patientData?.fullName} onNavigate={(view) => setCurrentView(view as View)} />;
       case 'chat':
         return <ChatAssistant patientName={patientData?.fullName} />;
       case 'report':
@@ -168,7 +168,7 @@ function App() {
       case 'apitest':
         return <APITestPanel />;
       default:
-        return <DashboardNew />;
+        return <DashboardNew onNavigate={(view) => setCurrentView(view as View)} />;
     }
   };
 
