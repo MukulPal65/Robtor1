@@ -52,7 +52,7 @@ const SymptomChecker: React.FC = () => {
   const selectedCount = symptoms.filter((s) => s.selected).length;
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 pb-24 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-red-500/5 rounded-full filter blur-[150px] pointer-events-none"></div>
 
@@ -60,26 +60,26 @@ const SymptomChecker: React.FC = () => {
         {/* Header */}
         <div className="mb-10 text-left">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="bg-slate-900 border border-white/5 p-4 rounded-[2rem] shadow-2xl animate-float">
-              <Stethoscope className="w-8 h-8 text-rose-400" />
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-blue-200 p-4 rounded-[2rem] animate-float">
+              <Stethoscope className="w-8 h-8 text-rose-500" />
             </div>
             <div>
-              <h1 className="text-3xl font-black text-white tracking-tight">AI Differential</h1>
-              <p className="text-slate-500 font-medium">Neural symptom mapping & triage</p>
+              <h1 className="text-3xl font-black text-gray-800 tracking-tight">AI Differential</h1>
+              <p className="text-gray-600 font-medium">Neural symptom mapping & triage</p>
             </div>
           </div>
         </div>
 
         {/* Search Bar - Integrated style */}
-        <div className="card p-2 mb-8 bg-slate-900/80">
+        <div className="bg-white/80 backdrop-blur-sm border border-blue-100 shadow-md rounded-[2.5rem] p-2 mb-8">
           <div className="relative group">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500 group-focus-within:text-rose-400 transition-colors" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-rose-500 transition-colors" />
             <input
               type="text"
               placeholder="Filter symptoms..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-16 pr-6 py-5 bg-transparent border-none text-white focus:ring-0 placeholder-slate-600 font-bold"
+              className="w-full pl-16 pr-6 py-5 bg-transparent border-none text-gray-800 focus:ring-0 placeholder-slate-400 font-bold outline-none"
             />
           </div>
         </div>
@@ -88,7 +88,7 @@ const SymptomChecker: React.FC = () => {
         {!showResults && (
           <div className="space-y-8 animate-fade-in">
             <div className="flex items-center justify-between px-4">
-              <h3 className="text-xs font-black text-slate-500 uppercase tracking-widest">Active Database</h3>
+              <h3 className="text-xs font-black text-gray-500 uppercase tracking-widest">Active Database</h3>
               <span className="text-[10px] font-black text-rose-500 bg-rose-500/10 px-3 py-1 rounded-full uppercase tracking-tighter">
                 {selectedCount} Selected
               </span>
@@ -103,12 +103,12 @@ const SymptomChecker: React.FC = () => {
                   <button
                     key={symptom.id}
                     onClick={() => toggleSymptom(symptom.id)}
-                    className={`p-6 rounded-[2rem] border-2 transition-all duration-300 text-left relative overflow-hidden group ${symptom.selected
-                      ? 'border-rose-500 bg-rose-500/10 text-white shadow-xl shadow-rose-500/10'
-                      : 'border-white/5 bg-slate-900/40 text-slate-500 hover:border-emerald-500/20'
+                    className={`p-6 rounded-[2rem] border-2 transition-all duration-300 text-left relative overflow-hidden group shadow-sm ${symptom.selected
+                      ? 'border-rose-500 bg-rose-50 text-rose-700 shadow-xl shadow-rose-500/20'
+                      : 'border-slate-200 bg-white text-gray-600 hover:border-blue-300 hover:bg-blue-50'
                       }`}
                   >
-                    <span className={`text-sm font-black tracking-tight ${symptom.selected ? '' : 'group-hover:text-slate-300'}`}>
+                    <span className={`text-sm font-black tracking-tight ${symptom.selected ? '' : 'group-hover:text-gray-800'}`}>
                       {symptom.name}
                     </span>
                     {symptom.selected && (
@@ -140,7 +140,7 @@ const SymptomChecker: React.FC = () => {
         {/* Results */}
         {showResults && assessment && (
           <div className="space-y-8 animate-slide-up text-left">
-            <div className="card p-10 bg-gradient-to-br from-rose-900/40 to-slate-900 border-rose-500/20">
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-rose-100 rounded-[2.5rem] p-10">
               <div className="flex items-start justify-between mb-8">
                 <div className="flex items-center space-x-6">
                   <div className="bg-rose-500 p-5 rounded-[2rem] shadow-premium">
@@ -148,37 +148,37 @@ const SymptomChecker: React.FC = () => {
                   </div>
                   <div>
                     <p className="text-[10px] font-black text-rose-500 uppercase tracking-[0.2em] mb-2">Identified Condition</p>
-                    <h3 className="text-3xl font-black text-white tracking-tight uppercase italic">{assessment.possible_condition}</h3>
+                    <h3 className="text-3xl font-black text-gray-800 tracking-tight uppercase italic">{assessment.possible_condition}</h3>
                   </div>
                 </div>
-                <div className="bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-2xl">
-                  <span className="text-xs font-black text-rose-500 uppercase tracking-widest">{assessment.confidence_score}% Confidence</span>
+                <div className="bg-rose-50 border border-rose-100 px-4 py-2 rounded-2xl">
+                  <span className="text-xs font-black text-rose-600 uppercase tracking-widest">{assessment.confidence_score}% Confidence</span>
                 </div>
               </div>
-              <div className="bg-slate-950/40 p-8 rounded-[2rem] border border-white/5">
+              <div className="bg-slate-50 p-8 rounded-[2rem] border border-slate-200">
                 <div className="flex items-center space-x-2 mb-4">
-                  <Info size={16} className="text-emerald-400" />
-                  <h4 className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Clinical Explanation</h4>
+                  <Info size={16} className="text-emerald-600" />
+                  <h4 className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Clinical Explanation</h4>
                 </div>
-                <p className="text-sm text-slate-400 leading-relaxed font-medium">{assessment.explanation}</p>
+                <p className="text-sm text-gray-600 leading-relaxed font-medium">{assessment.explanation}</p>
               </div>
             </div>
 
             {/* Recommendations Grid */}
             <div className="space-y-4">
-              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-4">Deployment Directives</h4>
+              <h4 className="text-[10px] font-black text-gray-500 uppercase tracking-widest ml-4">Deployment Directives</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {assessment.recommendations?.map((rec: any, i: number) => (
-                  <div key={i} className="card p-8 border-white/5 hover:border-emerald-500/10 transition-colors">
+                  <div key={i} className="bg-white p-8 border border-slate-200 rounded-[2.5rem] shadow-sm hover:border-emerald-500/30 transition-colors">
                     <div className="flex items-center space-x-4 mb-6">
-                      <div className="p-3 bg-slate-800 rounded-2xl border border-white/5">
-                        {rec.type === 'medication' ? <Pill className="w-6 h-6 text-blue-400" /> :
-                          rec.type === 'lifestyle' ? <CheckCircle className="w-6 h-6 text-emerald-400" /> :
-                            <Activity className="w-6 h-6 text-purple-400" />}
+                      <div className="p-3 bg-slate-100 rounded-2xl border border-slate-200">
+                        {rec.type === 'medication' ? <Pill className="w-6 h-6 text-blue-600" /> :
+                          rec.type === 'lifestyle' ? <CheckCircle className="w-6 h-6 text-emerald-600" /> :
+                            <Activity className="w-6 h-6 text-purple-600" />}
                       </div>
-                      <h4 className="font-black text-white uppercase tracking-tight text-sm">{rec.title}</h4>
+                      <h4 className="font-black text-gray-800 uppercase tracking-tight text-sm">{rec.title}</h4>
                     </div>
-                    <p className="text-xs text-slate-500 font-medium leading-relaxed">{rec.description}</p>
+                    <p className="text-xs text-gray-500 font-medium leading-relaxed">{rec.description}</p>
                   </div>
                 ))}
               </div>
