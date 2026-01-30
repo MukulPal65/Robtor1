@@ -412,14 +412,15 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       {/* Daily Progress Rings */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         {/* Steps Progress */}
-        <div className="card text-center hover:shadow-lg transition-all p-4">
+        {/* Steps Progress */}
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all">
           <div className="relative inline-block mb-3">
             <svg className="w-20 h-20 transform -rotate-90">
               <circle
                 cx="40"
                 cy="40"
                 r="34"
-                stroke="#e5e7eb"
+                stroke="#f1f5f9"
                 strokeWidth="6"
                 fill="none"
               />
@@ -441,7 +442,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Activity className="w-6 h-6 text-green-600" />
+              <Activity className="w-6 h-6 text-emerald-600" />
             </div>
           </div>
           <h4 className="text-[10px] font-bold text-gray-500 mb-0.5 uppercase tracking-widest">Steps</h4>
@@ -449,14 +450,15 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         </div>
 
         {/* Water Progress */}
-        <div className="card text-center hover:shadow-lg transition-all p-4">
+        {/* Water Progress */}
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all">
           <div className="relative inline-block mb-3">
             <svg className="w-20 h-20 transform -rotate-90">
               <circle
                 cx="40"
                 cy="40"
                 r="34"
-                stroke="#e5e7eb"
+                stroke="#f1f5f9"
                 strokeWidth="6"
                 fill="none"
               />
@@ -486,14 +488,15 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         </div>
 
         {/* Calories Progress */}
-        <div className="card text-center hover:shadow-lg transition-all p-4">
+        {/* Calories Progress */}
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all">
           <div className="relative inline-block mb-3">
             <svg className="w-20 h-20 transform -rotate-90">
               <circle
                 cx="40"
                 cy="40"
                 r="34"
-                stroke="#e5e7eb"
+                stroke="#f1f5f9"
                 strokeWidth="6"
                 fill="none"
               />
@@ -526,10 +529,10 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       {/* Analytics Charts */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         {/* Weekly Steps */}
-        <div className="card">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200">
           <h4 className="font-semibold text-gray-800 mb-4 flex items-center justify-between">
             <span>Weekly Steps</span>
-            <TrendingUp className="w-5 h-5 text-green-600" />
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
           </h4>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={processedWeeklySteps}>
@@ -551,7 +554,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         </div>
 
         {/* Heart Rate Trend */}
-        <div className="card">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200">
           <h4 className="font-semibold text-gray-800 mb-4 flex items-center justify-between">
             <span>Heart Rate Trend</span>
             <Heart className="w-5 h-5 text-red-600" />
@@ -582,10 +585,10 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         </div>
 
         {/* Sleep Analysis */}
-        <div className="card">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200">
           <h4 className="font-semibold text-gray-800 mb-4 flex items-center justify-between">
             <span>Sleep Analysis</span>
-            <Moon className="w-5 h-5 text-purple-600" />
+            <Moon className="w-5 h-5 text-violet-600" />
           </h4>
           <div className="flex flex-col items-center">
             <ResponsiveContainer width="100%" height={180}>
@@ -620,7 +623,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         </div>
 
         {/* Calories Burned vs Consumed */}
-        <div className="card">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200">
           <h4 className="font-semibold text-gray-800 mb-4">Calories: Burned vs Consumed</h4>
           <ResponsiveContainer width="100%" height={180}>
             <BarChart data={processedCaloriesData}>
