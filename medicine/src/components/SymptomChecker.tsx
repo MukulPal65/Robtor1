@@ -52,7 +52,7 @@ const SymptomChecker: React.FC = () => {
   const selectedCount = symptoms.filter((s) => s.selected).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 pb-24 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-6 pb-40 relative overflow-hidden">
       {/* Background Decor */}
       <div className="absolute top-0 left-0 w-96 h-96 bg-red-500/5 rounded-full filter blur-[150px] pointer-events-none"></div>
 
@@ -123,7 +123,7 @@ const SymptomChecker: React.FC = () => {
             </div>
 
             {selectedCount > 0 && (
-              <div className="pt-10 flex justify-center sticky bottom-32 z-[100]">
+              <div className="pt-10 flex justify-center sticky bottom-40 z-[90]">
                 <button
                   onClick={handleAnalyze}
                   disabled={analyzing}
