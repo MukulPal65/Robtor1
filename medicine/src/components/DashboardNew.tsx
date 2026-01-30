@@ -414,8 +414,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         {/* Steps Progress */}
         {/* Steps Progress */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
-          <div className="relative inline-block mb-4">
-            <svg className="w-32 h-32 transform -rotate-90">
+          <div className="relative w-32 h-32 mb-4 mx-auto">
+            <svg className="w-full h-full transform -rotate-90">
               <circle
                 cx="64"
                 cy="64"
@@ -441,7 +441,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 </linearGradient>
               </defs>
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center z-10">
               <Activity className="w-10 h-10 text-emerald-600" />
             </div>
           </div>
@@ -452,8 +452,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         {/* Water Progress */}
         {/* Water Progress */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
-          <div className="relative inline-block mb-4">
-            <svg className="w-32 h-32 transform -rotate-90">
+          <div className="relative w-32 h-32 mb-4 mx-auto">
+            <svg className="w-full h-full transform -rotate-90">
               <circle
                 cx="64"
                 cy="64"
@@ -479,7 +479,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 </linearGradient>
               </defs>
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center z-10">
               <Droplets className="w-10 h-10 text-cyan-600" />
             </div>
           </div>
@@ -490,8 +490,8 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         {/* Calories Progress */}
         {/* Calories Progress */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
-          <div className="relative inline-block mb-4">
-            <svg className="w-32 h-32 transform -rotate-90">
+          <div className="relative w-32 h-32 mb-4 mx-auto">
+            <svg className="w-full h-full transform -rotate-90">
               <circle
                 cx="64"
                 cy="64"
@@ -517,7 +517,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
                 </linearGradient>
               </defs>
             </svg>
-            <div className="absolute inset-0 flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center z-10">
               <Flame className="w-10 h-10 text-orange-600" />
             </div>
           </div>
