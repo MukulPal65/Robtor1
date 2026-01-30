@@ -415,7 +415,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         {/* Steps Progress */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
           <div className="relative w-32 h-32 mb-4 mx-auto">
-            <svg className="w-full h-full transform -rotate-90">
+            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
               <circle
                 cx="64"
                 cy="64"
@@ -453,7 +453,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         {/* Water Progress */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
           <div className="relative w-32 h-32 mb-4 mx-auto">
-            <svg className="w-full h-full transform -rotate-90">
+            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
               <circle
                 cx="64"
                 cy="64"
@@ -491,7 +491,7 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
         {/* Calories Progress */}
         <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
           <div className="relative w-32 h-32 mb-4 mx-auto">
-            <svg className="w-full h-full transform -rotate-90">
+            <svg className="w-full h-full transform -rotate-90" viewBox="0 0 128 128">
               <circle
                 cx="64"
                 cy="64"
