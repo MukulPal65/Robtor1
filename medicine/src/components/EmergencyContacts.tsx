@@ -100,7 +100,7 @@ const EmergencyContacts: React.FC = () => {
         {/* Header */}
         <div className="mb-10 text-left">
           <div className="flex items-center space-x-4 mb-4">
-            <div className="bg-white shadow-lg border border-indigo-200 p-4 rounded-[2rem]">
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-emerald-200 p-4 rounded-[2rem]">
               <Phone className="w-8 h-8 text-rose-500" />
             </div>
             <div>
@@ -121,7 +121,7 @@ const EmergencyContacts: React.FC = () => {
               <button
                 key={service.number}
                 onClick={() => handleCall(service.number)}
-                className="group relative bg-gray-50 border border-gray-200 rounded-[2rem] p-6 hover:bg-gray-100 transition-all active:scale-95 text-center overflow-hidden"
+                className="group relative bg-white/80 backdrop-blur-sm border border-emerald-200 rounded-[2rem] p-6 hover:bg-emerald-50 transition-all active:scale-95 text-center overflow-hidden shadow-md hover:shadow-lg"
               >
                 <div className={`bg-gradient-to-r ${service.color} w-10 h-10 rounded-2xl flex items-center justify-center mb-4 mx-auto shadow-lg group-hover:scale-110 transition-transform`}>
                   <service.icon className="w-5 h-5 text-white" />
@@ -143,7 +143,7 @@ const EmergencyContacts: React.FC = () => {
             </div>
             <button
               onClick={() => setIsAdding(true)}
-              className="bg-emerald-500 text-slate-950 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center space-x-2"
+              className="bg-gradient-to-r from-emerald-500 to-green-600 text-white px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all flex items-center space-x-2 shadow-lg shadow-emerald-500/30"
             >
               <UserPlus className="w-4 h-4" />
               <span>Initialize Addition</span>
@@ -152,7 +152,7 @@ const EmergencyContacts: React.FC = () => {
 
           {/* Add/Edit Form - Integrated native feel */}
           {(isAdding || editingId) && (
-            <div className="mb-10 p-8 bg-gray-50 border border-gray-200 rounded-[2.5rem] animate-fade-in relative">
+            <div className="mb-10 p-8 bg-white/80 backdrop-blur-sm border border-emerald-200 rounded-[2.5rem] animate-fade-in relative shadow-lg">
               <button
                 onClick={() => { setIsAdding(false); setEditingId(null); }}
                 className="absolute top-6 right-6 text-slate-500 hover:text-white"
@@ -229,7 +229,7 @@ const EmergencyContacts: React.FC = () => {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6 flex-1">
-                      <div className="bg-gradient-to-br from-blue-100 to-indigo-100 w-16 h-16 rounded-[2rem] flex items-center justify-center text-blue-600 font-black text-2xl border border-blue-200 shadow-lg group-hover:scale-105 transition-transform">
+                      <div className="bg-gradient-to-br from-emerald-100 to-green-100 w-16 h-16 rounded-[2rem] flex items-center justify-center text-emerald-700 font-black text-2xl border border-emerald-200 shadow-lg group-hover:scale-105 transition-transform">
                         {contact.name.charAt(0)}
                       </div>
                       <div className="flex-1 text-left">
@@ -268,7 +268,7 @@ const EmergencyContacts: React.FC = () => {
         {/* Neural Safety Tips */}
         <div className="mt-12 p-10 bg-slate-900/50 rounded-[3rem] border border-blue-500/10 text-left">
           <div className="flex items-center space-x-4 mb-8">
-            <Shield className="w-6 h-6 text-blue-400" />
+            <Shield className="w-6 h-6 text-emerald-600" />
             <h3 className="text-xl font-black text-gray-800 tracking-tight italic uppercase">Safety Persistence</h3>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -278,8 +278,8 @@ const EmergencyContacts: React.FC = () => {
               'Archive local emergency bypass codes',
               'Activate priority voice links in high-stress zones'
             ].map((tip, index) => (
-              <div key={index} className="flex items-center space-x-4 p-4 bg-gray-50 rounded-2xl border border-gray-200">
-                <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
+              <div key={index} className="flex items-center space-x-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-200">
+                <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
                 <span className="text-xs text-gray-700 font-bold">{tip}</span>
               </div>
             ))}
