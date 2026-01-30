@@ -413,25 +413,25 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
       <div className="grid grid-cols-3 gap-4 mb-6">
         {/* Steps Progress */}
         {/* Steps Progress */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all">
-          <div className="relative inline-block mb-3">
-            <svg className="w-20 h-20 transform -rotate-90">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
+          <div className="relative inline-block mb-4">
+            <svg className="w-32 h-32 transform -rotate-90">
               <circle
-                cx="40"
-                cy="40"
-                r="34"
+                cx="64"
+                cy="64"
+                r="56"
                 stroke="#f1f5f9"
-                strokeWidth="6"
+                strokeWidth="10"
                 fill="none"
               />
               <circle
-                cx="40"
-                cy="40"
-                r="34"
+                cx="64"
+                cy="64"
+                r="56"
                 stroke="url(#stepsGradient)"
-                strokeWidth="6"
+                strokeWidth="10"
                 fill="none"
-                strokeDasharray={`${stepsProgress * 2.13} 213`}
+                strokeDasharray={`${(stepsProgress / 100) * 351} 351`}
                 strokeLinecap="round"
               />
               <defs>
@@ -442,34 +442,34 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Activity className="w-6 h-6 text-emerald-600" />
+              <Activity className="w-10 h-10 text-emerald-600" />
             </div>
           </div>
-          <h4 className="text-[10px] font-bold text-gray-500 mb-0.5 uppercase tracking-widest">Steps</h4>
-          <p className="text-sm font-bold text-gray-800">{Math.round(stepsProgress)}%</p>
+          <h4 className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">Steps</h4>
+          <p className="text-2xl font-black text-gray-800">{Math.round(stepsProgress)}%</p>
         </div>
 
         {/* Water Progress */}
         {/* Water Progress */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all">
-          <div className="relative inline-block mb-3">
-            <svg className="w-20 h-20 transform -rotate-90">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
+          <div className="relative inline-block mb-4">
+            <svg className="w-32 h-32 transform -rotate-90">
               <circle
-                cx="40"
-                cy="40"
-                r="34"
+                cx="64"
+                cy="64"
+                r="56"
                 stroke="#f1f5f9"
-                strokeWidth="6"
+                strokeWidth="10"
                 fill="none"
               />
               <circle
-                cx="40"
-                cy="40"
-                r="34"
+                cx="64"
+                cy="64"
+                r="56"
                 stroke="url(#waterGradient)"
-                strokeWidth="6"
+                strokeWidth="10"
                 fill="none"
-                strokeDasharray={`${waterProgress * 2.13} 213`}
+                strokeDasharray={`${(waterProgress / 100) * 351} 351`}
                 strokeLinecap="round"
               />
               <defs>
@@ -480,34 +480,34 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Droplets className="w-6 h-6 text-cyan-600" />
+              <Droplets className="w-10 h-10 text-cyan-600" />
             </div>
           </div>
-          <h4 className="text-[10px] font-bold text-gray-500 mb-0.5 uppercase tracking-widest">Water</h4>
-          <p className="text-sm font-bold text-gray-800">{waterIntake}/{waterGoal}</p>
+          <h4 className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">Water</h4>
+          <p className="text-2xl font-black text-gray-800">{waterIntake}/{waterGoal}</p>
         </div>
 
         {/* Calories Progress */}
         {/* Calories Progress */}
-        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all">
-          <div className="relative inline-block mb-3">
-            <svg className="w-20 h-20 transform -rotate-90">
+        <div className="bg-white rounded-[2rem] p-6 shadow-sm border border-slate-200 text-center hover:shadow-lg transition-all flex flex-col items-center justify-center">
+          <div className="relative inline-block mb-4">
+            <svg className="w-32 h-32 transform -rotate-90">
               <circle
-                cx="40"
-                cy="40"
-                r="34"
+                cx="64"
+                cy="64"
+                r="56"
                 stroke="#f1f5f9"
-                strokeWidth="6"
+                strokeWidth="10"
                 fill="none"
               />
               <circle
-                cx="40"
-                cy="40"
-                r="34"
+                cx="64"
+                cy="64"
+                r="56"
                 stroke="url(#caloriesGradient)"
-                strokeWidth="6"
+                strokeWidth="10"
                 fill="none"
-                strokeDasharray={`${caloriesProgress * 2.13} 213`}
+                strokeDasharray={`${(caloriesProgress / 100) * 351} 351`}
                 strokeLinecap="round"
               />
               <defs>
@@ -518,11 +518,11 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User' }) => {
               </defs>
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <Flame className="w-6 h-6 text-orange-600" />
+              <Flame className="w-10 h-10 text-orange-600" />
             </div>
           </div>
-          <h4 className="text-[10px] font-bold text-gray-500 mb-0.5 uppercase tracking-widest">Calories</h4>
-          <p className="text-sm font-bold text-gray-800">{caloriesProgress}%</p>
+          <h4 className="text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">Calories</h4>
+          <p className="text-2xl font-black text-gray-800">{caloriesProgress}%</p>
         </div>
       </div>
 
