@@ -111,7 +111,7 @@ const EmergencyContacts: React.FC = () => {
         </div>
 
         {/* Global Dispatch Controls */}
-        <div className="card p-10 bg-gradient-to-br from-rose-900/20 to-slate-900 border-rose-500/20 mb-8">
+        <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-blue-100 rounded-[2.5rem] p-10 mb-8">
           <div className="flex items-center space-x-3 mb-8 px-2">
             <AlertCircle className="w-5 h-5 text-rose-500" />
             <h2 className="text-xs font-black text-rose-500 uppercase tracking-widest">Priority Dispatch Services</h2>
@@ -135,7 +135,7 @@ const EmergencyContacts: React.FC = () => {
         </div>
 
         {/* Personal Contacts */}
-        <div className="card p-10 text-left">
+        <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-blue-100 rounded-[2.5rem] p-10 text-left">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-xl font-black text-gray-800 tracking-tight">Safe Network</h2>
@@ -225,7 +225,7 @@ const EmergencyContacts: React.FC = () => {
               contacts.map((contact) => (
                 <div
                   key={contact.id}
-                  className="bg-slate-900 border border-white/5 rounded-[2.5rem] p-8 hover:bg-slate-800/80 transition-all group"
+                  className="bg-slate-100 border border-slate-200 rounded-[2.5rem] p-8 hover:bg-blue-50 transition-all group shadow-sm"
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-6 flex-1">
@@ -247,13 +247,13 @@ const EmergencyContacts: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleEdit(contact)}
-                        className="bg-slate-800 text-blue-400 p-4 rounded-2xl hover:bg-slate-700 transition-all border border-white/5"
+                        className="bg-white text-blue-600 p-4 rounded-2xl hover:bg-slate-50 transition-all border border-slate-200 shadow-sm"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(contact.id)}
-                        className="bg-slate-800 text-rose-500 p-4 rounded-2xl hover:bg-slate-700 transition-all border border-white/5"
+                        className="bg-white text-rose-500 p-4 rounded-2xl hover:bg-slate-50 transition-all border border-slate-200 shadow-sm"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -266,7 +266,7 @@ const EmergencyContacts: React.FC = () => {
         </div>
 
         {/* Neural Safety Tips */}
-        <div className="mt-12 p-10 bg-slate-900/50 rounded-[3rem] border border-blue-500/10 text-left">
+        <div className="mt-12 p-10 bg-white/90 backdrop-blur-sm rounded-[3rem] border border-blue-100 text-left shadow-xl">
           <div className="flex items-center space-x-4 mb-8">
             <Shield className="w-6 h-6 text-blue-600" />
             <h3 className="text-xl font-black text-gray-800 tracking-tight italic uppercase">Safety Persistence</h3>
