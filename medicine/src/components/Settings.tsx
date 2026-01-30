@@ -352,22 +352,22 @@ const Settings: React.FC<SettingsProps> = ({
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 pb-10 border-b border-white/5">
-                    <div className="bg-slate-800/40 p-6 rounded-3xl group hover:bg-emerald-500/5 transition-colors cursor-pointer border border-white/5">
-                      <Activity className="text-slate-500 group-hover:text-emerald-500 mb-4 transition-colors" />
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Height (cm)</label>
+                    <div className="bg-slate-100 p-6 rounded-3xl group hover:bg-blue-50 transition-colors cursor-pointer border border-slate-200 shadow-sm">
+                      <Activity className="text-gray-400 group-hover:text-blue-500 mb-4 transition-colors" />
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Height (cm)</label>
                       <input
                         type="number"
-                        className="bg-transparent text-xl font-black text-white outline-none w-full"
+                        className="bg-transparent text-xl font-black text-gray-800 outline-none w-full placeholder-gray-400"
                         value={profile.height}
                         onChange={(e) => setProfile({ ...profile, height: e.target.value })}
                       />
                     </div>
-                    <div className="bg-slate-800/40 p-6 rounded-3xl group hover:bg-emerald-500/5 transition-colors cursor-pointer border border-white/5">
-                      <Droplet className="text-slate-500 group-hover:text-emerald-500 mb-4 transition-colors" />
-                      <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1 block">Weight (kg)</label>
+                    <div className="bg-slate-100 p-6 rounded-3xl group hover:bg-blue-50 transition-colors cursor-pointer border border-slate-200 shadow-sm">
+                      <Droplet className="text-gray-400 group-hover:text-blue-500 mb-4 transition-colors" />
+                      <label className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1 block">Weight (kg)</label>
                       <input
                         type="number"
-                        className="bg-transparent text-xl font-black text-white outline-none w-full"
+                        className="bg-transparent text-xl font-black text-gray-800 outline-none w-full placeholder-gray-400"
                         value={profile.weight}
                         onChange={(e) => setProfile({ ...profile, weight: e.target.value })}
                       />
