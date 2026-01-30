@@ -174,10 +174,10 @@ const Settings: React.FC<SettingsProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-green-50 to-emerald-50 relative overflow-hidden pb-32">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 relative overflow-hidden pb-32">
       {/* Decorative background components */}
-      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-emerald-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
-      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
+      <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-blue-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 animate-blob"></div>
+      <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-indigo-500/5 rounded-full mix-blend-screen filter blur-3xl opacity-50 translate-y-1/2 -translate-x-1/2 animate-blob animation-delay-2000"></div>
 
       <div className="max-w-6xl mx-auto px-6 py-12 relative z-10">
         <div className="mb-12 text-left">
@@ -188,7 +188,7 @@ const Settings: React.FC<SettingsProps> = ({
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Enhanced Navigation Sidebar */}
           <div className="lg:col-span-4 space-y-6">
-            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-emerald-100 rounded-3xl p-4 space-y-2">
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-blue-100 rounded-3xl p-4 space-y-2">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -197,13 +197,13 @@ const Settings: React.FC<SettingsProps> = ({
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`w-full group flex items-start space-x-4 px-4 py-4 rounded-3xl transition-all duration-300 ${isActive
-                      ? 'bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-xl shadow-emerald-500/30'
-                      : 'text-gray-700 hover:bg-emerald-50 hover:text-gray-900'
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-xl shadow-blue-500/30'
+                      : 'text-gray-700 hover:bg-blue-50 hover:text-gray-900'
                       }`}
                   >
-                    <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-white/20' : 'bg-emerald-100 group-hover:bg-emerald-200'
+                    <div className={`p-2.5 rounded-2xl transition-colors duration-300 ${isActive ? 'bg-white/20' : 'bg-blue-100 group-hover:bg-blue-200'
                       }`}>
-                      <Icon size={20} className={isActive ? 'text-white' : 'text-emerald-700'} />
+                      <Icon size={20} className={isActive ? 'text-white' : 'text-blue-700'} />
                     </div>
                     <div className="text-left">
                       <p className="font-bold text-sm tracking-tight">{tab.name}</p>
@@ -229,10 +229,10 @@ const Settings: React.FC<SettingsProps> = ({
             </div>
 
             {/* Quick Status Card */}
-            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-emerald-100 rounded-3xl p-6 text-gray-800">
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-blue-100 rounded-3xl p-6 text-gray-800">
               <div className="flex items-center space-x-3 mb-4">
-                <div className="p-2 bg-emerald-100 rounded-xl">
-                  <Shield size={18} className="text-emerald-600" />
+                <div className="p-2 bg-blue-100 rounded-xl">
+                  <Shield size={18} className="text-blue-600" />
                 </div>
                 <p className="text-xs font-bold uppercase tracking-widest text-gray-600">Security Pulse</p>
               </div>
@@ -253,7 +253,7 @@ const Settings: React.FC<SettingsProps> = ({
 
           {/* Main Workspace Area */}
           <div className="lg:col-span-8">
-            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-emerald-100 rounded-3xl p-10 min-h-[600px]">
+            <div className="bg-white/90 backdrop-blur-sm shadow-xl border border-blue-100 rounded-3xl p-10 min-h-[600px]">
               {/* Profile Tab Workspace */}
               {activeTab === 'profile' && (
                 <div className="space-y-10 animate-fade-in text-left">
