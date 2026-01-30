@@ -176,6 +176,14 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
               <Bell className="w-6 h-6 text-gray-700" />
               <span className="absolute top-2 right-2 w-3 h-3 bg-rose-500 rounded-full border-2 border-white animate-pulse"></span>
             </button>
+            <button
+              onClick={() => onNavigate && onNavigate('settings')}
+              className="relative p-1 bg-white rounded-xl shadow-md hover:shadow-lg transition-all border border-blue-100 group overflow-hidden"
+            >
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform">
+                {patientName.charAt(0).toUpperCase()}
+              </div>
+            </button>
           </div>
         </div>
 
