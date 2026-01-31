@@ -20,7 +20,9 @@ import {
   Smartphone,
   Bluetooth,
   Wifi,
-  Radio
+  Radio,
+  X,
+  Sparkles
 } from 'lucide-react';
 import { useBluetooth } from '../lib/BluetoothContext';
 
@@ -673,16 +675,106 @@ const Settings: React.FC<SettingsProps> = ({
                 </div>
               )}
 
-              {/* Subscription placeholder */}
+              {/* Subscription Plans Grid */}
               {activeTab === 'subscription' && (
-                <div className="space-y-10 animate-fade-in py-10 text-center">
-                  <div className="inline-flex items-center justify-center p-6 bg-emerald-50 border border-emerald-100 rounded-[3rem] mb-6 shadow-sm">
-                    <Heart size={64} className="text-emerald-500 fill-emerald-500" />
+                <div className="space-y-10 animate-fade-in py-6">
+                  <div className="text-center mb-10">
+                    <h2 className="text-3xl font-black text-slate-900 tracking-tight mb-2">Health Platform Plans</h2>
+                    <p className="text-slate-600 font-medium">Choose the level of care that fits your lifestyle</p>
                   </div>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tight">You're on our <span className="text-emerald-500 italic">Elite</span> Plan</h2>
-                  <p className="text-slate-600 max-w-sm mx-auto font-medium">Enjoy unlimited AI analysis, priority support, and real-time medical insights.</p>
-                  <div className="pt-10 flex justify-center">
-                    <button className="btn-secondary px-10 bg-gray-100 text-slate-800 border border-gray-200 hover:bg-gray-200">Manage Billing</button>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {/* Free Plan */}
+                    <div className="bg-white border-2 border-slate-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all flex flex-col group">
+                      <div className="p-4 bg-slate-50 rounded-2xl w-fit mb-6 group-hover:bg-slate-100 transition-colors">
+                        <Activity size={24} className="text-slate-400" />
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900 mb-2">Free</h3>
+                      <p className="text-3xl font-black text-slate-900 mb-6">$0<span className="text-sm text-slate-400 font-bold ml-1">/mo</span></p>
+
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex items-center space-x-3 text-sm text-slate-600 font-medium">
+                          <Shield size={16} className="text-emerald-500" />
+                          <span>Basic Monitoring</span>
+                        </li>
+                        <li className="flex items-center space-x-3 text-sm text-slate-600 font-medium">
+                          <Shield size={16} className="text-emerald-500" />
+                          <span>Emergency Contacts</span>
+                        </li>
+                        <li className="flex items-center space-x-3 text-sm text-slate-400 font-medium opacity-50">
+                          <X size={16} className="text-slate-300" />
+                          <span>Bluetooth Vitals</span>
+                        </li>
+                      </ul>
+
+                      <button className="w-full py-4 rounded-2xl bg-slate-100 text-slate-400 font-black text-xs uppercase tracking-widest cursor-not-allowed">
+                        Current Tier
+                      </button>
+                    </div>
+
+                    {/* Pro Plan */}
+                    <div className="bg-white border-2 border-blue-100 rounded-[2.5rem] p-8 shadow-sm hover:shadow-xl transition-all flex flex-col relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 bg-blue-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-tighter">Recommended</div>
+                      <div className="p-4 bg-blue-50 rounded-2xl w-fit mb-6 group-hover:bg-blue-100 transition-colors">
+                        <Smartphone size={24} className="text-blue-600" />
+                      </div>
+                      <h3 className="text-xl font-black text-slate-900 mb-2">Pro</h3>
+                      <p className="text-3xl font-black text-slate-900 mb-6">$12<span className="text-sm text-slate-400 font-bold ml-1">/mo</span></p>
+
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex items-center space-x-3 text-sm text-slate-600 font-medium">
+                          <Shield size={16} className="text-emerald-500" />
+                          <span>Real-time Bluetooth</span>
+                        </li>
+                        <li className="flex items-center space-x-3 text-sm text-slate-600 font-medium">
+                          <Shield size={16} className="text-emerald-500" />
+                          <span>AI Chat Assistant</span>
+                        </li>
+                        <li className="flex items-center space-x-3 text-sm text-slate-600 font-medium">
+                          <Shield size={16} className="text-emerald-500" />
+                          <span>Personalized Goals</span>
+                        </li>
+                      </ul>
+
+                      <button className="w-full py-4 rounded-2xl bg-blue-600 text-white font-black text-xs uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all">
+                        Upgrade Now
+                      </button>
+                    </div>
+
+                    {/* Elite Plan */}
+                    <div className="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-[2.5rem] p-8 shadow-2xl flex flex-col relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 bg-emerald-500 text-white text-[10px] font-black px-4 py-1.5 rounded-bl-2xl uppercase tracking-tighter shadow-lg">Active</div>
+                      <Sparkles className="absolute -bottom-4 -right-4 w-32 h-32 opacity-10 text-emerald-400 rotate-12" />
+                      <div className="p-4 bg-white/10 rounded-2xl w-fit mb-6">
+                        <Heart size={24} className="text-emerald-400" />
+                      </div>
+                      <h3 className="text-xl font-black text-white mb-2">Elite</h3>
+                      <p className="text-3xl font-black text-white mb-6">$29<span className="text-sm text-slate-400 font-bold ml-1">/mo</span></p>
+
+                      <ul className="space-y-4 mb-8 flex-1">
+                        <li className="flex items-center space-x-3 text-sm text-slate-200 font-medium">
+                          <Shield size={16} className="text-emerald-400" />
+                          <span>Priority Report Analysis</span>
+                        </li>
+                        <li className="flex items-center space-x-3 text-sm text-slate-200 font-medium">
+                          <Shield size={16} className="text-emerald-400" />
+                          <span>Medical Network Access</span>
+                        </li>
+                        <li className="flex items-center space-x-3 text-sm text-slate-200 font-medium">
+                          <Shield size={16} className="text-emerald-400" />
+                          <span>24/7 Premium Support</span>
+                        </li>
+                      </ul>
+
+                      <button className="w-full py-4 rounded-2xl bg-white text-slate-900 font-black text-xs uppercase tracking-widest shadow-xl hover:bg-gray-100 transition-all">
+                        In Progress
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="pt-10 flex flex-col items-center">
+                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4 text-center">Your billing is managed via encrypted Stripe gateway</p>
+                    <button className="btn-secondary px-10 bg-white shadow-md border border-slate-200 hover:border-blue-400 transition-all">Manage Previous Invoices</button>
                   </div>
                 </div>
               )}
