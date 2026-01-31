@@ -536,36 +536,6 @@ const Settings: React.FC<SettingsProps> = ({
                       </div>
                     </div>
 
-                    {/* Legacy Integration List */}
-                    <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 shadow-inner group">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="p-3 bg-white rounded-2xl shadow-sm">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Google_Fit_icon_2018.svg" alt="Google Fit" className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-slate-900 leading-none">Google Fit</h4>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Cloud Sync</p>
-                          </div>
-                        </div>
-                        <span className="text-[9px] font-black uppercase text-slate-400 bg-gray-200 px-3 py-1.5 rounded-full tracking-widest">Queued</span>
-                      </div>
-                    </div>
-
-                    <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 shadow-inner group">
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-4">
-                          <div className="p-3 bg-white rounded-2xl shadow-sm">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Apple_Health_icon.svg" alt="Apple Health" className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <h4 className="font-bold text-slate-900 leading-none">Apple Health</h4>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Cloud Sync</p>
-                          </div>
-                        </div>
-                        <span className="text-[9px] font-black uppercase text-slate-400 bg-gray-200 px-3 py-1.5 rounded-full tracking-widest">Queued</span>
-                      </div>
-                    </div>
                   </div>
                 </div>
               )}
