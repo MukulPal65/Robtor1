@@ -48,17 +48,46 @@ class BluetoothService {
         if (!this.device) throw new Error('No device selected. Please pair a device first.');
 
         this.onDataCallback = onData;
+
+        // Pre-connect Cleanup: Ensure any existing connection is cleared
+        try {
+            if (this.device.gatt?.connected) {
+                console.log('Cleaning up existing GATT connection...');
+                await this.device.gatt.disconnect();
+                await new Promise(resolve => setTimeout(resolve, 500)); // Cool-down
+            }
+        } catch (e) {
+            console.warn('Cleanup failed, proceeding anyway:', e);
+        }
+
         console.log(`Connecting to GATT Server on: ${this.device.name || 'Unnamed Device'}...`);
 
-        try {
-            this.server = await this.device.gatt?.connect() || null;
-            if (!this.server) {
-                throw new Error('Failed to establish GATT server connection.');
+        let attempts = 0;
+        const maxRetries = 3;
+        let lastError: any = null;
+
+        while (attempts < maxRetries) {
+            try {
+                this.server = await this.device.gatt?.connect() || null;
+                if (!this.server) {
+                    throw new Error('GATT server returned null.');
+                }
+                console.log(`GATT Server connected successfully on attempt ${attempts + 1}.`);
+                break; // Success!
+            } catch (error: any) {
+                attempts++;
+                lastError = error;
+                console.warn(`Connection attempt ${attempts} failed:`, error.message);
+                if (attempts < maxRetries) {
+                    console.log('Retrying in 1.5 seconds...');
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
             }
-            console.log('GATT Server connected successfully.');
-        } catch (error: any) {
-            console.error('GATT Connection Error:', error);
-            throw new Error(`Connection failed: ${error.message || 'Check if device is too far or already connected elsewhere.'}`);
+        }
+
+        if (!this.server || !this.device.gatt?.connected) {
+            console.error('Final GATT Connection Error:', lastError);
+            throw new Error(`Connection failed after ${maxRetries} attempts. Hint: Restart Bluetooth on your phone and try again.`);
         }
 
         if (this.server) {

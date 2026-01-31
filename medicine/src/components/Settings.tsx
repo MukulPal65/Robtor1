@@ -436,6 +436,7 @@ const Settings: React.FC<SettingsProps> = ({
                           <li>Keep watch screen <strong>ON</strong> while scanning</li>
                           <li>Turn phone Bluetooth **OFF and ON**</li>
                           <li>Ensure watch is **NOT connected** to any other app (like Da Fit)</li>
+                          <li>Restart the watch if connection fails repeatedly</li>
                         </ul>
                       </div>
                     </div>
