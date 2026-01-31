@@ -437,6 +437,7 @@ const Settings: React.FC<SettingsProps> = ({
                           <li>Turn phone Bluetooth **OFF and ON**</li>
                           <li>Ensure watch is **NOT connected** to any other app (like Da Fit)</li>
                           <li>Restart the watch if connection fails repeatedly</li>
+                          <li className="text-blue-700 font-bold">Open the Heart Rate app on your watch to start streaming</li>
                         </ul>
                       </div>
                     </div>
@@ -462,7 +463,9 @@ const Settings: React.FC<SettingsProps> = ({
                           {btData?.connected && (
                             <div className="flex items-center space-x-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100">
                               <Radio size={14} className="animate-pulse" />
-                              <span className="text-[10px] font-black uppercase tracking-widest">Signal: Excellent</span>
+                              <span className="text-[10px] font-black uppercase tracking-widest">
+                                {btData.heartRate > 0 ? 'Signal: Excellent' : 'Status: Syncing Data...'}
+                              </span>
                             </div>
                           )}
                         </div>

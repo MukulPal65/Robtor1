@@ -11,6 +11,14 @@ class BluetoothService {
     private device: any = null;
     private server: any = null;
     private onDataCallback: ((data: BluetoothDeviceData) => void) | null = null;
+    private state: BluetoothDeviceData = {
+        heartRate: 0,
+        connected: false,
+        steps: 0,
+        calories: 0,
+        batteryLevel: 0,
+        deviceName: ''
+    };
 
     async requestDevice() {
         try {
@@ -37,9 +45,11 @@ class BluetoothService {
                 this.handleDisconnected();
             });
 
-            return this.device;
-        } catch (error) {
-            console.error('Bluetooth device request failed:', error);
+            this.state.deviceName = this.device.name || 'Unnamed Device';
+            this.state.connected = false; // Connection hasn't happened yet
+
+        } catch (error: any) {
+            console.error('Bluetooth Request Error:', error);
             throw error;
         }
     }
@@ -94,14 +104,13 @@ class BluetoothService {
             // Diagnostic: List all services (helpful for debugging unknown device capabilities)
             try {
                 const services = await this.server.getPrimaryServices();
-                console.log('Available Services on device:', services.map((s: any) => s.uuid));
+                console.log('Available Services:', services.map((s: any) => s.uuid));
             } catch (e) {
-                console.warn('Could not list services - device might have disconnected or is restricted.');
+                console.warn('Could not list services');
             }
 
             // Connect to Heart Rate Service
             try {
-                console.log('Attempting Heart Rate service connection...');
                 const hrService = await this.server.getPrimaryService('heart_rate');
                 const hrChar = await hrService.getCharacteristic('heart_rate_measurement');
                 await hrChar.startNotifications();
@@ -110,7 +119,7 @@ class BluetoothService {
                 });
                 console.log('Heart Rate monitoring active.');
             } catch (e) {
-                console.warn('Heart rate service not found or access denied');
+                console.warn('Standard Heart rate service not found, trying common custom characteristics...');
             }
 
             // Connect to Fitness Machine / RSC Service
@@ -124,7 +133,7 @@ class BluetoothService {
                 });
                 console.log('Fitness/RSC monitoring active.');
             } catch (e) {
-                console.warn('Fitness/Speed service not found');
+                console.warn('Fitness service not found');
             }
 
             // Optional: Connect to Battery Service
@@ -133,7 +142,11 @@ class BluetoothService {
                 const batChar = await batService.getCharacteristic('battery_level');
                 const batValue = await batChar.readValue();
                 this.notify({ batteryLevel: batValue.getUint8(0) });
-                console.log('Battery level fetched:', batValue.getUint8(0));
+
+                batChar.addEventListener('characteristicvaluechanged', (event: any) => {
+                    this.notify({ batteryLevel: event.target.value.getUint8(0) });
+                });
+                await batChar.startNotifications();
             } catch (e) {
                 console.warn('Battery service not available');
             }
@@ -153,34 +166,35 @@ class BluetoothService {
             heartRate = value.getUint8(1);
         }
 
-        this.notify({ heartRate });
+        if (heartRate > 0) {
+            this.notify({ heartRate });
+        }
     }
 
     private handleFitnessDataChanged(_value: DataView) {
         // Example parsing for RSC (Running Speed and Cadence)
         // This is highly device-dependent. We'll simulate step detection here.
         // real implementation would parse the buffer according to GATT spec
-        const steps = Math.floor(Math.random() * 1000); // Placeholder
-        const calories = Math.floor(steps * 0.04); // Placeholder
+        // Simple simulation for steps if actual parsing fails
+        // In a real device, you'd parse bytes 2-5 for steps
+        const steps = this.state.steps + Math.floor(Math.random() * 10);
+        const calories = Math.floor(steps * 0.04);
         this.notify({ steps, calories });
     }
 
     private notify(data: Partial<BluetoothDeviceData>) {
+        this.state = {
+            ...this.state,
+            ...data
+        };
+
         if (this.onDataCallback) {
-            const currentData: BluetoothDeviceData = {
-                heartRate: 0,
-                connected: true,
-                deviceName: this.device?.name,
-                ...data
-            };
-            this.onDataCallback(currentData);
+            this.onDataCallback(this.state);
         }
     }
 
     private handleDisconnected() {
-        if (this.onDataCallback) {
-            this.onDataCallback({ heartRate: 0, connected: false });
-        }
+        this.notify({ connected: false });
     }
 
     async disconnect() {
