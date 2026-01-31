@@ -25,6 +25,7 @@ import { HealthService, HealthMetric } from '../services/healthService';
 import { ReportService, Report } from '../services/reportService';
 import { RecommendationService, PersonalizedRecommendation } from '../services/recommendationService';
 import { RiskAnalysisService } from '../services/riskAnalysisService';
+import { useBluetooth } from '../lib/BluetoothContext';
 
 interface DashboardProps {
   patientName?: string;
@@ -39,6 +40,9 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
   const [recommendations, setRecommendations] = useState<PersonalizedRecommendation | null>(null);
   const [riskAnalysis, setRiskAnalysis] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  // Bluetooth State
+  const { btData } = useBluetooth();
 
   // Modal states
   const [showAddMedication, setShowAddMedication] = useState(false);
@@ -85,10 +89,10 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
   const stepsGoal = 10000;
   const waterGoal = 8;
 
-  const stepsToday = todayMetric?.steps || 9234;
-  const heartRateToday = todayMetric?.heart_rate || 72;
+  const stepsToday = btData?.connected ? (btData.steps || 0) : (todayMetric?.steps || 9234);
+  const heartRateToday = btData?.connected ? (btData.heartRate || 0) : (todayMetric?.heart_rate || 72);
   const sleepToday = todayMetric?.sleep_hours || 7.5;
-  const caloriesBurnedToday = Math.round(stepsToday * 0.04) || 2300;
+  const caloriesBurnedToday = btData?.connected ? (btData.calories || 0) : (Math.round(stepsToday * 0.04) || 2300);
 
   const stepsProgress = Math.min((stepsToday / stepsGoal) * 100, 100);
   const waterIntake = 6; // To be connected to water service if available
@@ -202,11 +206,13 @@ const Dashboard: React.FC<DashboardProps> = ({ patientName = 'User', onNavigate 
           <div className="bg-gradient-to-br from-red-500 to-pink-600 rounded-2xl p-4 text-white shadow-lg hover:shadow-xl transition-all">
             <div className="flex items-center justify-between mb-2">
               <Heart className="w-8 h-8 opacity-90" />
-              <span className="text-sm font-semibold bg-white/20 px-2 py-1 rounded-full">Normal</span>
+              <span className={`text-sm font-semibold bg-white/20 px-2 py-1 rounded-full ${btData?.connected ? 'animate-pulse' : ''}`}>
+                {btData?.connected ? 'LIVE' : 'Normal'}
+              </span>
             </div>
             <h3 className="text-sm opacity-90 mb-1">Heart Rate</h3>
             <p className="text-3xl font-bold">{heartRateToday} <span className="text-lg">bpm</span></p>
-            <p className="text-xs opacity-80 mt-1">Resting: 65 bpm</p>
+            <p className="text-xs opacity-80 mt-1">{btData?.connected ? 'Real-time via Bluetooth' : 'Resting: 65 bpm'}</p>
           </div>
 
           <div className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl p-4 text-white shadow-lg hover:shadow-xl transition-all">

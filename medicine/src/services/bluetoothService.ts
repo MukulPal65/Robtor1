@@ -8,13 +8,13 @@ export interface BluetoothDeviceData {
 }
 
 class BluetoothService {
-    private device: BluetoothDevice | null = null;
-    private server: BluetoothRemoteGATTServer | null = null;
+    private device: any = null;
+    private server: any = null;
     private onDataCallback: ((data: BluetoothDeviceData) => void) | null = null;
 
     async requestDevice() {
         try {
-            this.device = await navigator.bluetooth.requestDevice({
+            this.device = await (navigator as any).bluetooth.requestDevice({
                 filters: [
                     { services: ['heart_rate'] },
                     { services: ['running_speed_and_cadence'] },

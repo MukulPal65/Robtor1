@@ -22,7 +22,7 @@ import {
   Wifi,
   Radio
 } from 'lucide-react';
-import { bluetoothService, BluetoothDeviceData } from '../services/bluetoothService';
+import { useBluetooth } from '../lib/BluetoothContext';
 
 interface SettingsProps {
   patientName?: string;
@@ -82,35 +82,23 @@ const Settings: React.FC<SettingsProps> = ({
     marketingEmails: false,
   });
 
-  // Bluetooth State
-  const [isScanning, setIsScanning] = useState(false);
-  const [btData, setBtData] = useState<BluetoothDeviceData | null>(null);
+  // Bluetooth State from Context
+  const { btData, isScanning, connect, disconnect } = useBluetooth();
 
   const handleBluetoothConnect = async () => {
     try {
-      setIsScanning(true);
-      await bluetoothService.requestDevice();
-      await bluetoothService.connect((data) => {
-        setBtData(data);
-        if (data.connected) {
-          setProfile(prev => ({ ...prev, has_wearable: true }));
-        }
-      });
+      await connect();
       alert('Device paired successfully! Vitals are now live.');
     } catch (error: any) {
       if (error.name !== 'NotFoundError') {
         alert('Bluetooth error: ' + error.message);
       }
-    } finally {
-      setIsScanning(false);
     }
   };
 
   const handleBluetoothDisconnect = async () => {
     try {
-      await bluetoothService.disconnect();
-      setBtData(null);
-      setProfile(prev => ({ ...prev, has_wearable: false }));
+      await disconnect();
       alert('Device disconnected.');
     } catch (error: any) {
       alert('Error disconnecting: ' + error.message);

@@ -14,6 +14,7 @@ import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import APITestPanel from './components/APITestPanel';
 import Navbar from './components/Navbar';
+import { BluetoothProvider } from './lib/BluetoothContext';
 
 type View = 'splash' | 'login' | 'signup' | 'onboarding' | 'dashboard' | 'chat' | 'report' | 'symptom' | 'settings' | 'emergency' | 'privacy' | 'terms' | 'apitest';
 
@@ -173,10 +174,12 @@ function App() {
   };
 
   return (
-    <div className="relative">
-      {renderView()}
-      <Navbar isAuthenticated={isAuthenticated} currentView={currentView} setCurrentView={setCurrentView} />
-    </div>
+    <BluetoothProvider>
+      <div className="relative">
+        {renderView()}
+        <Navbar isAuthenticated={isAuthenticated} currentView={currentView} setCurrentView={setCurrentView} />
+      </div>
+    </BluetoothProvider>
   );
 }
 
