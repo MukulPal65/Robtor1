@@ -21,7 +21,15 @@ class BluetoothService {
                     'running_speed_and_cadence',
                     'battery_service',
                     'device_information',
-                    0x1826 // Fitness Machine Service
+                    'generic_access',
+                    'generic_attribute',
+                    'fitness_machine',
+                    0x1826, // Fitness Machine Service
+                    0x180D, // Heart Rate
+                    0x180F, // Battery Service
+                    0x180A, // Device Information
+                    0xFFE0, // Common Custom Serial
+                    0xfee7  // Broadcom/Common
                 ]
             });
 

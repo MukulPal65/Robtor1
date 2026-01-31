@@ -427,6 +427,19 @@ const Settings: React.FC<SettingsProps> = ({
                     <h2 className="text-2xl font-black text-slate-900 tracking-tight">Health Devices</h2>
                     <p className="text-slate-500 text-sm mt-1">Connect wearables to sync vitals automatically</p>
                   </div>
+                  <div className="bg-blue-50/50 border border-blue-100 rounded-3xl p-6 mb-8">
+                    <div className="flex items-start space-x-3">
+                      <Shield size={18} className="text-blue-600 mt-0.5" />
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900 mb-1">Watch not showing up?</h4>
+                        <ul className="text-xs text-slate-600 space-y-1 ml-4 list-disc">
+                          <li>Keep watch screen <strong>ON</strong> while scanning</li>
+                          <li>Turn phone Bluetooth **OFF and ON**</li>
+                          <li>Ensure watch is **NOT connected** to any other app (like Da Fit)</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {/* Web Bluetooth Integration Card */}
