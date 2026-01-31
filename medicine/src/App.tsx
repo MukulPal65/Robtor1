@@ -13,10 +13,11 @@ import EmergencyContacts from './components/EmergencyContacts';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
 import APITestPanel from './components/APITestPanel';
+import HealthTrends from './components/HealthTrends';
 import Navbar from './components/Navbar';
 import { BluetoothProvider } from './lib/BluetoothContext';
 
-type View = 'splash' | 'login' | 'signup' | 'onboarding' | 'dashboard' | 'chat' | 'report' | 'symptom' | 'settings' | 'emergency' | 'privacy' | 'terms' | 'apitest';
+type View = 'splash' | 'login' | 'signup' | 'onboarding' | 'dashboard' | 'chat' | 'report' | 'symptom' | 'trends' | 'settings' | 'emergency' | 'privacy' | 'terms' | 'apitest';
 
 function App() {
   const [currentView, setCurrentView] = useState<View>('splash');
@@ -160,6 +161,8 @@ function App() {
         return <SymptomChecker />;
       case 'settings':
         return <Settings patientName={patientData?.fullName} onLogout={handleLogout} onUpdate={handleDashboardRefresh} />;
+      case 'trends':
+        return <HealthTrends onBack={() => setCurrentView('dashboard')} />;
       case 'emergency':
         return <EmergencyContacts />;
       case 'privacy':

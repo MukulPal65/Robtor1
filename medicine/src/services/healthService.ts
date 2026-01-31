@@ -64,6 +64,49 @@ export const HealthService = {
         return data as HealthMetric | null;
     },
 
+    // Get metrics for the last 30 days
+    async getMonthlyMetrics() {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return [];
+
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const dateStr = thirtyDaysAgo.toISOString().split('T')[0];
+
+        const { data, error } = await supabase
+            .from('health_metrics')
+            .select('*')
+            .eq('user_id', user.id)
+            .gte('date', dateStr)
+            .order('date', { ascending: true });
+
+        if (error) {
+            console.error('Error fetching monthly metrics:', error);
+            return [];
+        }
+        return data as HealthMetric[];
+    },
+
+    // Get simple trend insights
+    async getTrendInsights() {
+        const weekly = await this.getWeeklyMetrics();
+        if (weekly.length < 2) return null;
+
+        const currentSteps = weekly[weekly.length - 1].steps;
+        const prevSteps = weekly[weekly.length - 2].steps;
+        const stepChange = prevSteps === 0 ? 0 : ((currentSteps - prevSteps) / prevSteps) * 100;
+
+        const currentHR = weekly[weekly.length - 1].heart_rate;
+        const prevHR = weekly[weekly.length - 2].heart_rate;
+        const hrChange = prevHR === 0 ? 0 : ((currentHR - prevHR) / prevHR) * 100;
+
+        return {
+            stepChange: Math.round(stepChange),
+            hrChange: Math.round(hrChange),
+            status: stepChange > 0 ? 'improving' : 'declining'
+        };
+    },
+
     // Add or update today's metric
     async upsertMetric(metric: Partial<HealthMetric>) {
         const { data: { user } } = await supabase.auth.getUser();

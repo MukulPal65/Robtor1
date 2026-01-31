@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, FileText, MessageSquare, Activity, PhoneCall, Settings, LucideIcon } from 'lucide-react';
+import { Home, FileText, MessageSquare, Activity, PhoneCall, Settings, LucideIcon, TrendingUp } from 'lucide-react';
 
 type View =
   | 'splash'
@@ -10,6 +10,7 @@ type View =
   | 'chat'
   | 'report'
   | 'symptom'
+  | 'trends'
   | 'settings'
   | 'emergency'
   | 'privacy'
@@ -40,6 +41,7 @@ const Navbar: React.FC<Props> = ({ isAuthenticated, currentView, setCurrentView 
     { key: 'home', view: 'dashboard', label: 'Home', icon: Home, color: 'text-emerald-500' },
     { key: 'report', view: 'report', label: 'Reports', icon: FileText, color: 'text-blue-500' },
     { key: 'chat', view: 'chat', label: 'Chat', icon: MessageSquare, color: 'text-indigo-500' },
+    { key: 'trends', view: 'trends', label: 'Trends', icon: TrendingUp, color: 'text-blue-500' },
     { key: 'symptom', view: 'symptom', label: 'Analysis', icon: Activity, color: 'text-teal-500' },
     { key: 'emergency', view: 'emergency', label: 'SOS', icon: PhoneCall, color: 'text-rose-500' },
     { key: 'settings', view: 'settings', label: 'Settings', icon: Settings, color: 'text-slate-500' },
