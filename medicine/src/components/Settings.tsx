@@ -17,8 +17,12 @@ import {
   Trash2,
   Download,
   Heart,
-  Smartphone
+  Smartphone,
+  Bluetooth,
+  Wifi,
+  Radio
 } from 'lucide-react';
+import { bluetoothService, BluetoothDeviceData } from '../services/bluetoothService';
 
 interface SettingsProps {
   patientName?: string;
@@ -77,6 +81,41 @@ const Settings: React.FC<SettingsProps> = ({
     weeklyReports: true,
     marketingEmails: false,
   });
+
+  // Bluetooth State
+  const [isScanning, setIsScanning] = useState(false);
+  const [btData, setBtData] = useState<BluetoothDeviceData | null>(null);
+
+  const handleBluetoothConnect = async () => {
+    try {
+      setIsScanning(true);
+      await bluetoothService.requestDevice();
+      await bluetoothService.connect((data) => {
+        setBtData(data);
+        if (data.connected) {
+          setProfile(prev => ({ ...prev, has_wearable: true }));
+        }
+      });
+      alert('Device paired successfully! Vitals are now live.');
+    } catch (error: any) {
+      if (error.name !== 'NotFoundError') {
+        alert('Bluetooth error: ' + error.message);
+      }
+    } finally {
+      setIsScanning(false);
+    }
+  };
+
+  const handleBluetoothDisconnect = async () => {
+    try {
+      await bluetoothService.disconnect();
+      setBtData(null);
+      setProfile(prev => ({ ...prev, has_wearable: false }));
+      alert('Device disconnected.');
+    } catch (error: any) {
+      alert('Error disconnecting: ' + error.message);
+    }
+  };
 
   useEffect(() => {
     fetchProfile();
@@ -395,67 +434,148 @@ const Settings: React.FC<SettingsProps> = ({
                     <p className="text-slate-500 text-sm mt-1">Connect wearables to sync vitals automatically</p>
                   </div>
 
-                  <div className="space-y-6">
-                    {/* Primary Connection Card - Wearable */}
-                    <div className="p-8 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 rounded-[2.5rem] relative overflow-hidden border border-purple-500/10 group">
-                      <div className="absolute top-0 right-0 p-8 opacity-20 group-hover:opacity-40 transition-opacity">
-                        <Smartphone size={120} className="text-purple-500" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Web Bluetooth Integration Card */}
+                    <div className="p-8 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 rounded-[2.5rem] relative overflow-hidden border border-blue-500/10 group col-span-1 md:col-span-2">
+                      <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:opacity-20 transition-opacity">
+                        <Bluetooth size={120} className="text-blue-500" />
                       </div>
                       <div className="relative z-10">
-                        <div className="flex items-center space-x-4 mb-6">
-                          <div className={`p-4 rounded-2xl ${profile.has_wearable ? 'bg-purple-600 text-white' : 'bg-gray-100 text-slate-400'}`}>
-                            <Activity size={32} />
+                        <div className="flex items-center justify-between mb-8">
+                          <div className="flex items-center space-x-4">
+                            <div className={`p-4 rounded-2xl ${btData?.connected ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/40' : 'bg-gray-100 text-slate-400'}`}>
+                              <Bluetooth size={32} className={btData?.connected ? 'animate-pulse' : ''} />
+                            </div>
+                            <div>
+                              <h3 className="text-lg font-black text-slate-900">Web Bluetooth Bridge</h3>
+                              <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Real-time hardware sync</p>
+                            </div>
                           </div>
-                          <div>
-                            <h3 className="text-lg font-black text-slate-900">Universal Health Bridge</h3>
-                            <p className="text-sm font-medium text-purple-600">
-                              {profile.has_wearable ? 'Device Connected & Syncing' : 'No Device Connected'}
-                            </p>
-                          </div>
+                          {btData?.connected && (
+                            <div className="flex items-center space-x-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl border border-emerald-100">
+                              <Radio size={14} className="animate-pulse" />
+                              <span className="text-[10px] font-black uppercase tracking-widest">Signal: Excellent</span>
+                            </div>
+                          )}
                         </div>
 
-                        <p className="text-slate-600 text-sm mb-8 max-w-lg leading-relaxed">
-                          Connect any supported fitness tracker (Fitbit, Garmin, Apple Watch) or health app (Google Fit, Apple Health) to unlock AI-powered insights on your dashboard.
-                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                          <div>
+                            <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                              Connect medical-grade Bluetooth LE devices (Heart Rate Monitors, Pulse Oximeters) directly to your browser for real-time AI processing.
+                            </p>
+                            <ul className="space-y-2">
+                              {['Secure GATT Streaming', 'Standard Medical Protocols', 'Zero Latency Analysis'].map(feature => (
+                                <li key={feature} className="flex items-center text-[10px] font-black uppercase tracking-widest text-blue-600">
+                                  <div className="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2" />
+                                  {feature}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
 
-                        <div className="flex items-center space-x-4">
+                          {btData?.connected && (
+                            <div className="bg-white/50 backdrop-blur-md rounded-3xl p-6 border border-blue-100 flex items-center justify-center">
+                              <div className="text-center">
+                                <div className="space-y-6">
+                                  <div className="text-center">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2">Live Heart Rate</p>
+                                    <div className="flex items-baseline justify-center space-x-2">
+                                      <span className="text-5xl font-black text-slate-900 tabular-nums animate-pulse">{btData.heartRate || 0}</span>
+                                      <span className="text-sm font-black text-rose-500 uppercase">BPM</span>
+                                    </div>
+                                  </div>
+
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-white/40 p-4 rounded-2xl border border-blue-50/50 text-center">
+                                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Steps Today</p>
+                                      <div className="flex items-baseline justify-center space-x-1">
+                                        <span className="text-2xl font-black text-slate-900">{btData.steps || 0}</span>
+                                        <span className="text-[10px] font-bold text-blue-500 uppercase">Steps</span>
+                                      </div>
+                                    </div>
+                                    <div className="bg-white/40 p-4 rounded-2xl border border-blue-50/50 text-center">
+                                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Energy Burn</p>
+                                      <div className="flex items-baseline justify-center space-x-1">
+                                        <span className="text-2xl font-black text-slate-900">{btData.calories || 0}</span>
+                                        <span className="text-[10px] font-bold text-orange-500 uppercase">Kcal</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <div className="mt-4 flex items-center justify-center space-x-4">
+                                  <div className="flex items-center space-x-1">
+                                    <Droplet size={12} className="text-blue-500" />
+                                    <span className="text-[10px] font-bold text-slate-600">{btData.batteryLevel || '--'}% Batt</span>
+                                  </div>
+                                  <div className="w-1 h-1 bg-slate-300 rounded-full" />
+                                  <span className="text-[10px] font-bold text-slate-600 truncate max-w-[100px]">{btData.deviceName}</span>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap gap-4">
                           <button
-                            onClick={() => setProfile({ ...profile, has_wearable: !profile.has_wearable })}
-                            className={`px-8 py-3 rounded-2xl font-bold shadow-lg transition-all transform hover:-translate-y-1 ${profile.has_wearable ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-purple-600 text-white hover:bg-purple-700'}`}
+                            onClick={btData?.connected ? handleBluetoothDisconnect : handleBluetoothConnect}
+                            disabled={isScanning}
+                            className={`px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.15em] shadow-xl transition-all transform hover:-translate-y-1 active:scale-95 flex items-center ${btData?.connected
+                              ? 'bg-white text-rose-600 border-2 border-rose-100 hover:bg-rose-50 hover:border-rose-200'
+                              : 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-blue-500/20 hover:shadow-blue-500/40'}`}
                           >
-                            {profile.has_wearable ? 'Disconnect Device' : 'Connect New Device'}
+                            {isScanning ? (
+                              <>
+                                <Loader size={16} className="animate-spin mr-3" />
+                                Negotiating...
+                              </>
+                            ) : (
+                              <>
+                                <Bluetooth size={16} className="mr-3" />
+                                {btData?.connected ? 'Terminate Session' : 'Initialize Discovery'}
+                              </>
+                            )}
                           </button>
-                          {profile.has_wearable && (
-                            <div className="flex items-center space-x-2 text-emerald-600 bg-emerald-50 px-4 py-2 rounded-xl">
-                              <Activity size={16} className="animate-pulse" />
-                              <span className="text-xs font-bold uppercase tracking-wider">Live</span>
+
+                          {!btData?.connected && (
+                            <div className="flex items-center space-x-3 px-4 py-4 bg-amber-50 rounded-2xl border border-amber-100">
+                              <Wifi size={14} className="text-amber-600" />
+                              <span className="text-[10px] font-bold text-amber-800 uppercase tracking-widest leading-none">HTTPS Context Required for hardware access</span>
                             </div>
                           )}
                         </div>
                       </div>
                     </div>
 
-                    {/* Other Integrations List */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 opacity-80">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-white rounded-lg shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Google_Fit_icon_2018.svg" alt="Google Fit" className="w-5 h-5" /></div>
-                            <span className="font-bold text-slate-900">Google Fit</span>
+                    {/* Legacy Integration List */}
+                    <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 shadow-inner group">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="p-3 bg-white rounded-2xl shadow-sm">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Google_Fit_icon_2018.svg" alt="Google Fit" className="w-6 h-6" />
                           </div>
-                          <span className="text-[10px] font-black uppercase text-slate-400 bg-gray-200 px-2 py-1 rounded">Coming Soon</span>
+                          <div>
+                            <h4 className="font-bold text-slate-900 leading-none">Google Fit</h4>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Cloud Sync</p>
+                          </div>
                         </div>
-                        <p className="text-xs text-slate-500">Direct integration for Android users.</p>
+                        <span className="text-[9px] font-black uppercase text-slate-400 bg-gray-200 px-3 py-1.5 rounded-full tracking-widest">Queued</span>
                       </div>
-                      <div className="p-6 bg-gray-50 rounded-3xl border border-gray-100 opacity-80">
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center space-x-3">
-                            <div className="p-2 bg-white rounded-lg shadow-sm"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Apple_Health_icon.svg" alt="Apple Health" className="w-5 h-5" /></div>
-                            <span className="font-bold text-slate-900">Apple Health</span>
+                    </div>
+
+                    <div className="p-8 bg-gray-50 rounded-[2.5rem] border border-gray-100 shadow-inner group">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-4">
+                          <div className="p-3 bg-white rounded-2xl shadow-sm">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/c/c4/Apple_Health_icon.svg" alt="Apple Health" className="w-6 h-6" />
                           </div>
-                          <span className="text-[10px] font-black uppercase text-slate-400 bg-gray-200 px-2 py-1 rounded">Coming Soon</span>
+                          <div>
+                            <h4 className="font-bold text-slate-900 leading-none">Apple Health</h4>
+                            <p className="text-[10px] font-bold text-slate-400 uppercase mt-1">Cloud Sync</p>
+                          </div>
                         </div>
-                        <p className="text-xs text-slate-500">Direct integration for iOS users.</p>
+                        <span className="text-[9px] font-black uppercase text-slate-400 bg-gray-200 px-3 py-1.5 rounded-full tracking-widest">Queued</span>
                       </div>
                     </div>
                   </div>

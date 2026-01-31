@@ -1,5 +1,7 @@
 export interface BluetoothDeviceData {
     heartRate: number;
+    steps?: number;
+    calories?: number;
     batteryLevel?: number;
     deviceName?: string;
     connected: boolean;
@@ -13,8 +15,12 @@ class BluetoothService {
     async requestDevice() {
         try {
             this.device = await navigator.bluetooth.requestDevice({
-                filters: [{ services: ['heart_rate'] }],
-                optionalServices: ['battery_service']
+                filters: [
+                    { services: ['heart_rate'] },
+                    { services: ['running_speed_and_cadence'] },
+                    { services: [0x1826] } // Fitness Machine Service
+                ],
+                optionalServices: ['battery_service', 'device_information']
             });
 
             this.device.addEventListener('gattserverdisconnected', () => {
@@ -36,30 +42,46 @@ class BluetoothService {
 
         if (this.server) {
             // Connect to Heart Rate Service
-            const hrService = await this.server.getPrimaryService('heart_rate');
-            const hrChar = await hrService.getCharacteristic('heart_rate_measurement');
+            try {
+                const hrService = await this.server.getPrimaryService('heart_rate');
+                const hrChar = await hrService.getCharacteristic('heart_rate_measurement');
+                await hrChar.startNotifications();
+                hrChar.addEventListener('characteristicvaluechanged', (event: any) => {
+                    this.handleHeartRateChanged(event.target.value);
+                });
+            } catch (e) {
+                console.warn('Heart rate service not found');
+            }
 
-            await hrChar.startNotifications();
-            hrChar.addEventListener('characteristicvaluechanged', (event: any) => {
-                this.handleHeartRateChanged(event.target.value);
-            });
+            // Connect to Fitness Machine / RSC Service (Simulated for steps/calories)
+            try {
+                // This is a placeholder for actual fitness data parsing
+                // Most devices use custom GATT characteristics for steps/calories if not standard
+                const fitnessService = await this.server.getPrimaryService('running_speed_and_cadence');
+                const fitnessChar = await fitnessService.getCharacteristic('rsc_measurement');
+                await fitnessChar.startNotifications();
+                fitnessChar.addEventListener('characteristicvaluechanged', (event: any) => {
+                    this.handleFitnessDataChanged(event.target.value);
+                });
+            } catch (e) {
+                console.warn('Fitness service not found');
+            }
 
             // Optional: Connect to Battery Service
             try {
                 const batService = await this.server.getPrimaryService('battery_service');
                 const batChar = await batService.getCharacteristic('battery_level');
                 const batValue = await batChar.readValue();
-                this.notify(0, batValue.getUint8(0));
+                this.notify({ batteryLevel: batValue.getUint8(0) });
             } catch (e) {
                 console.warn('Battery service not available');
             }
 
-            this.notify(0);
+            this.notify({ connected: true });
         }
     }
 
     private handleHeartRateChanged(value: DataView) {
-        // Standard GATT Heart Rate measurement format
         const flags = value.getUint8(0);
         const rate16Bits = flags & 0x1;
         let heartRate: number;
@@ -70,17 +92,27 @@ class BluetoothService {
             heartRate = value.getUint8(1);
         }
 
-        this.notify(heartRate);
+        this.notify({ heartRate });
     }
 
-    private notify(heartRate: number, batteryLevel?: number) {
+    private handleFitnessDataChanged(_value: DataView) {
+        // Example parsing for RSC (Running Speed and Cadence)
+        // This is highly device-dependent. We'll simulate step detection here.
+        // real implementation would parse the buffer according to GATT spec
+        const steps = Math.floor(Math.random() * 1000); // Placeholder
+        const calories = Math.floor(steps * 0.04); // Placeholder
+        this.notify({ steps, calories });
+    }
+
+    private notify(data: Partial<BluetoothDeviceData>) {
         if (this.onDataCallback) {
-            this.onDataCallback({
-                heartRate,
-                batteryLevel,
+            const currentData: BluetoothDeviceData = {
+                heartRate: 0,
+                connected: true,
                 deviceName: this.device?.name,
-                connected: true
-            });
+                ...data
+            };
+            this.onDataCallback(currentData);
         }
     }
 
