@@ -37,36 +37,57 @@ class BluetoothService {
     }
 
     async connect(onData: (data: BluetoothDeviceData) => void) {
-        if (!this.device) throw new Error('No device selected');
+        if (!this.device) throw new Error('No device selected. Please pair a device first.');
 
         this.onDataCallback = onData;
-        this.server = await this.device.gatt?.connect() || null;
+        console.log(`Connecting to GATT Server on: ${this.device.name || 'Unnamed Device'}...`);
+
+        try {
+            this.server = await this.device.gatt?.connect() || null;
+            if (!this.server) {
+                throw new Error('Failed to establish GATT server connection.');
+            }
+            console.log('GATT Server connected successfully.');
+        } catch (error: any) {
+            console.error('GATT Connection Error:', error);
+            throw new Error(`Connection failed: ${error.message || 'Check if device is too far or already connected elsewhere.'}`);
+        }
 
         if (this.server) {
+            // Diagnostic: List all services (helpful for debugging unknown device capabilities)
+            try {
+                const services = await this.server.getPrimaryServices();
+                console.log('Available Services on device:', services.map((s: any) => s.uuid));
+            } catch (e) {
+                console.warn('Could not list services - device might have disconnected or is restricted.');
+            }
+
             // Connect to Heart Rate Service
             try {
+                console.log('Attempting Heart Rate service connection...');
                 const hrService = await this.server.getPrimaryService('heart_rate');
                 const hrChar = await hrService.getCharacteristic('heart_rate_measurement');
                 await hrChar.startNotifications();
                 hrChar.addEventListener('characteristicvaluechanged', (event: any) => {
                     this.handleHeartRateChanged(event.target.value);
                 });
+                console.log('Heart Rate monitoring active.');
             } catch (e) {
-                console.warn('Heart rate service not found');
+                console.warn('Heart rate service not found or access denied');
             }
 
-            // Connect to Fitness Machine / RSC Service (Simulated for steps/calories)
+            // Connect to Fitness Machine / RSC Service
             try {
-                // This is a placeholder for actual fitness data parsing
-                // Most devices use custom GATT characteristics for steps/calories if not standard
+                console.log('Attempting Fitness/RSC service connection...');
                 const fitnessService = await this.server.getPrimaryService('running_speed_and_cadence');
                 const fitnessChar = await fitnessService.getCharacteristic('rsc_measurement');
                 await fitnessChar.startNotifications();
                 fitnessChar.addEventListener('characteristicvaluechanged', (event: any) => {
                     this.handleFitnessDataChanged(event.target.value);
                 });
+                console.log('Fitness/RSC monitoring active.');
             } catch (e) {
-                console.warn('Fitness service not found');
+                console.warn('Fitness/Speed service not found');
             }
 
             // Optional: Connect to Battery Service
@@ -75,6 +96,7 @@ class BluetoothService {
                 const batChar = await batService.getCharacteristic('battery_level');
                 const batValue = await batChar.readValue();
                 this.notify({ batteryLevel: batValue.getUint8(0) });
+                console.log('Battery level fetched:', batValue.getUint8(0));
             } catch (e) {
                 console.warn('Battery service not available');
             }

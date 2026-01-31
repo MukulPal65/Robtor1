@@ -90,11 +90,15 @@ const Settings: React.FC<SettingsProps> = ({
   const handleBluetoothConnect = async () => {
     try {
       await connect();
-      alert('Device paired successfully! Vitals are now live.');
+      alert('Device paired successfully! ✨ Vitals are now live.');
     } catch (error: any) {
-      if (error.name !== 'NotFoundError') {
-        alert('Bluetooth error: ' + error.message);
+      if (error.name === 'NotFoundError' || error.message?.includes('User cancelled')) {
+        console.log('User cancelled the pairing dialog.');
+        return;
       }
+
+      console.error('Handled Bluetooth error:', error);
+      alert('Connection Error: ' + (error.message || 'Unknown error occurred. Please check mobile bluetooth settings and try again.'));
     }
   };
 
