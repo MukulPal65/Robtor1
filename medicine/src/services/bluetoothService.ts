@@ -15,12 +15,14 @@ class BluetoothService {
     async requestDevice() {
         try {
             this.device = await (navigator as any).bluetooth.requestDevice({
-                filters: [
-                    { services: ['heart_rate'] },
-                    { services: ['running_speed_and_cadence'] },
-                    { services: [0x1826] } // Fitness Machine Service
-                ],
-                optionalServices: ['battery_service', 'device_information']
+                acceptAllDevices: true,
+                optionalServices: [
+                    'heart_rate',
+                    'running_speed_and_cadence',
+                    'battery_service',
+                    'device_information',
+                    0x1826 // Fitness Machine Service
+                ]
             });
 
             this.device.addEventListener('gattserverdisconnected', () => {
