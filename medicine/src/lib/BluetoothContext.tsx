@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { bluetoothService, BluetoothDeviceData } from '../services/bluetoothService';
+import { HealthService } from '../services/healthService';
 
 interface BluetoothContextType {
     btData: BluetoothDeviceData | null;
@@ -21,7 +22,6 @@ export const BluetoothProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         if (btData?.connected && (btData.heartRate > 0 || btData.steps || btData.calories)) {
             syncInterval = setInterval(async () => {
                 try {
-                    const { HealthService } = await import('../services/healthService');
                     await HealthService.upsertMetric({
                         heart_rate: btData.heartRate,
                         steps: btData.steps || 0
