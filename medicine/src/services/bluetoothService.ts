@@ -177,7 +177,7 @@ class BluetoothService {
         // real implementation would parse the buffer according to GATT spec
         // Simple simulation for steps if actual parsing fails
         // In a real device, you'd parse bytes 2-5 for steps
-        const steps = this.state.steps + Math.floor(Math.random() * 10);
+        const steps = (this.state.steps || 0) + Math.floor(Math.random() * 10);
         const calories = Math.floor(steps * 0.04);
         this.notify({ steps, calories });
     }
