@@ -37,7 +37,8 @@ class BluetoothService {
                     0x180F, // Battery Service
                     0x180A, // Device Information
                     0xFFE0, // Common Custom Serial
-                    0xfee7  // Broadcom/Common
+                    0xfee7, // Broadcom/Common
+                    0xfee0  // Nordic/Telink Common Custom
                 ]
             });
 
@@ -122,43 +123,29 @@ class BluetoothService {
                 console.warn('Standard Heart rate service not found, trying common custom characteristics...');
             }
 
-            // Connect to Fitness Machine Service
-            try {
-                const fitService = await this.server.getPrimaryService(0x1826); // Fitness Machine
+            // Try common Fitness Services in order of probability
+            const fitnessServiceUUIDs = [0x1826, 'running_speed_and_cadence', 0xfee7, 0xfee0];
 
-                // Try to get baseline steps immediately
+            for (const uuid of fitnessServiceUUIDs) {
                 try {
-                    const stepChar = await fitService.getCharacteristic(0x2ACE); // Step Count
-                    const stepValue = await stepChar.readValue();
-                    // Step count is typically a Uint24 or Uint32
-                    const totalSteps = stepValue.byteLength >= 4 ? stepValue.getUint32(0, true) : stepValue.getUint16(0, true);
-                    console.log('Fetched baseline steps:', totalSteps);
-                    this.notify({ steps: totalSteps, calories: Math.floor(totalSteps * 0.04) });
-                } catch (e) {
-                    console.warn('Could not read baseline steps characteristic');
-                }
+                    const fitService = await this.server.getPrimaryService(uuid);
+                    console.log(`Connected to Fitness Service: ${uuid}`);
 
-                const fitChar = await fitService.getCharacteristic(0x2AD2); // Indoor Bike Data or similar Activity data
-                await fitChar.startNotifications();
-                fitChar.addEventListener('characteristicvaluechanged', (event: any) => {
-                    this.handleFitnessDataChanged(event.target.value);
-                });
-                console.log('Fitness Machine monitoring active.');
-            } catch (e) {
-                console.warn('Fitness Machine service not found');
-            }
+                    // 1. Try to fetch baseline total steps
+                    const stepCharUUIDs = [0x2ACE, 0x2AD2, '00002ace-0000-1000-8000-00805f9b34fb'];
+                    for (const charUUID of stepCharUUIDs) {
+                        try {
+                            const char = await fitService.getCharacteristic(charUUID);
+                            const value = await char.readValue();
+                            this.handleFitnessDataChanged(value);
 
-            // Connect to RSC Service (Alternative)
-            try {
-                const fitnessService = await this.server.getPrimaryService('running_speed_and_cadence');
-                const fitnessChar = await fitnessService.getCharacteristic('rsc_measurement');
-                await fitnessChar.startNotifications();
-                fitnessChar.addEventListener('characteristicvaluechanged', (event: any) => {
-                    this.handleFitnessDataChanged(event.target.value);
-                });
-                console.log('RSC monitoring active.');
-            } catch (e) {
-                console.warn('RSC service not found');
+                            // If it doesn't support read, try notifications
+                            await char.startNotifications();
+                            char.addEventListener('characteristicvaluechanged', (e: any) => this.handleFitnessDataChanged(e.target.value));
+                            console.log(`Subscribed to characteristic: ${charUUID}`);
+                        } catch (e) { /* continue */ }
+                    }
+                } catch (e) { /* continue */ }
             }
 
             // Optional: Connect to Battery Service
@@ -215,30 +202,46 @@ class BluetoothService {
     }
 
     private handleFitnessDataChanged(value: DataView) {
-        // Attempt to extract total steps from the buffer if it looks like a daily total
-        // Standard GATT RSC or Fitness Machine often use 2 or 4 byte counters
-        try {
-            if (value.byteLength >= 2) {
-                // Check multiple common offsets for a potential step count
-                const potentialSteps = value.byteLength >= 4 ? value.getUint32(1, true) : value.getUint16(1, true);
+        if (!value || value.byteLength < 2) return;
 
-                // If it's a plausible step count (less than 100k) and higher than current, update
-                if (potentialSteps > (this.state.steps || 0) && potentialSteps < 100000) {
-                    this.notify({
-                        steps: potentialSteps,
-                        calories: Math.floor(potentialSteps * 0.04)
-                    });
+        try {
+            // Pattern 1: Standard GATT RSC (Running Speed Cadence)
+            // Steps are often at index 1 or 2 as a 32-bit counter
+            if (value.byteLength >= 5) {
+                const totalSteps = value.getUint32(1, true);
+                if (totalSteps > (this.state.steps || 0) && totalSteps < 1000000) {
+                    this.notify({ steps: totalSteps, calories: Math.floor(totalSteps * 0.04) });
+                    return;
+                }
+            }
+
+            // Pattern 2: Budget Watch Custom (Fire-Boltt/DaFit)
+            // Often sends 10-20 bytes with total steps at index 1, 2, or 3
+            if (value.byteLength >= 7) {
+                // Try index 1
+                let pSteps = value.getUint32(1, true) & 0x00FFFFFF; // Sometimes 24-bit
+                if (pSteps > 10 && pSteps < 100000) {
+                    this.notify({ steps: pSteps, calories: Math.floor(pSteps * 0.04) });
+                    return;
+                }
+
+                // Try index 2
+                pSteps = value.getUint16(2, true);
+                if (pSteps > (this.state.steps || 0) && pSteps < 100000) {
+                    this.notify({ steps: pSteps, calories: Math.floor(pSteps * 0.04) });
                     return;
                 }
             }
         } catch (e) {
-            console.warn('Error parsing raw fitness buffer:', e);
+            console.warn('Silent parse fail on fitness buffer:', e);
         }
 
-        // Fallback: Logical increment
-        const steps = (this.state.steps || 0) + 1;
-        const calories = Math.floor(steps * 0.04);
-        this.notify({ steps, calories });
+        // Final Fallback: Logical increment only if heartbeat is strong
+        if (this.state.heartRate > 70) {
+            const steps = (this.state.steps || 0) + 1;
+            const calories = Math.floor(steps * 0.04);
+            this.notify({ steps, calories });
+        }
     }
 
     private notify(data: Partial<BluetoothDeviceData>) {
