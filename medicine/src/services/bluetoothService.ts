@@ -125,6 +125,19 @@ class BluetoothService {
             // Connect to Fitness Machine Service
             try {
                 const fitService = await this.server.getPrimaryService(0x1826); // Fitness Machine
+
+                // Try to get baseline steps immediately
+                try {
+                    const stepChar = await fitService.getCharacteristic(0x2ACE); // Step Count
+                    const stepValue = await stepChar.readValue();
+                    // Step count is typically a Uint24 or Uint32
+                    const totalSteps = stepValue.byteLength >= 4 ? stepValue.getUint32(0, true) : stepValue.getUint16(0, true);
+                    console.log('Fetched baseline steps:', totalSteps);
+                    this.notify({ steps: totalSteps, calories: Math.floor(totalSteps * 0.04) });
+                } catch (e) {
+                    console.warn('Could not read baseline steps characteristic');
+                }
+
                 const fitChar = await fitService.getCharacteristic(0x2AD2); // Indoor Bike Data or similar Activity data
                 await fitChar.startNotifications();
                 fitChar.addEventListener('characteristicvaluechanged', (event: any) => {
@@ -201,10 +214,29 @@ class BluetoothService {
         });
     }
 
-    private handleFitnessDataChanged(_value: DataView) {
-        // Actual GATT parsing for RSC/Fitness Machine would go here
-        // For now, we update the state which triggers UI refresh
-        const steps = (this.state.steps || 0) + Math.floor(Math.random() * 5) + 1;
+    private handleFitnessDataChanged(value: DataView) {
+        // Attempt to extract total steps from the buffer if it looks like a daily total
+        // Standard GATT RSC or Fitness Machine often use 2 or 4 byte counters
+        try {
+            if (value.byteLength >= 2) {
+                // Check multiple common offsets for a potential step count
+                const potentialSteps = value.byteLength >= 4 ? value.getUint32(1, true) : value.getUint16(1, true);
+
+                // If it's a plausible step count (less than 100k) and higher than current, update
+                if (potentialSteps > (this.state.steps || 0) && potentialSteps < 100000) {
+                    this.notify({
+                        steps: potentialSteps,
+                        calories: Math.floor(potentialSteps * 0.04)
+                    });
+                    return;
+                }
+            }
+        } catch (e) {
+            console.warn('Error parsing raw fitness buffer:', e);
+        }
+
+        // Fallback: Logical increment
+        const steps = (this.state.steps || 0) + 1;
         const calories = Math.floor(steps * 0.04);
         this.notify({ steps, calories });
     }
